@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Propuesta de valor**: Entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables.
 
-**Fase actual**: Fase 1 — Cimientos (setup inicial)
+**Fase actual**: Fase 2 — MVP funcional (pantallas 05 y 07 pendientes)
 
 ---
 
@@ -24,7 +24,13 @@ cycling-companion/
 │   └── api/          → Fastify 5 (TypeScript, Zod validation)
 ├── packages/
 │   └── shared/       → Types compartidos, validaciones Zod, constantes
-└── docs/             → Visión del producto, PRD, plan de agentes
+├── supabase/
+│   ├── migrations/   → Scripts SQL incrementales (001, 002, 003)
+│   └── seed*.sql     → Datos de prueba
+└── docs/
+    ├── specs/        → Especificaciones L1 (UX), L2 (técnico), L3 (issues)
+    ├── design/       → Mockups JSX de referencia (excluidos de git)
+    └── *.md          → Visión, PRD, agentes, design system, setup guides
 ```
 
 - **Base de datos**: Supabase (PostgreSQL + Auth + Storage + RLS)
@@ -142,7 +148,7 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 ### Al trabajar en nuevas features:
 1. Revisar el PRD (`docs/02-PRD.md`) para entender el contexto funcional
 2. Consultar `docs/DESIGN-SYSTEM.md` para implementar UI (pantallas, tokens, componentes, guía de conversión JSX→Tailwind)
-3. Los mockups JSX originales están en `docs/designs/` (excluidos de git) — usar `docs/DESIGN-SYSTEM.md` como referencia documentada
+3. Los mockups JSX originales están en `docs/design/` (excluidos de git) — usar `docs/DESIGN-SYSTEM.md` como referencia documentada
 4. Mantener consistencia con el tono y estructura del código existente
 5. No sobre-ingeniería: implementar solo lo necesario para la issue actual
 
@@ -158,6 +164,14 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 
 ---
 
+## Gotchas conocidos
+
+- `pnpm typecheck` falla actualmente por `apps/web/src/app/(app)/plan/page.tsx` que importa `./plan-content` (placeholder, pendiente de implementar en Fase 2). El build (`pnpm build`) sí pasa.
+- `activity_type` ENUM en DB usa 5 tipos de entrenamiento: `intervals`, `endurance`, `recovery`, `tempo`, `rest` (migración 003). No confundir con modalidad (outdoor/indoor).
+- Los mockups JSX en `docs/design/` están excluidos de git. Usar `docs/DESIGN-SYSTEM.md` como fuente de verdad documentada.
+
+---
+
 ## Documentos de Referencia
 
 | Documento | Ruta |
@@ -166,3 +180,6 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 | PRD completo (modelo de datos, endpoints, flujo IA) | `docs/02-PRD.md` |
 | Plan de agentes y desarrollo | `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md` |
 | Design system (pantallas, tokens, componentes, conversión JSX→Next.js) | `docs/DESIGN-SYSTEM.md` |
+| Especificaciones por pantalla (22 archivos L1/L2/L3) | `docs/specs/` |
+| Configuración Google OAuth | `docs/GOOGLE-OAUTH-SETUP.md` |
+| Configuración Supabase | `docs/SUPABASE-SETUP.md` |
