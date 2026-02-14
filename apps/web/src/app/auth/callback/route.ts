@@ -11,10 +11,6 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (error) {
-      console.error("[auth/callback] exchangeCodeForSession error:", error.message, error);
-    }
-
     if (!error) {
       const forwardedHost = request.headers.get("x-forwarded-host");
       const isLocalEnv = process.env.NODE_ENV === "development";
@@ -26,8 +22,6 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}${next}`);
       }
     }
-  } else {
-    console.error("[auth/callback] No code parameter in callback URL");
   }
 
   // Si hay error, redirigir a una página de error
