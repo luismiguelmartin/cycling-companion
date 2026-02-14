@@ -26,3 +26,5 @@ export {
   type ZoneDefinition,
   type CalculatedZone,
 } from "./constants/zones";
+export { ACTIVITY_FILTERS, type ActivityFilterKey } from "./constants/activity-filters";
+export { RPE_COLORS, getRPEColor } from "./constants/rpe";

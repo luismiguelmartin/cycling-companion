@@ -159,6 +159,35 @@ LoginScreen → (onLogin) → OnboardingScreen → (onComplete) → Pantalla con
 
 ---
 
+### Screen-04b: Importar Actividad (`ImportActivityPage`)
+**Ruta sugerida**: `/activities/import`
+**Fuente**: `screen-import-activity.jsx`
+
+| Elemento | Descripción | Datos |
+|----------|-------------|-------|
+| **Header** | Título "Importar actividad" + subtítulo descriptivo | — |
+| **Mode toggle** | Toggle inline con 2 opciones: Archivo .fit/.gpx (icono `Upload`) / Manual (icono `Edit3`) | Modo activo |
+| **FileDropZone** | Zona de carga con drag & drop. 3 estados: vacío (dashed border), dragging (accent border + fondo), con archivo (fondo verde + Check + nombre + botón "Quitar") | Archivo seleccionado |
+| **Preview datos archivo** | Grid 3 cols con datos a extraer (fecha, distancia, duración, potencia, FC, cadencia). Cada dato con icono + label + "Automático" o "Si disponible" | — |
+| **Datos adicionales (archivo)** | Campos opcionales post-carga: nombre actividad, tipo (select), RPE, notas | — |
+| **Formulario manual** | Card con info banner azul + sección obligatoria (nombre, fecha, tipo, duración h/m/s) + sección métricas opcionales (distancia, potencia, FC media, FC max, cadencia) + RPE + notas | FormData |
+| **RPEInput** | 10 barras clicables con colores por valor y alturas diferentes (activa 36px, inactiva 28px). Label semántico debajo (ej: "7/10 — Muy duro") | RPE 1-10 |
+| **ActionBar** | Botón "Cancelar" (secundario) + "Generar datos mock" (solo manual) + "Guardar actividad" (gradient naranja, disabled si no válido) | canSave |
+| **Toast de éxito** | Fixed bottom-right, fondo verde, "Actividad guardada correctamente" | Tras guardar |
+
+**Responsive**: Grid preview 3→2 cols en mobile. Campos de formulario apilados. Botones action bar con flex-wrap. Padding reducido en mobile.
+
+**Tokens de tema adicionales** (Importar Actividad):
+
+| Token | Dark | Light | Uso |
+|-------|------|-------|-----|
+| `successBg` | `rgba(34,197,94,0.08)` | `rgba(34,197,94,0.06)` | Fondo archivo cargado |
+| `successB` | `rgba(34,197,94,0.2)` | `rgba(34,197,94,0.25)` | Borde archivo cargado |
+| `dropBg` | `rgba(249,115,22,0.04)` | `rgba(249,115,22,0.03)` | Fondo zona drop activa |
+| `dropB` | `rgba(249,115,22,0.2)` | `rgba(249,115,22,0.25)` | Borde zona drop activa |
+
+---
+
 ### Screen-05: Planificación Semanal (`PlanPage`)
 **Ruta sugerida**: `/plan`
 
@@ -507,6 +536,60 @@ El tema se gestiona vía Context API (`Ctx`). Toggle en el sidebar.
 - Font: 14px, weight 500, color `t2`
 - Radius: 10px, padding: `10px 18px`
 
+#### FileDropZone
+```
+┌╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶┐
+╎        [Upload icon]          ╎
+╎   Arrastra tu archivo aquí    ╎
+╎   o haz clic para seleccionar ╎
+╎       [.FIT]  [.GPX]         ╎
+└╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶┘
+```
+- 3 estados: vacío (dashed `inB`), dragging (dashed `acc` + fondo `dropBg`), con archivo (fondo `successBg` + borde `successB`)
+- Vacío: icono Upload (26px) en contenedor 56×56 radius 16, titulo 15px bold, subtitulo 13px `t3`, badges extensión
+- Con archivo: Check verde + nombre + tamaño/extensión + botón "Quitar" rojo
+- Acepta: `.fit`, `.gpx`
+- Padding: 40px desktop, 28px mobile
+
+#### RPEInput (interactivo)
+```
+[1][2][3][4][5][6][7][8][9][10]
+ 7/10 — Muy duro
+```
+- 10 barras clicables, ancho `100%` cada una (flex grow), gap 4px
+- Altura: activa (n ≤ value) 36px, inactiva 28px. Radius 5px
+- Color por barra individual: 1-3 `#22c55e`, 4 `#84cc16`, 5-6 `#eab308`, 7-8 `#f97316`, 9-10 `#ef4444`
+- Número centrado: 10px, weight 700, blanco si activa, `t4` si inactiva
+- Label debajo: `{value}/10 — {nombre}`, color del valor, 12px weight 500
+- Diferente de RPEIndicator: éste es interactivo (onClick), aquél es solo visual
+- Nombres: Muy fácil, Fácil, Ligero, Moderado, Algo duro, Duro, Muy duro, Intenso, Máximo, Límite absoluto
+
+#### SelectField
+```
+┌──────────────────────────────┐
+│ Label              *         │
+│ ┌────────────────────────┐   │
+│ │ Opción seleccionada  ▾ │   │
+│ └────────────────────────┘   │
+└──────────────────────────────┘
+```
+- Select nativo con `appearance: none` + icono `ChevronDown` absoluto derecha
+- Label: 12px, weight 500, `t1`
+- Input: padding `10px 14px`, radius 9, fontSize 14, fondo `inBg`, borde `inB`
+- Mismo patrón visual que OnboardingField
+
+#### ImportModeToggle
+```
+┌─────────────────────────────────────────┐
+│ [📤 Archivo .fit/.gpx] [✏️ Manual]     │
+└─────────────────────────────────────────┘
+```
+- Container: inline-flex, gap 4, padding 4, radius 12, fondo `inBg`, borde `inB`
+- Opción activa: fondo `actBg`, borde `acc` al 30%, texto `acc`, weight 600
+- Opción inactiva: fondo transparente, borde transparente, texto `t2`, weight 400
+- Font: 13px, padding `9px 18px` desktop / `8px 14px` mobile
+- Iconos: Upload (15px) para archivo, Edit3 (15px) para manual
+
 ---
 
 ### 2.6 Iconos
@@ -525,6 +608,7 @@ Librería: **Lucide React**
 | Tema | `Sun` (claro), `Moon` (oscuro) |
 | Onboarding (pasos) | `User` (datos), `Heart` (rendimiento), `Target` (objetivo), `Check` (completado) |
 | Login/Auth | `Zap` (logo), `Activity` (empezar a entrenar) |
+| Importar actividad | `Upload`, `Edit3`, `FileText`, `Trash2`, `Check`, `AlertCircle`, `ChevronDown` |
 
 ---
 
