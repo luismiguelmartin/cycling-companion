@@ -112,7 +112,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
   const maxHrNumber = formData.max_hr ? parseInt(formData.max_hr) : null;
 
   return (
-    <div className="flex flex-col gap-5 p-4 md:p-6">
+    <div className="flex flex-col gap-5">
       {/* Page header */}
       <div className="flex items-center justify-between">
         <h1 className="text-[22px] font-bold text-[var(--text-primary)] md:text-[28px]">Perfil</h1>

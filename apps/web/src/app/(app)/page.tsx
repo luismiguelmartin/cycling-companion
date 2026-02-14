@@ -89,7 +89,7 @@ export default async function DashboardPage() {
       : "Sube tu primera actividad para empezar a recibir recomendaciones personalizadas. Cuantos más datos tenga, mejores serán mis consejos. 🚴‍♂️";
 
   return (
-    <div className="p-4 md:p-8">
+    <div>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-[22px] font-bold text-[var(--text-primary)] md:text-[26px]">
