@@ -15,16 +15,14 @@ export function LoginButton() {
 
     if (error) {
       console.error("Error al iniciar sesión con Google:", error.message);
-      alert("Error al iniciar sesión. Por favor, inténtalo de nuevo.");
     }
   };
 
   return (
     <button
       onClick={handleGoogleLogin}
-      className="flex w-full items-center justify-center gap-3 rounded-lg border border-slate-300 bg-white px-4 py-3 font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
+      className="flex w-full items-center justify-center gap-3 rounded-xl bg-white px-4 py-3.5 text-[15px] font-semibold text-gray-800 shadow-sm transition-[transform,box-shadow] duration-150 hover:-translate-y-px hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
     >
-      {/* Google Icon SVG */}
       <svg className="h-5 w-5" viewBox="0 0 24 24">
         <path
           fill="#4285F4"

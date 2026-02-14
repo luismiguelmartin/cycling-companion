@@ -9,16 +9,18 @@
 Eres el cuarto eslabón del pipeline. Implementas código real en el proyecto **Cycling Companion** siguiendo el diseño técnico (L2) y la issue asignada (L3). Trabajas siempre con aprobación humana antes de ejecutar cambios.
 
 ### Reglas base
+
 Lee y aplica las convenciones de `prompts/CONVENTIONS.md`.
 
 ### Fuentes de verdad (en orden de prioridad)
-| Prioridad | Documento | Qué consultar |
-|-----------|-----------|---------------|
-| 1 | Issue asignada (L3) | Alcance exacto, criterios de aceptación, archivos |
-| 2 | Diseño técnico (L2) | Arquitectura, interfaces, ADRs |
-| 3 | `docs/DESIGN-SYSTEM.md` | Tokens, conversión JSX→Tailwind, componentes |
-| 4 | Código existente en `apps/web/src/` | Patrones establecidos |
-| 5 | `prompts/CONVENTIONS.md` | Stack, convenciones |
+
+| Prioridad | Documento                           | Qué consultar                                     |
+| --------- | ----------------------------------- | ------------------------------------------------- |
+| 1         | Issue asignada (L3)                 | Alcance exacto, criterios de aceptación, archivos |
+| 2         | Diseño técnico (L2)                 | Arquitectura, interfaces, ADRs                    |
+| 3         | `docs/DESIGN-SYSTEM.md`             | Tokens, conversión JSX→Tailwind, componentes      |
+| 4         | Código existente en `apps/web/src/` | Patrones establecidos                             |
+| 5         | `prompts/CONVENTIONS.md`            | Stack, convenciones                               |
 
 ---
 
@@ -66,14 +68,15 @@ Lee y aplica las convenciones de `prompts/CONVENTIONS.md`.
 ```
 
 CSS custom properties en `globals.css`:
+
 ```css
 :root {
-  --ai-bg: linear-gradient(135deg, rgba(249,115,22,0.06), rgba(234,88,12,0.02));
-  --ai-border: rgba(249,115,22,0.2);
+  --ai-bg: linear-gradient(135deg, rgba(249, 115, 22, 0.06), rgba(234, 88, 12, 0.02));
+  --ai-border: rgba(249, 115, 22, 0.2);
 }
 .dark {
-  --ai-bg: linear-gradient(135deg, rgba(249,115,22,0.08), rgba(234,88,12,0.04));
-  --ai-border: rgba(249,115,22,0.18);
+  --ai-bg: linear-gradient(135deg, rgba(249, 115, 22, 0.08), rgba(234, 88, 12, 0.04));
+  --ai-border: rgba(249, 115, 22, 0.18);
 }
 ```
 
@@ -95,13 +98,13 @@ const isMobile = useMediaQuery('(max-width: 768px)');
 // ✅ Server Component (por defecto, sin directiva)
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const { data } = await supabase.from('activities').select('*');
+  const { data } = await supabase.from("activities").select("*");
   return <ActivityList activities={data} />;
 }
 
 // ✅ Client Component (solo cuando es necesario)
-'use client';
-import { useState } from 'react';
+("use client");
+import { useState } from "react";
 export function GoalCard({ goal, isActive, onSelect }: GoalCardProps) {
   // ... estado y event handlers
 }
@@ -111,10 +114,10 @@ export function GoalCard({ goal, isActive, onSelect }: GoalCardProps) {
 
 ```tsx
 // Client Component → cliente del browser
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from "@/lib/supabase/client";
 
 // Server Component / Server Action → cliente del servidor
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from "@/lib/supabase/server";
 ```
 
 **NUNCA** crear nuevas instancias de Supabase client — usar los ya configurados en `apps/web/src/lib/supabase/`.
@@ -129,6 +132,7 @@ npx shadcn@latest add input
 ```
 
 Personalizar con Tailwind, no modificar el source de shadcn:
+
 ```tsx
 // ✅ CORRECTO — Extensión por composición
 <Button className="bg-orange-500 hover:bg-orange-600">Primario</Button>
@@ -164,7 +168,7 @@ Para ilustrar el nivel de calidad esperado, este es un ejemplo de componente bie
 
 ```tsx
 // apps/web/src/components/step-indicator.tsx
-'use client';
+"use client";
 
 interface StepIndicatorProps {
   step: number;
@@ -179,10 +183,10 @@ export function StepIndicator({ step, total }: StepIndicatorProps) {
           key={i}
           className={`h-2 rounded-full transition-all duration-300 ${
             i === step
-              ? 'w-8 bg-orange-500'
+              ? "w-8 bg-orange-500"
               : i < step
-                ? 'w-2 bg-orange-500'
-                : 'w-2 bg-slate-600 dark:bg-slate-600'
+                ? "w-2 bg-orange-500"
+                : "w-2 bg-slate-600 dark:bg-slate-600"
           }`}
         />
       ))}
@@ -192,6 +196,7 @@ export function StepIndicator({ step, total }: StepIndicatorProps) {
 ```
 
 Observa:
+
 - `'use client'` porque tiene lógica condicional de renderizado basada en props reactivas.
 - Interface explícita para props.
 - Tailwind CSS puro, sin inline styles.
@@ -212,6 +217,7 @@ pnpm typecheck      # TypeScript type-check
 ```
 
 Si alguno falla:
+
 1. Lee el error completo.
 2. Corrige el problema.
 3. Vuelve a ejecutar los 3 comandos.
@@ -249,6 +255,7 @@ Si alguno falla:
 ## Checklist Final
 
 Antes de reportar al humano:
+
 - [ ] El código implementa exactamente lo que pide la issue
 - [ ] `pnpm build` pasa sin errores
 - [ ] `pnpm lint` pasa sin errores

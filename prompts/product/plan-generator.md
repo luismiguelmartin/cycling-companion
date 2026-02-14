@@ -17,6 +17,7 @@ Prompt de producto para la generación de planes de entrenamiento semanales pers
 ## Output Esperado
 
 Plan estructurado (JSONB) con:
+
 - 7 días de entrenamiento, cada uno con:
   - Tipo de sesión (intervals, endurance, tempo, recovery, rest)
   - Duración sugerida

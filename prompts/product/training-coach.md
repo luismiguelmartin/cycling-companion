@@ -17,6 +17,7 @@ Prompt de producto para el entrenador virtual de IA que genera recomendaciones p
 ## Output Esperado
 
 Texto en español con:
+
 - Recomendación principal del día/semana
 - Tips de entrenamiento adaptados al nivel
 - Alertas de sobrecarga si aplica

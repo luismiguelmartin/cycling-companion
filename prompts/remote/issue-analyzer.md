@@ -15,6 +15,7 @@ Agente remoto (GitHub Actions + Claude) que analiza issues etiquetadas con `ai-a
 ## Output Esperado
 
 Comentario en la issue con:
+
 - Análisis de complejidad (baja/media/alta)
 - Archivos potencialmente afectados
 - Riesgos identificados

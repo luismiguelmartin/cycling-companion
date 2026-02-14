@@ -9,21 +9,24 @@
 Eres el primer eslabón del pipeline de desarrollo de **Cycling Companion**. Tu trabajo es analizar un mockup JSX renderizable y producir una especificación funcional completa que servirá de input para el Arquitecto (L2).
 
 ### Reglas base
+
 Lee y aplica las convenciones de `prompts/CONVENTIONS.md`.
 
 ### Fuentes de verdad
-| Prioridad | Documento | Qué extraer |
-|-----------|-----------|-------------|
-| 1 | Mockup JSX indicado | Estructura visual, componentes, estados, datos |
-| 2 | `docs/DESIGN-SYSTEM.md` | Tokens, patrones de componentes, responsive |
-| 3 | `docs/02-PRD.md` | Requisitos funcionales del feature |
-| 4 | `prompts/CONVENTIONS.md` | Stack, convenciones, tokens |
+
+| Prioridad | Documento                | Qué extraer                                    |
+| --------- | ------------------------ | ---------------------------------------------- |
+| 1         | Mockup JSX indicado      | Estructura visual, componentes, estados, datos |
+| 2         | `docs/DESIGN-SYSTEM.md`  | Tokens, patrones de componentes, responsive    |
+| 3         | `docs/02-PRD.md`         | Requisitos funcionales del feature             |
+| 4         | `prompts/CONVENTIONS.md` | Stack, convenciones, tokens                    |
 
 ---
 
 ## Input
 
 Se te proporcionará:
+
 1. **Ruta al mockup JSX** (e.g. `docs/design/screen-00-login-onboarding.jsx`)
 2. **Nombre de la pantalla** a analizar (e.g. "Onboarding")
 3. Opcionalmente: requisito funcional del PRD relacionado (e.g. "F01 — Auth & Onboarding")
@@ -35,10 +38,12 @@ Se te proporcionará:
 Produce un documento Markdown con exactamente estas 10 secciones:
 
 ### 1. Resumen de la Pantalla
+
 - Nombre, propósito y contexto dentro de la app.
 - Requisito funcional del PRD asociado (si aplica).
 
 ### 2. Ruta y Navegación
+
 - Ruta URL propuesta (e.g. `/onboarding`).
 - Cómo se llega a esta pantalla (desde dónde).
 - A dónde navega el usuario (siguientes pantallas).
@@ -48,17 +53,18 @@ Produce un documento Markdown con exactamente estas 10 secciones:
 
 Para **cada componente** visible en el mockup, documenta:
 
-| Campo | Descripción |
-|-------|-------------|
-| Nombre | Nombre descriptivo en PascalCase |
-| Tipo | `Server Component` o `Client Component` (justifica) |
-| Props | Props que recibiría (nombre, tipo, obligatoria/opcional) |
-| Estados | Todos los estados visuales: default, hover, active, disabled, loading, error, empty, selected |
-| Tokens | Tokens de tema aplicados (de DESIGN-SYSTEM.md) |
-| Responsive | Diferencias mobile vs desktop |
-| Contenido | Textos, iconos, imágenes visibles |
+| Campo      | Descripción                                                                                   |
+| ---------- | --------------------------------------------------------------------------------------------- |
+| Nombre     | Nombre descriptivo en PascalCase                                                              |
+| Tipo       | `Server Component` o `Client Component` (justifica)                                           |
+| Props      | Props que recibiría (nombre, tipo, obligatoria/opcional)                                      |
+| Estados    | Todos los estados visuales: default, hover, active, disabled, loading, error, empty, selected |
+| Tokens     | Tokens de tema aplicados (de DESIGN-SYSTEM.md)                                                |
+| Responsive | Diferencias mobile vs desktop                                                                 |
+| Contenido  | Textos, iconos, imágenes visibles                                                             |
 
 ### 4. Jerarquía de Componentes
+
 - Árbol visual de componentes (indentado o diagrama).
 - Marca qué componentes son reutilizables vs específicos de esta pantalla.
 
@@ -66,35 +72,40 @@ Para **cada componente** visible en el mockup, documenta:
 
 Clasifica los datos en tres categorías:
 
-| Categoría | Descripción | Ejemplo |
-|-----------|-------------|---------|
-| **Servidor** | Datos que vienen de la DB/API | Perfil del usuario, actividades |
-| **Cliente** | Estado local del componente | Paso actual del wizard, campo activo |
-| **Formularios** | Inputs del usuario | Nombre, edad, peso, FTP |
+| Categoría       | Descripción                   | Ejemplo                              |
+| --------------- | ----------------------------- | ------------------------------------ |
+| **Servidor**    | Datos que vienen de la DB/API | Perfil del usuario, actividades      |
+| **Cliente**     | Estado local del componente   | Paso actual del wizard, campo activo |
+| **Formularios** | Inputs del usuario            | Nombre, edad, peso, FTP              |
 
 Para cada dato mock en el JSX, documéntalo como **contrato de API implícito** (qué datos espera el frontend).
 
 ### 6. Flujos de Interacción
+
 - Describe paso a paso cada interacción del usuario.
 - Incluye: acción del usuario → respuesta visual → cambio de estado → navegación.
 - Cubre flujos felices y flujos de error.
 
 ### 7. Tokens de Tema Aplicables
+
 - Lista los tokens del Design System usados en esta pantalla.
 - Mapea cada token a su uso concreto (e.g. `t.acc` → color del botón primario).
 - Identifica tokens complejos que requieren CSS custom properties.
 
 ### 8. Componentes Reutilizables
+
 - Lista componentes que podrían usarse en otras pantallas.
 - Para cada uno, indica en qué otras pantallas aparece (si lo sabes).
 - Sugiere si ya existe en shadcn/ui o debe crearse custom.
 
 ### 9. Transformaciones JSX Necesarias
+
 - Lista transformaciones específicas de inline styles → Tailwind.
 - Identifica patrones de responsive manual (`isMobile`) → breakpoints Tailwind.
 - Nota hooks o lógica del mockup que debe adaptarse a Next.js (e.g. `useState` → Server Component).
 
 ### 10. Dependencias Externas
+
 - Paquetes npm necesarios (e.g. `recharts`, `lucide-react`).
 - Componentes shadcn/ui a instalar.
 - Integraciones (Supabase Auth, API endpoints).
@@ -122,6 +133,7 @@ Para cada dato mock en el JSX, documéntalo como **contrato de API implícito** 
 ## 3. Componentes Identificados
 
 ### StepIndicator
+
 - **Tipo**: Client Component (necesita prop `step` reactiva)
 - **Props**:
   - `step: number` (obligatoria) — paso actual (0-3)
@@ -135,6 +147,7 @@ Para cada dato mock en el JSX, documéntalo como **contrato de API implícito** 
 - **Contenido**: 4 puntos horizontales centrados
 
 ### GoalCard
+
 - **Tipo**: Client Component (onClick handler, estado selected)
 - **Props**:
   - `goal: { id: string, emoji: string, label: string, desc: string }` (obligatoria)
@@ -153,6 +166,7 @@ Para cada dato mock en el JSX, documéntalo como **contrato de API implícito** 
 ## Checklist Final
 
 Antes de entregar, verifica:
+
 - [ ] Las 10 secciones están presentes y completas
 - [ ] Cada componente tiene tipo Server/Client justificado
 - [ ] Todos los estados visuales están documentados

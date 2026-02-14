@@ -1,3 +1,62 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  /* ===== Light theme (default) ===== */
+  :root {
+    /* Hero / Login background */
+    --hero-bg: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+
+    /* Glow effects */
+    --glow-orange: rgba(249, 115, 22, 0.15);
+    --glow-blue: rgba(59, 130, 246, 0.1);
+
+    /* AI coach box */
+    --ai-bg: rgba(249, 115, 22, 0.05);
+    --ai-border: rgba(249, 115, 22, 0.2);
+
+    /* Card */
+    --card-bg: #ffffff;
+    --card-border: rgba(0, 0, 0, 0.08);
+
+    /* Input */
+    --input-bg: #f8fafc;
+    --input-border: #e2e8f0;
+
+    /* Text */
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --text-inverse: #ffffff;
+
+    /* Surface */
+    --surface-bg: #ffffff;
+    --surface-elevated: #f8fafc;
+  }
+
+  /* ===== Dark theme ===== */
+  .dark {
+    --hero-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+
+    --glow-orange: rgba(249, 115, 22, 0.2);
+    --glow-blue: rgba(59, 130, 246, 0.15);
+
+    --ai-bg: rgba(249, 115, 22, 0.08);
+    --ai-border: rgba(249, 115, 22, 0.25);
+
+    --card-bg: rgba(30, 41, 59, 0.5);
+    --card-border: rgba(255, 255, 255, 0.08);
+
+    --input-bg: rgba(15, 23, 42, 0.5);
+    --input-border: rgba(255, 255, 255, 0.1);
+
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-inverse: #0f172a;
+
+    --surface-bg: #0f172a;
+    --surface-elevated: #1e293b;
+  }
+}

@@ -17,6 +17,7 @@ Prompt de producto para el análisis post-sesión de actividades de ciclismo. Ge
 ## Output Esperado
 
 Análisis estructurado (JSONB) con:
+
 - Resumen de la sesión
 - Evaluación del esfuerzo vs objetivo planificado
 - Puntos fuertes y áreas de mejora

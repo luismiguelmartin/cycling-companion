@@ -15,6 +15,7 @@ Agente remoto (GitHub Actions + Claude) que revisa automáticamente las PRs abie
 ## Output Esperado
 
 Comentario de review en la PR con:
+
 - Resumen de cambios
 - Verificación de convenciones de código
 - Detección de problemas de seguridad (RLS, secrets, inyección)

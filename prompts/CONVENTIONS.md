@@ -15,14 +15,14 @@ Este documento define las reglas compartidas por todos los agentes del pipeline.
 
 ## 2. Documentos de Referencia
 
-| Documento | Ruta | Contenido clave |
-|-----------|------|-----------------|
-| Visión del producto | `docs/01-PRODUCT-VISION.md` | Contexto, propuesta de valor, usuarios |
-| PRD | `docs/02-PRD.md` | Requisitos funcionales, modelo de datos, endpoints |
-| Plan de agentes | `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md` | Roles, fases, pipeline |
-| Design System | `docs/DESIGN-SYSTEM.md` | Tokens, componentes, conversión JSX→Tailwind |
-| Instrucciones de código | `CLAUDE.md` | Stack, comandos, convenciones |
-| Mockups JSX | `docs/design/*.jsx` | Fuente de verdad visual (no comiteados) |
+| Documento               | Ruta                                     | Contenido clave                                    |
+| ----------------------- | ---------------------------------------- | -------------------------------------------------- |
+| Visión del producto     | `docs/01-PRODUCT-VISION.md`              | Contexto, propuesta de valor, usuarios             |
+| PRD                     | `docs/02-PRD.md`                         | Requisitos funcionales, modelo de datos, endpoints |
+| Plan de agentes         | `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md` | Roles, fases, pipeline                             |
+| Design System           | `docs/DESIGN-SYSTEM.md`                  | Tokens, componentes, conversión JSX→Tailwind       |
+| Instrucciones de código | `CLAUDE.md`                              | Stack, comandos, convenciones                      |
+| Mockups JSX             | `docs/design/*.jsx`                      | Fuente de verdad visual (no comiteados)            |
 
 ---
 
@@ -82,28 +82,33 @@ components/
 ## 5. Reglas de Código
 
 ### TypeScript
+
 - `strict: true` — prohibido `any`.
 - Interfaces TypeScript explícitas para props de componentes.
 - Schemas Zod definidos una vez en `packages/shared`, reutilizados en web y API.
 
 ### React / Next.js
+
 - **App Router** (nunca Pages Router).
 - **Server Components por defecto** — solo `'use client'` cuando sea necesario (estado, efectos, eventos).
 - Nomenclatura: PascalCase para componentes, kebab-case para archivos.
 - Co-locación: `Button.tsx` + `Button.test.tsx` en la misma carpeta.
 
 ### Estilos
+
 - **Tailwind CSS** exclusivamente — nunca inline styles ni CSS modules.
 - **shadcn/ui** como base — personalizar con Tailwind antes de crear componentes desde cero.
 - Tema dark/light con clases `dark:` y CSS custom properties en `globals.css` para tokens complejos.
 - Mobile-first: diseñar para móvil primero, escalar con `md:`, `lg:`.
 
 ### API (Fastify)
+
 - Schema Zod en cada ruta para validación automática.
 - Manejo de errores consistente con códigos HTTP apropiados.
 - RLS en Supabase: **nunca desactivar**.
 
 ### Supabase — Patrones de Cliente
+
 - Client Components: `import { createClient } from '@/lib/supabase/client'`
 - Server Components / Actions: `import { createClient } from '@/lib/supabase/server'`
 - Middleware ya configurado en `apps/web/src/middleware.ts`.
@@ -114,17 +119,17 @@ components/
 
 Tabla de transformaciones principales (detalle en DESIGN-SYSTEM.md §6.2):
 
-| Patrón en mockup JSX | Conversión a Next.js + Tailwind |
-|-----------------------|----------------------------------|
-| `style={{ padding: 12 }}` | `className="p-3"` |
-| `borderRadius: 14` | `rounded-[14px]` |
-| `"rgba(255,255,255,0.02)"` | `bg-white/[0.02]` |
-| `"1px solid rgba(...)"` | `border border-white/[0.06]` |
-| `isMobile ? X : Y` | `clase-mobile md:clase-desktop` |
-| `linear-gradient(...)` | CSS custom properties en `globals.css` |
-| `boxShadow: "..."` | `shadow-*` o CSS custom property |
-| Google Fonts link | `next/font` con `DM_Sans` |
-| `t.t1`, `t.card`, `t.acc` | Clases Tailwind + CSS variables |
+| Patrón en mockup JSX       | Conversión a Next.js + Tailwind        |
+| -------------------------- | -------------------------------------- |
+| `style={{ padding: 12 }}`  | `className="p-3"`                      |
+| `borderRadius: 14`         | `rounded-[14px]`                       |
+| `"rgba(255,255,255,0.02)"` | `bg-white/[0.02]`                      |
+| `"1px solid rgba(...)"`    | `border border-white/[0.06]`           |
+| `isMobile ? X : Y`         | `clase-mobile md:clase-desktop`        |
+| `linear-gradient(...)`     | CSS custom properties en `globals.css` |
+| `boxShadow: "..."`         | `shadow-*` o CSS custom property       |
+| Google Fonts link          | `next/font` con `DM_Sans`              |
+| `t.t1`, `t.card`, `t.acc`  | Clases Tailwind + CSS variables        |
 
 ---
 
@@ -132,28 +137,28 @@ Tabla de transformaciones principales (detalle en DESIGN-SYSTEM.md §6.2):
 
 ### Dark Mode (por defecto)
 
-| Token | Valor | Tailwind |
-|-------|-------|----------|
-| `bg` | `#0c1320` | `bg-[#0c1320]` |
-| `t1` | `#f1f5f9` | `text-slate-100` |
-| `t2` | `#94a3b8` | `text-slate-400` |
-| `t3` | `#64748b` | `text-slate-500` |
-| `t4` | `#475569` | `text-slate-600` |
-| `acc` | `#f97316` | `text-orange-500` |
-| `card` | `rgba(255,255,255,0.02)` | `bg-white/[0.02]` |
+| Token   | Valor                    | Tailwind              |
+| ------- | ------------------------ | --------------------- |
+| `bg`    | `#0c1320`                | `bg-[#0c1320]`        |
+| `t1`    | `#f1f5f9`                | `text-slate-100`      |
+| `t2`    | `#94a3b8`                | `text-slate-400`      |
+| `t3`    | `#64748b`                | `text-slate-500`      |
+| `t4`    | `#475569`                | `text-slate-600`      |
+| `acc`   | `#f97316`                | `text-orange-500`     |
+| `card`  | `rgba(255,255,255,0.02)` | `bg-white/[0.02]`     |
 | `cardB` | `rgba(255,255,255,0.06)` | `border-white/[0.06]` |
-| `inBg` | `rgba(255,255,255,0.03)` | `bg-white/[0.03]` |
-| `inB` | `rgba(255,255,255,0.08)` | `border-white/[0.08]` |
+| `inBg`  | `rgba(255,255,255,0.03)` | `bg-white/[0.03]`     |
+| `inB`   | `rgba(255,255,255,0.08)` | `border-white/[0.08]` |
 
 ### Light Mode
 
-| Token | Valor | Tailwind |
-|-------|-------|----------|
-| `bg` | `#f8f9fb` | `bg-slate-50` |
-| `t1` | `#0f172a` | `text-slate-950` |
-| `t2` | `#475569` | `text-slate-600` |
-| `acc` | `#ea580c` | `text-orange-600` |
-| `card` | `rgba(0,0,0,0.02)` | `bg-black/[0.02]` |
+| Token   | Valor              | Tailwind              |
+| ------- | ------------------ | --------------------- |
+| `bg`    | `#f8f9fb`          | `bg-slate-50`         |
+| `t1`    | `#0f172a`          | `text-slate-950`      |
+| `t2`    | `#475569`          | `text-slate-600`      |
+| `acc`   | `#ea580c`          | `text-orange-600`     |
+| `card`  | `rgba(0,0,0,0.02)` | `bg-black/[0.02]`     |
 | `cardB` | `rgba(0,0,0,0.06)` | `border-black/[0.06]` |
 
 ### Tokens Complejos → CSS Custom Properties
@@ -161,13 +166,13 @@ Tabla de transformaciones principales (detalle en DESIGN-SYSTEM.md §6.2):
 ```css
 /* globals.css */
 :root {
-  --ai-bg: linear-gradient(135deg, rgba(249,115,22,0.06), rgba(234,88,12,0.02));
-  --ai-border: rgba(249,115,22,0.2);
+  --ai-bg: linear-gradient(135deg, rgba(249, 115, 22, 0.06), rgba(234, 88, 12, 0.02));
+  --ai-border: rgba(249, 115, 22, 0.2);
   --hero-bg: linear-gradient(135deg, #f0f4f8, #e8ecf0, #f5f0eb);
 }
 .dark {
-  --ai-bg: linear-gradient(135deg, rgba(249,115,22,0.08), rgba(234,88,12,0.04));
-  --ai-border: rgba(249,115,22,0.18);
+  --ai-bg: linear-gradient(135deg, rgba(249, 115, 22, 0.08), rgba(234, 88, 12, 0.04));
+  --ai-border: rgba(249, 115, 22, 0.18);
   --hero-bg: linear-gradient(135deg, #0f1923, #162032, #1a1a2e);
 }
 ```
@@ -176,12 +181,12 @@ Tabla de transformaciones principales (detalle en DESIGN-SYSTEM.md §6.2):
 
 ## 8. Labels de GitHub
 
-| Categoría | Labels |
-|-----------|--------|
-| Tipo | `type:feature`, `type:bug`, `type:refactor`, `type:docs`, `type:test` |
-| Prioridad | `priority:p0` (crítico), `priority:p1` (alto), `priority:p2` (medio) |
-| Fase | `phase:1`, `phase:2`, `phase:3` |
-| AI Pipeline | `ai-analyze`, `ai-generate-pr`, `ai-generated`, `ai-reviewed` |
+| Categoría   | Labels                                                                |
+| ----------- | --------------------------------------------------------------------- |
+| Tipo        | `type:feature`, `type:bug`, `type:refactor`, `type:docs`, `type:test` |
+| Prioridad   | `priority:p0` (crítico), `priority:p1` (alto), `priority:p2` (medio)  |
+| Fase        | `phase:1`, `phase:2`, `phase:3`                                       |
+| AI Pipeline | `ai-analyze`, `ai-generate-pr`, `ai-generated`, `ai-reviewed`         |
 
 ---
 
@@ -198,10 +203,10 @@ Tabla de transformaciones principales (detalle en DESIGN-SYSTEM.md §6.2):
 
 ## 10. Tipos de Entrenamiento
 
-| Tipo | Color | Emoji |
-|------|-------|-------|
-| `intervals` | Rojo `#ef4444` | ⚡ |
-| `endurance` | Verde `#22c55e` | 🚴 |
-| `recovery` | Azul `#3b82f6` | 💆 |
-| `tempo` | Naranja `#f97316` | 🔥 |
-| `rest` | Gris `#6b7280` | 😴 |
+| Tipo        | Color             | Emoji |
+| ----------- | ----------------- | ----- |
+| `intervals` | Rojo `#ef4444`    | ⚡    |
+| `endurance` | Verde `#22c55e`   | 🚴    |
+| `recovery`  | Azul `#3b82f6`    | 💆    |
+| `tempo`     | Naranja `#f97316` | 🔥    |
+| `rest`      | Gris `#6b7280`    | 😴    |
