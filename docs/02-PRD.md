@@ -76,62 +76,73 @@ El producto se desarrolla como caso de uso real de un pipeline AI-first integrad
 | **Supabase Storage**         | Almacenamiento de archivos .fit/.gpx subidos                |
 | **Supabase DB (PostgreSQL)** | Datos de usuario, actividades, planes, métricas             |
 
-#### Modelo de datos (simplificado)
+#### Modelo de datos (según migraciones aplicadas)
+
+> Ref: `supabase/migrations/001_initial_schema.sql` + `002_alter_users_for_onboarding.sql`
 
 ```
 users
-├── id (UUID, from Supabase Auth)
-├── email
-├── display_name
-├── age
-├── weight_kg
-├── ftp (Functional Threshold Power)
-├── max_hr
-├── rest_hr
-├── goal (enum: performance | health | weight_loss | recovery)
-├── created_at
-└── updated_at
+├── id (UUID, PK, FK → auth.users, ON DELETE CASCADE)
+├── email (TEXT, NOT NULL)
+├── display_name (TEXT, NOT NULL)               ← obligatorio desde migration 002
+├── age (INTEGER, NOT NULL, CHECK 0-120)        ← obligatorio desde migration 002
+├── weight_kg (DECIMAL(5,2), NOT NULL, CHECK 0-300) ← obligatorio, CHECK ampliado
+├── ftp (INTEGER, nullable, CHECK 0-1000)       ← CHECK ampliado en migration 002
+├── max_hr (INTEGER, nullable, CHECK 0-250)     ← CHECK ampliado en migration 002
+├── rest_hr (INTEGER, nullable, CHECK 0-200)    ← CHECK ampliado en migration 002
+├── goal (TEXT, NOT NULL, DEFAULT 'performance') ← TEXT con CHECK, no ENUM (ref: ADR-004)
+│   └── CHECK: 'performance' | 'health' | 'weight_loss' | 'recovery'
+├── created_at (TIMESTAMPTZ, NOT NULL)
+└── updated_at (TIMESTAMPTZ, NOT NULL, auto-trigger)
 
 activities
-├── id (UUID)
-├── user_id (FK → users)
-├── name
-├── date
-├── type (enum: intervals | endurance | tempo | recovery | rest)
-├── duration_seconds
-├── distance_km
-├── avg_power_watts
-├── avg_hr_bpm
-├── max_hr_bpm
-├── avg_cadence_rpm
-├── tss (Training Stress Score, calculado)
-├── rpe (Rating of Perceived Exertion, 1-10, input usuario)
-├── ai_analysis (JSONB, análisis generado por IA)
-├── notes
-├── is_reference (boolean)
-├── raw_file_url (Storage URL, nullable)
-├── created_at
-└── updated_at
+├── id (UUID, PK, auto-generated)
+├── user_id (UUID, NOT NULL, FK → users, ON DELETE CASCADE)
+├── name (TEXT, NOT NULL)
+├── date (DATE, NOT NULL)
+├── type (activity_type ENUM: 'outdoor' | 'indoor' | 'recovery')  ← ⚠️ ver nota abajo
+├── duration_seconds (INTEGER, NOT NULL, CHECK > 0)
+├── distance_km (DECIMAL(8,2), CHECK ≥ 0)
+├── avg_power_watts (INTEGER, CHECK ≥ 0)
+├── avg_hr_bpm (INTEGER, CHECK 0-220)
+├── max_hr_bpm (INTEGER, CHECK 0-220)
+├── avg_cadence_rpm (INTEGER, CHECK ≥ 0)
+├── tss (INTEGER, CHECK ≥ 0)
+├── rpe (INTEGER, CHECK 1-10)
+├── ai_analysis (JSONB, nullable)
+├── notes (TEXT, nullable)
+├── is_reference (BOOLEAN, DEFAULT FALSE)
+├── raw_file_url (TEXT, nullable)
+├── created_at (TIMESTAMPTZ, NOT NULL)
+└── updated_at (TIMESTAMPTZ, NOT NULL, auto-trigger)
 
 weekly_plans
-├── id (UUID)
-├── user_id (FK → users)
-├── week_start (date)
-├── plan_data (JSONB)
-│   └── { days: [{ day, type, intensity, duration, nutrition_tip, rest_tip }] }
-├── ai_rationale (text, explicación de la IA)
-├── created_at
-└── updated_at
+├── id (UUID, PK, auto-generated)
+├── user_id (UUID, NOT NULL, FK → users, ON DELETE CASCADE)
+├── week_start (DATE, NOT NULL)
+├── plan_data (JSONB, NOT NULL)
+│   └── Estructura planificada: array de 7 PlanDay objects
+├── ai_rationale (TEXT, nullable)
+├── created_at (TIMESTAMPTZ, NOT NULL)
+├── updated_at (TIMESTAMPTZ, NOT NULL, auto-trigger)
+└── UNIQUE(user_id, week_start)
 
-activity_metrics (series temporales simplificadas)
-├── id (UUID)
-├── activity_id (FK → activities)
-├── timestamp_seconds (offset desde inicio)
-├── power_watts
-├── hr_bpm
-├── cadence_rpm
-└── speed_kmh
+activity_metrics (series temporales)
+├── id (UUID, PK, auto-generated)
+├── activity_id (UUID, NOT NULL, FK → activities, ON DELETE CASCADE)
+├── timestamp_seconds (INTEGER, NOT NULL)
+├── power_watts (INTEGER, nullable)
+├── hr_bpm (INTEGER, nullable, CHECK 0-220)
+├── cadence_rpm (INTEGER, nullable, CHECK ≥ 0)
+└── speed_kmh (DECIMAL(5,2), nullable, CHECK ≥ 0)
 ```
+
+**⚠️ Nota sobre `activity_type`**: La ENUM en base de datos usa `('outdoor', 'indoor', 'recovery')` (migration 001). Sin embargo, el diseño visual y las constantes del frontend (`packages/shared/src/constants/activity-types.ts`) manejan 5 tipos: `intervals`, `endurance`, `tempo`, `recovery`, `rest`. Esta diferencia se resolverá en una migración futura (Fase 2) que actualizará el ENUM de la base de datos para alinearlo con el diseño.
+
+**Decisiones de diseño aplicadas (migration 002)**:
+- `goal` cambió de `goal_type` ENUM a TEXT con CHECK constraint (ADR-004: más flexible para migraciones futuras)
+- `display_name`, `age`, `weight_kg` son NOT NULL (obligatorios en el onboarding)
+- CHECKs más estrictos en `ftp` (< 1000), `max_hr` (< 250), `rest_hr` (< 200), `weight_kg` (< 300)
 
 ### 3.4 IA / LLM
 
@@ -190,9 +201,19 @@ cycling-companion/
 │   └── api/          → Fastify 5 backend (TypeScript, Zod)
 ├── packages/
 │   └── shared/       → Types compartidos, validaciones Zod, constantes
+│       └── src/
+│           ├── schemas/     → Zod schemas (activity, user-profile, ...)
+│           ├── constants/   → Constantes de negocio (activity-types, goals, rpe, zones, ...)
+│           └── index.ts     → Re-exports centralizados
+├── supabase/
+│   └── migrations/   → Scripts SQL incrementales (001_initial_schema, 002_alter_users, ...)
 ├── docs/
-│   ├── designs/      → Mockups JSX de referencia (excluidos de git)
+│   ├── design/       → Mockups JSX de referencia (excluidos de git)
+│   ├── specs/        → Especificaciones L1 (UX), L2 (técnico), L3 (issues) por pantalla
 │   ├── DESIGN-SYSTEM.md → Guía visual: pantallas, tokens, componentes, conversión JSX→Next.js
+│   ├── GOOGLE-OAUTH-SETUP.md → Guía de configuración OAuth
+│   ├── SETUP-CHECKLIST.md → Checklist de setup del proyecto
+│   ├── SUPABASE-SETUP.md → Guía de configuración de Supabase
 │   ├── 01-PRODUCT-VISION.md
 │   ├── 02-PRD.md
 │   └── 03-AGENTS-AND-DEVELOPMENT-PLAN.md
@@ -433,28 +454,24 @@ cycling-companion/
 
 ## 5. Datos mock
 
-Para la fase inicial de desarrollo, se proporcionan datos mock que simulan actividades reales.
+Para la fase inicial de desarrollo, los datos de ejemplo se documentan en las especificaciones y el design system como referencia.
 
-### Estructura de datos mock
+### Fuentes de datos de ejemplo
 
-Archivo `data/mock/activities.json` (se creará cuando se implemente F03-F04):
+- **DESIGN-SYSTEM.md §5**: datos mock de referencia para todas las pantallas
+- **Especificaciones L1**: cada spec incluye apéndice con datos mock de la pantalla
+- **Supabase**: las actividades y perfil se crean directamente vía la app (onboarding + formulario de importación manual)
 
-- 20-30 actividades distribuidas en 6 semanas
-- Variedad de tipos (outdoor, indoor, recovery)
-- Métricas realistas para un ciclista amateur (FTP ~200W, FC max ~175)
-- Algunos con series temporales simplificadas
-- Progresión lógica (mejora gradual con algún bajón)
+### Perfil de usuario ejemplo
 
-Archivo `data/mock/user-profile.json`:
-
-- Usuario ejemplo: 45 años, 78kg, FTP 195W, FC max 172, objetivo: performance
+- 45 años, 78 kg, FTP 195 W, FC max 172, objetivo: performance
 
 ### Transición a datos reales
 
-La arquitectura permite sustituir datos mock por datos reales:
+La arquitectura ya soporta datos reales:
 
-1. Upload de archivos .fit/.gpx
-2. Parseo automático
+1. Upload de archivos .fit/.gpx (implementado en pantalla de importación)
+2. Formulario manual para crear actividades
 3. Misma estructura en BD
 
 ---
@@ -495,3 +512,25 @@ La arquitectura permite sustituir datos mock por datos reales:
 | Cold starts en Render (free tier)    | Bajo    | Aceptable para MVP, documentar como limitación             |
 | Costes de API de Claude              | Medio   | Caché de recomendaciones, limitar llamadas por usuario/día |
 | Complejidad del parseo .fit/.gpx     | Medio   | Empezar con mock, parseo como feature separada             |
+| ENUM activity_type desalineado       | Bajo    | DB usa outdoor/indoor/recovery; frontend usa 5 tipos. Migración pendiente en Fase 2 |
+
+---
+
+## 9. Estado de especificaciones
+
+> Última actualización: 2026-02-14
+
+Todas las pantallas tienen especificaciones completas en `docs/specs/`:
+
+| Screen | Pantalla | L1 (UX) | L2 (Técnico) | L3 (Issues) | Implementada |
+|--------|----------|:-------:|:------------:|:-----------:|:------------:|
+| 00 | Login + Onboarding | ✅ | ✅ | ✅ | ✅ |
+| 01 | Dashboard | ✅ | ✅ | — | ✅ |
+| 02 | Importar Actividad | ✅ | ✅ | ✅ | ✅ |
+| 03 | Lista Actividades | ✅ | ✅ | ✅ | ✅ |
+| 04 | Detalle Actividad | ✅ | ✅ | ✅ | ✅ |
+| 05 | Planificación Semanal | ✅ | ✅ | ✅ | ⏳ |
+| 06 | Perfil | ✅ | ✅ | — | ✅ |
+| 07 | Insights / Comparar | ✅ | ✅ | ✅ | ⏳ |
+
+**Convención de nombres**: `L{nivel}-screen-{número_PRD}-{nombre}.md`

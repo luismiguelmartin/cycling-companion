@@ -204,3 +204,36 @@ Cycling Companion **no es el objetivo principal**, sino el banco de pruebas del 
 - Proporcionar un demo tangible de la metodología de desarrollo
 
 El protagonista es el **pipeline AI-first**. El producto es el terreno donde se demuestra.
+
+---
+
+## 10. Estado actual de implementación
+
+> Última actualización: 2026-02-14
+
+### Pantallas implementadas (Fase 1 completada)
+
+| Pantalla | Estado | Notas |
+|----------|--------|-------|
+| Login + Onboarding | ✅ Implementada | OAuth Google + 4 pasos |
+| Dashboard | ✅ Implementada | KPIs, gráfica tendencia, tarjeta IA |
+| Lista de actividades | ✅ Implementada | Tabla, filtros, búsqueda |
+| Detalle de actividad | ✅ Implementada | Métricas, gráficas, análisis IA |
+| Importar actividad | ✅ Implementada | Formulario manual + upload .fit/.gpx |
+| Perfil y ajustes | ✅ Implementada | Datos personales, zonas, objetivo |
+| Planificación semanal | ⏳ Especificada (L1/L2/L3) | Pendiente implementación (Fase 2) |
+| Insights / Comparar | ⏳ Especificada (L1/L2/L3) | Pendiente implementación (Fase 2) |
+
+### Artefactos de diseño y especificación
+
+- **Design System**: `docs/DESIGN-SYSTEM.md` — guía completa con tokens, componentes, paleta y guía de conversión JSX→Next.js
+- **Mockups JSX**: `docs/design/` — fuente de verdad visual (excluidos de git)
+- **Especificaciones**: 22 archivos en `docs/specs/` (L1 funcional, L2 técnico, L3 plan de issues) para las 8 pantallas
+- **Schemas compartidos**: `packages/shared/src/` — validaciones Zod y constantes de negocio
+
+### Infraestructura
+
+- Monorepo Turborepo + pnpm operativo
+- CI/CD: GitHub Actions (lint, typecheck, format, build)
+- Base de datos: Supabase con 4 tablas + RLS + 2 migraciones aplicadas
+- Auth: Google OAuth via Supabase Auth

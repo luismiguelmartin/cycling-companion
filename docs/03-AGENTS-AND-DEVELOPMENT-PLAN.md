@@ -390,6 +390,15 @@ jobs:
 
 El desarrollo se organiza en **4 fases** distribuidas en **7 semanas**, diseñado para ganar confianza y experiencia de forma progresiva.
 
+### Estado actual (2026-02-14)
+
+```
+Fase 1: Cimientos                    ✅ COMPLETADA
+Fase 2: MVP funcional                🔄 EN PROGRESO (pantallas 05 y 07 pendientes)
+Fase 3: Pipeline AI-first            ⏳ PENDIENTE
+Fase 4: Pulido y evaluación          ⏳ PENDIENTE
+```
+
 ### Filosofía incremental
 
 ```
@@ -419,12 +428,12 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 | 4   | Primer deploy: Vercel (front) + Render (API)              | Manual      |
 | 5   | Onboarding flow (4 pasos según DESIGN-SYSTEM.md §1.0b)   | L4          |
 
-**Entregables semana 1**:
+**Entregables semana 1**: ✅ COMPLETADOS
 
-- Monorepo funcional con CI
-- Auth con Google funcionando
-- Deploy automático en cada push a main
-- Onboarding básico
+- ✅ Monorepo funcional con CI (Turborepo + pnpm + GitHub Actions)
+- ✅ Auth con Google funcionando (Supabase Auth)
+- ✅ Deploy automático en cada push a main
+- ✅ Onboarding de 4 pasos (migration 002 aplicada)
 
 #### Semana 2: Datos y primeras pantallas
 
@@ -440,13 +449,15 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 | 5   | Cargar datos mock en Supabase (seed script)               | L4              |
 | 5   | Dashboard funcional con datos mock                        | L4              |
 
-**Entregables semana 2**:
+**Entregables semana 2**: ✅ COMPLETADOS
 
-- Dashboard con datos mock visibles
-- Agentes L1, L2, L3 usados por primera vez
-- Primeras issues creadas por L3
+- ✅ Dashboard funcional con datos de Supabase
+- ✅ Agentes L1, L2, L3 usados para todas las pantallas
+- ✅ Specs L1/L2/L3 generadas para 8 pantallas (22 archivos en `docs/specs/`)
+- ✅ Design System documentado (`docs/DESIGN-SYSTEM.md`, 920 líneas)
+- ✅ Schemas Zod compartidos en `packages/shared`
 
-**Retrospectiva**: Documentar qué funcionó de los agentes locales, qué ajustar.
+**Retrospectiva**: Los agentes locales L1→L2→L3 funcionan bien como pipeline secuencial. El DESIGN-SYSTEM.md es esencial como referencia para L1 y L4.
 
 ---
 
