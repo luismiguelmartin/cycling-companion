@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```
 cycling-companion/
 ├── apps/
-│   ├── web/          → Next.js 14+ (App Router, TypeScript, Tailwind CSS, shadcn/ui)
+│   ├── web/          → Next.js 16 (App Router, TypeScript, Tailwind CSS, shadcn/ui)
 │   └── api/          → Fastify (TypeScript, Zod validation, Swagger docs)
 ├── packages/
 │   └── shared/       → Types compartidos, validaciones Zod, constantes
@@ -28,7 +28,7 @@ cycling-companion/
 ```
 
 ### Componentes clave
-- **Frontend**: Next.js 14+ con App Router, TypeScript, Tailwind CSS, Recharts, shadcn/ui
+- **Frontend**: Next.js 16 (LTS) con App Router, React 19, TypeScript, Tailwind CSS, Recharts, shadcn/ui
 - **Backend**: Fastify con TypeScript, validación Zod, documentación Swagger
 - **Base de datos**: Supabase (PostgreSQL + Auth + Storage + RLS)
 - **Autenticación**: Supabase Auth con Google OAuth
@@ -43,7 +43,7 @@ cycling-companion/
 ### Setup inicial
 ```bash
 # Instalar dependencias (desde raíz del monorepo)
-npm install
+pnpm install
 
 # Configurar variables de entorno
 # Copiar .env.example a .env en apps/web y apps/api
@@ -54,46 +54,43 @@ cp apps/api/.env.example apps/api/.env
 ### Desarrollo
 ```bash
 # Ejecutar todo el monorepo (web + api)
-npm run dev
+pnpm dev
 
 # Ejecutar solo el frontend
-npm run dev --filter=web
+pnpm --filter web dev
 
 # Ejecutar solo el backend
-npm run dev --filter=api
-
-# Ejecutar con Turborepo en paralelo
-npx turbo run dev
+pnpm --filter api dev
 ```
 
 ### Build y validación
 ```bash
 # Build de todo el proyecto
-npm run build
+pnpm build
 
 # Lint
-npm run lint
+pnpm lint
 
 # Type-check
-npm run typecheck
+pnpm typecheck
 
 # Tests
-npm run test
+pnpm test
 
 # Tests con coverage
-npm run test:coverage
+pnpm test:coverage
 ```
 
 ### Base de datos
 ```bash
 # Generar tipos de Supabase
-npm run db:types
+pnpm db:types
 
 # Ejecutar migraciones (desde Supabase Dashboard o CLI)
 supabase db push
 
 # Seed de datos mock (script custom)
-npm run db:seed
+pnpm db:seed
 ```
 
 ---

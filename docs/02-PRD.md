@@ -27,7 +27,7 @@ El producto se desarrolla como caso de uso real dentro de un TFM sobre integraci
 
 | Tecnología | Justificación |
 |---|---|
-| **Next.js 14+** (App Router) | React con SSR, routing integrado, optimización de rendimiento. PWA-ready con `next-pwa`. |
+| **Next.js 16 LTS** (App Router) | React 19 con SSR, routing integrado, Turbopack, optimización de rendimiento. PWA-ready con `next-pwa`. |
 | **TypeScript** | Seguridad de tipos, mejor DX, coherente con el backend. |
 | **Tailwind CSS** | Desarrollo rápido de UI responsive, utility-first, sin CSS custom. |
 | **Recharts o Chart.js** | Gráficas de rendimiento (potencia, FC, tendencias). Recharts por integración natural con React. |
