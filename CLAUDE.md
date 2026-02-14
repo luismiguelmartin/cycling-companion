@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Propuesta de valor**: Entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables.
 
-**Fase actual**: Fase 2 — MVP funcional (pantallas 05 y 07 pendientes)
+**Fase actual**: Fase 2 — MVP funcional (frontend completo, backend/IA pendientes)
 
 ---
 
@@ -164,11 +164,42 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 
 ---
 
+## Estado de Implementación
+
+### Pantallas implementadas (frontend)
+| Ruta | Pantalla | Datos |
+|------|----------|-------|
+| `/auth/login` | Login (Google OAuth) | Supabase Auth |
+| `/onboarding` | Onboarding wizard (4 pasos) | Supabase |
+| `/` | Dashboard (KPIs, gráficas, coach IA) | Supabase + mock |
+| `/activities` | Lista de actividades (filtros, búsqueda) | Supabase |
+| `/activities/[id]` | Detalle de actividad (métricas, chart) | Supabase |
+| `/activities/import` | Importar actividad (manual/archivo) | Solo UI |
+| `/plan` | Planificación semanal (7 días, tips) | Mock data |
+| `/insights` | Insights (comparativas, radar, análisis) | Supabase (cálculos client) |
+| `/profile` | Perfil (datos, zonas, ajustes) | Supabase |
+
+### Pendiente
+- **API Fastify**: Solo tiene `/health`. Faltan endpoints CRUD y de IA.
+- **Integración Claude API**: Entrenador virtual (análisis actividades, generación planes).
+- **Importación real**: Pantalla Import es solo UI, sin conexión a backend.
+- **weekly_plans real**: Plan usa mock data embebido; falta consultar tabla real.
+
+### Métricas
+- **Componentes**: 32 en `apps/web/src/components/`
+- **Tests**: 16 archivos (103 tests) — componentes, utils, schemas
+- **Migraciones SQL**: 3 (001 schema inicial, 002 onboarding, 003 activity_type enum)
+- **Schemas Zod compartidos**: 4 (user-profile, activity, weekly-plan, insights)
+- **Constantes compartidas**: 7 módulos
+
+---
+
 ## Gotchas conocidos
 
-- `pnpm typecheck` falla actualmente por `apps/web/src/app/(app)/plan/page.tsx` que importa `./plan-content` (placeholder, pendiente de implementar en Fase 2). El build (`pnpm build`) sí pasa.
 - `activity_type` ENUM en DB usa 5 tipos de entrenamiento: `intervals`, `endurance`, `recovery`, `tempo`, `rest` (migración 003). No confundir con modalidad (outdoor/indoor).
 - Los mockups JSX en `docs/design/` están excluidos de git. Usar `docs/DESIGN-SYSTEM.md` como fuente de verdad documentada.
+- Padding de páginas está centralizado en `app-shell.tsx` (`p-4 md:p-8`), no ponerlo en páginas individuales.
+- Para pasar iconos de Server→Client Components, usar `ReactNode` (JSX pre-renderizado), no `LucideIcon` (función).
 
 ---
 
@@ -180,6 +211,6 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 | PRD completo (modelo de datos, endpoints, flujo IA) | `docs/02-PRD.md` |
 | Plan de agentes y desarrollo | `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md` |
 | Design system (pantallas, tokens, componentes, conversión JSX→Next.js) | `docs/DESIGN-SYSTEM.md` |
-| Especificaciones por pantalla (22 archivos L1/L2/L3) | `docs/specs/` |
+| Especificaciones por pantalla (22 archivos L1/L2/L3 para 8 pantallas) | `docs/specs/` |
 | Configuración Google OAuth | `docs/GOOGLE-OAUTH-SETUP.md` |
 | Configuración Supabase | `docs/SUPABASE-SETUP.md` |
