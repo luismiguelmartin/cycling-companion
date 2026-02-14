@@ -33,3 +33,26 @@ export const activitySchema = z.object({
   updated_at: z.string().datetime(),
 });
 export type Activity = z.infer<typeof activitySchema>;
+
+export const activityCreateSchema = activitySchema
+  .omit({
+    id: true,
+    user_id: true,
+    tss: true,
+    ai_analysis: true,
+    is_reference: true,
+    raw_file_url: true,
+    created_at: true,
+    updated_at: true,
+  })
+  .extend({
+    distance_km: z.number().positive().nullable().default(null),
+    avg_power_watts: z.number().int().positive().nullable().default(null),
+    avg_hr_bpm: z.number().int().positive().max(220).nullable().default(null),
+    max_hr_bpm: z.number().int().positive().max(220).nullable().default(null),
+    avg_cadence_rpm: z.number().int().positive().nullable().default(null),
+    rpe: z.number().int().min(1).max(10).nullable().default(null),
+    notes: z.string().nullable().default(null),
+  });
+
+export type ActivityCreate = z.infer<typeof activityCreateSchema>;

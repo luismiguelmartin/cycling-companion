@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Search, Filter, Upload } from "lucide-react";
 import { ACTIVITY_FILTERS, type ActivityFilterKey } from "shared";
+import Link from "next/link";
 import { ActivityListItem } from "@/components/activity-list-item";
 import { formatDuration } from "@/lib/dashboard/calculations";
 
@@ -51,14 +52,14 @@ export function ActivitiesContent({ activities }: ActivitiesContentProps) {
             {activities.length} registradas
           </p>
         </div>
-        <button
-          onClick={() => alert("Importación disponible próximamente")}
+        <Link
+          href="/activities/import"
           className="flex items-center gap-1.5 rounded-[10px] px-3 py-[7px] text-[12px] font-semibold text-white md:px-[18px] md:py-[9px] md:text-[13px]"
           style={{ background: "linear-gradient(135deg, #f97316, #ea580c)" }}
         >
           <Upload className="h-3.5 w-3.5" />
           Importar
-        </button>
+        </Link>
       </div>
 
       {/* Search + Filter toggle */}
@@ -79,7 +80,8 @@ export function ActivitiesContent({ activities }: ActivitiesContentProps) {
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center rounded-[10px] border px-3 py-[9px] text-[12px] transition-colors"
           style={{
-            backgroundColor: showFilters || isFilterActive ? "var(--active-nav-bg)" : "var(--input-bg)",
+            backgroundColor:
+              showFilters || isFilterActive ? "var(--active-nav-bg)" : "var(--input-bg)",
             borderColor:
               showFilters || isFilterActive ? "rgba(249,115,22,0.4)" : "var(--input-border)",
             color: showFilters || isFilterActive ? "var(--accent)" : "var(--text-secondary)",

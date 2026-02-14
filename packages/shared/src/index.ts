@@ -11,8 +11,10 @@ export {
 export {
   activityTypeEnum,
   activitySchema,
+  activityCreateSchema,
   type ActivityType,
   type Activity,
+  type ActivityCreate,
 } from "./schemas/activity";
 
 // Constants
