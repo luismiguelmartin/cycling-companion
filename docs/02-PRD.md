@@ -2,14 +2,14 @@
 
 ## 1. Información general
 
-| Campo | Valor |
-|---|---|
-| **Producto** | Cycling Companion |
-| **Versión** | MVP v1.0 |
-| **Autor** | Luis Miguel Martín |
-| **Fecha** | Febrero 2026 |
-| **Contexto** | TFM — Pipeline AI-first aplicado al desarrollo de software |
-| **Plazo de desarrollo** | 6-8 semanas |
+| Campo                   | Valor                                                      |
+| ----------------------- | ---------------------------------------------------------- |
+| **Producto**            | Cycling Companion                                          |
+| **Versión**             | MVP v1.0                                                   |
+| **Autor**               | Luis Miguel Martín                                         |
+| **Fecha**               | Febrero 2026                                               |
+| **Contexto**            | TFM — Pipeline AI-first aplicado al desarrollo de software |
+| **Plazo de desarrollo** | 6-8 semanas                                                |
 
 ---
 
@@ -25,13 +25,13 @@ El producto se desarrolla como caso de uso real dentro de un TFM sobre integraci
 
 ### 3.1 Frontend
 
-| Tecnología | Justificación |
-|---|---|
+| Tecnología                      | Justificación                                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | **Next.js 16 LTS** (App Router) | React 19 con SSR, routing integrado, Turbopack, optimización de rendimiento. PWA-ready con `next-pwa`. |
-| **TypeScript** | Seguridad de tipos, mejor DX, coherente con el backend. |
-| **Tailwind CSS** | Desarrollo rápido de UI responsive, utility-first, sin CSS custom. |
-| **Recharts o Chart.js** | Gráficas de rendimiento (potencia, FC, tendencias). Recharts por integración natural con React. |
-| **shadcn/ui** | Componentes accesibles y personalizables sobre Radix UI + Tailwind. |
+| **TypeScript**                  | Seguridad de tipos, mejor DX, coherente con el backend.                                                |
+| **Tailwind CSS**                | Desarrollo rápido de UI responsive, utility-first, sin CSS custom.                                     |
+| **Recharts o Chart.js**         | Gráficas de rendimiento (potencia, FC, tendencias). Recharts por integración natural con React.        |
+| **shadcn/ui**                   | Componentes accesibles y personalizables sobre Radix UI + Tailwind.                                    |
 
 #### PWA
 
@@ -42,12 +42,12 @@ El producto se desarrolla como caso de uso real dentro de un TFM sobre integraci
 
 ### 3.2 Backend / API
 
-| Tecnología | Justificación |
-|---|---|
-| **Fastify** | Más rápido que Express, schema-based validation, plugin ecosystem maduro. |
-| **TypeScript** | Mismo lenguaje en todo el stack. |
-| **Fastify Swagger** | Documentación automática de API (OpenAPI). |
-| **Zod** | Validación de schemas compartida con frontend. |
+| Tecnología          | Justificación                                                             |
+| ------------------- | ------------------------------------------------------------------------- |
+| **Fastify**         | Más rápido que Express, schema-based validation, plugin ecosystem maduro. |
+| **TypeScript**      | Mismo lenguaje en todo el stack.                                          |
+| **Fastify Swagger** | Documentación automática de API (OpenAPI).                                |
+| **Zod**             | Validación de schemas compartida con frontend.                            |
 
 #### Estructura de la API
 
@@ -67,12 +67,12 @@ El producto se desarrolla como caso de uso real dentro de un TFM sobre integraci
 
 ### 3.3 Base de datos y servicios
 
-| Tecnología | Uso |
-|---|---|
-| **Supabase** | PostgreSQL gestionado + Auth + Storage + Realtime |
-| **Supabase Auth** | Autenticación con Google (zero config), gestión de sesiones |
-| **Supabase Storage** | Almacenamiento de archivos .fit/.gpx subidos |
-| **Supabase DB (PostgreSQL)** | Datos de usuario, actividades, planes, métricas |
+| Tecnología                   | Uso                                                         |
+| ---------------------------- | ----------------------------------------------------------- |
+| **Supabase**                 | PostgreSQL gestionado + Auth + Storage + Realtime           |
+| **Supabase Auth**            | Autenticación con Google (zero config), gestión de sesiones |
+| **Supabase Storage**         | Almacenamiento de archivos .fit/.gpx subidos                |
+| **Supabase DB (PostgreSQL)** | Datos de usuario, actividades, planes, métricas             |
 
 #### Modelo de datos (simplificado)
 
@@ -133,13 +133,13 @@ activity_metrics (series temporales simplificadas)
 
 ### 3.4 IA / LLM
 
-| Componente | Tecnología |
-|---|---|
-| **LLM principal** | Claude (vía API de Anthropic) |
-| **Capa de prompts** | Prompts versionados en el repo (`/prompts/*.md`) |
-| **Contexto** | Datos del usuario + actividades recientes + plan actual (RAG simplificado) |
-| **Reglas de entrenamiento** | Heurísticas en código (umbrales de TSS, zonas, progresión) |
-| **Guardrails** | La IA recomienda, nunca decide. Siempre muestra razonamiento. |
+| Componente                  | Tecnología                                                                 |
+| --------------------------- | -------------------------------------------------------------------------- |
+| **LLM principal**           | Claude (vía API de Anthropic)                                              |
+| **Capa de prompts**         | Prompts versionados en el repo (`/prompts/*.md`)                           |
+| **Contexto**                | Datos del usuario + actividades recientes + plan actual (RAG simplificado) |
+| **Reglas de entrenamiento** | Heurísticas en código (umbrales de TSS, zonas, progresión)                 |
+| **Guardrails**              | La IA recomienda, nunca decide. Siempre muestra razonamiento.              |
 
 #### Flujo de una recomendación IA
 
@@ -154,22 +154,22 @@ activity_metrics (series temporales simplificadas)
 
 ### 3.5 Autenticación
 
-| Aspecto | Decisión |
-|---|---|
-| **Proveedor** | Supabase Auth |
-| **Método principal** | Google OAuth |
-| **Método secundario** | Email + password (como fallback) |
-| **Sesiones** | JWT gestionado por Supabase, cookies httpOnly |
-| **RLS (Row Level Security)** | Activado. Cada usuario solo ve sus datos. |
+| Aspecto                      | Decisión                                      |
+| ---------------------------- | --------------------------------------------- |
+| **Proveedor**                | Supabase Auth                                 |
+| **Método principal**         | Google OAuth                                  |
+| **Método secundario**        | Email + password (como fallback)              |
+| **Sesiones**                 | JWT gestionado por Supabase, cookies httpOnly |
+| **RLS (Row Level Security)** | Activado. Cada usuario solo ve sus datos.     |
 
 ### 3.6 Despliegue
 
-| Componente | Plataforma | Plan | Justificación |
-|---|---|---|---|
-| **Frontend (Next.js)** | **Vercel** | Free (Hobby) | Despliegue nativo de Next.js, CDN global, preview deploys por PR |
-| **Backend (Fastify)** | **Render** | Free | Web service con auto-deploy desde GitHub, sleep tras 15min de inactividad (aceptable para MVP) |
-| **Base de datos** | **Supabase** | Free | 500MB DB, 1GB Storage, 50K auth users, suficiente para MVP |
-| **Dominio** | Subdominios gratuitos | — | `cycling-companion.vercel.app` + `api-cycling.onrender.com` |
+| Componente             | Plataforma            | Plan         | Justificación                                                                                  |
+| ---------------------- | --------------------- | ------------ | ---------------------------------------------------------------------------------------------- |
+| **Frontend (Next.js)** | **Vercel**            | Free (Hobby) | Despliegue nativo de Next.js, CDN global, preview deploys por PR                               |
+| **Backend (Fastify)**  | **Render**            | Free         | Web service con auto-deploy desde GitHub, sleep tras 15min de inactividad (aceptable para MVP) |
+| **Base de datos**      | **Supabase**          | Free         | 500MB DB, 1GB Storage, 50K auth users, suficiente para MVP                                     |
+| **Dominio**            | Subdominios gratuitos | —            | `cycling-companion.vercel.app` + `api-cycling.onrender.com`                                    |
 
 #### CI/CD
 
@@ -216,6 +216,7 @@ cycling-companion/
 **Descripción**: El usuario se registra/logea con Google y completa un onboarding de 3-4 pasos.
 
 **Flujo**:
+
 1. Landing → "Entrar con Google"
 2. Redirect OAuth → Supabase Auth
 3. Si es nuevo usuario → Onboarding:
@@ -226,6 +227,7 @@ cycling-companion/
 4. Redirect al dashboard
 
 **Criterios de aceptación**:
+
 - Login con Google funciona en menos de 3 clics
 - Los datos del onboarding se guardan en la tabla `users`
 - Si el usuario ya existe, va directo al dashboard
@@ -240,6 +242,7 @@ cycling-companion/
 **Descripción**: Vista rápida del estado de entrenamiento.
 
 **Componentes**:
+
 - **KPI Cards** (4): distancia semanal, tiempo semanal, potencia media semanal, FC media semanal
 - **Gráfica de tendencia**: últimas 4 semanas, potencia media por semana (barras) con línea de FC
 - **Tarjeta IA**: recomendación del día (texto generado, máx 2-3 frases)
@@ -282,10 +285,12 @@ cycling-companion/
 **Descripción**: Dos modos de importación.
 
 **Modo mock (fase inicial)**:
+
 - Formulario manual: nombre, fecha, tipo, duración, distancia, potencia media, FC media, cadencia, RPE
 - Opción de generar datos mock automáticos (botón "generar actividad de ejemplo")
 
 **Modo archivo (fase posterior)**:
+
 - Upload de .fit o .gpx
 - Parseo server-side (librería `fit-file-parser` para .fit, `gpxparser` para .gpx)
 - Extracción de métricas y series temporales
@@ -300,6 +305,7 @@ cycling-companion/
 **Descripción**: Vista completa de una sesión.
 
 **Secciones**:
+
 - KPI Cards: distancia, tiempo, potencia media, FC media, cadencia media, TSS estimado
 - Gráficas temporales (si hay datos de series): potencia/tiempo, FC/tiempo, cadencia/tiempo
 - RPE registrado por el usuario
@@ -316,17 +322,20 @@ cycling-companion/
 **Descripción**: Plan semanal generado por IA.
 
 **Vista**:
+
 - Calendario horizontal (lunes a domingo)
 - Cada día: card con tipo de entreno, intensidad (baja/media/alta), duración estimada
 - Colores: verde (recuperación), amarillo (resistencia), naranja (tempo), rojo (intervalos), gris (descanso)
 - Indicador de carga semanal acumulada (barra de progreso)
 
 **Generación IA**:
+
 - Input: perfil del usuario + últimas 2 semanas de actividades + objetivo
 - Output: JSON con 7 días, cada uno con: tipo, intensidad, duración, tip de nutrición, tip de descanso
 - Botón "Recalcular": regenera el plan
 
 **Recomendaciones complementarias por día**:
+
 - Nutrición: hidratación, carbohidratos pre/post (texto corto)
 - Descanso: horas de sueño sugeridas, recuperación activa
 
@@ -339,6 +348,7 @@ cycling-companion/
 **Descripción**: Comparativa entre dos periodos.
 
 **Flujo**:
+
 1. Seleccionar periodo A (semana o mes)
 2. Seleccionar periodo B
 3. Ver datos lado a lado
@@ -358,6 +368,7 @@ cycling-companion/
 **Descripción**: Gestión de datos personales y configuración.
 
 **Secciones**:
+
 - Datos personales: nombre, edad, peso, avatar (de Google)
 - Datos de entrenamiento: FTP, FC max, FC reposo (editables)
 - Zonas automáticas: calculadas al modificar FTP o FC, mostrando tabla de zonas
@@ -373,11 +384,13 @@ cycling-companion/
 **Descripción**: Sistema de alertas basado en reglas.
 
 **Reglas**:
+
 - Si TSS semanal > 1.2x media de las últimas 4 semanas → alerta amarilla
 - Si TSS semanal > 1.5x media → alerta roja
 - Si más de 3 días consecutivos de alta intensidad → alerta de descanso
 
 **Visualización**:
+
 - Banner en dashboard
 - Icono en planificación semanal
 - Mención en recomendación IA
@@ -392,20 +405,22 @@ cycling-companion/
 
 **Puntos de contacto**:
 
-| Ubicación | Tipo de recomendación | Trigger |
-|---|---|---|
-| Dashboard | Recomendación del día | Carga automática |
-| Detalle actividad | Análisis post-sesión | Al abrir actividad sin análisis |
-| Planificación | Plan semanal completo | Al generar/recalcular plan |
-| Comparativas | Resumen de tendencias | Al comparar periodos |
+| Ubicación         | Tipo de recomendación | Trigger                         |
+| ----------------- | --------------------- | ------------------------------- |
+| Dashboard         | Recomendación del día | Carga automática                |
+| Detalle actividad | Análisis post-sesión  | Al abrir actividad sin análisis |
+| Planificación     | Plan semanal completo | Al generar/recalcular plan      |
+| Comparativas      | Resumen de tendencias | Al comparar periodos            |
 
 **Tono del entrenador**:
+
 - Cercano pero profesional
 - Basado en datos, nunca inventado
 - Motivador sin ser condescendiente
 - Siempre explica el porqué
 
 **Implementación**:
+
 - Prompts versionados en `/prompts/`
 - Contexto construido programáticamente (no RAG complejo, sino template filling)
 - Reglas de entrenamiento en código como primer filtro (la IA complementa, no sustituye)
@@ -420,6 +435,7 @@ Para la fase inicial de desarrollo, se proporcionan datos mock que simulan activ
 ### Estructura de datos mock
 
 Archivo `/data/mock/activities.json`:
+
 - 20-30 actividades distribuidas en 6 semanas
 - Variedad de tipos (outdoor, indoor, recovery)
 - Métricas realistas para un ciclista amateur (FTP ~200W, FC max ~175)
@@ -427,11 +443,13 @@ Archivo `/data/mock/activities.json`:
 - Progresión lógica (mejora gradual con algún bajón)
 
 Archivo `/data/mock/user-profile.json`:
+
 - Usuario ejemplo: 45 años, 78kg, FTP 195W, FC max 172, objetivo: performance
 
 ### Transición a datos reales
 
 La arquitectura permite sustituir datos mock por datos reales:
+
 1. Upload de archivos .fit/.gpx
 2. Parseo automático
 3. Misma estructura en BD
@@ -440,15 +458,15 @@ La arquitectura permite sustituir datos mock por datos reales:
 
 ## 6. Requisitos no funcionales
 
-| Requisito | Especificación |
-|---|---|
-| **Rendimiento** | Dashboard carga en < 2s, gráficas en < 1s |
-| **Responsive** | Desktop-first, usable en tablet y móvil |
-| **Accesibilidad** | Contrastes AA, navegación por teclado en flows principales |
-| **Seguridad** | RLS en Supabase, HTTPS, sanitización de inputs |
-| **Privacidad** | Datos del usuario aislados por RLS, no se comparten entre usuarios |
+| Requisito          | Especificación                                                        |
+| ------------------ | --------------------------------------------------------------------- |
+| **Rendimiento**    | Dashboard carga en < 2s, gráficas en < 1s                             |
+| **Responsive**     | Desktop-first, usable en tablet y móvil                               |
+| **Accesibilidad**  | Contrastes AA, navegación por teclado en flows principales            |
+| **Seguridad**      | RLS en Supabase, HTTPS, sanitización de inputs                        |
+| **Privacidad**     | Datos del usuario aislados por RLS, no se comparten entre usuarios    |
 | **Disponibilidad** | Aceptable tier gratuito (cold starts en Render: ~30s primera request) |
-| **Mantenibilidad** | TypeScript end-to-end, linting, tests automatizados |
+| **Mantenibilidad** | TypeScript end-to-end, linting, tests automatizados                   |
 
 ---
 
@@ -467,10 +485,10 @@ La arquitectura permite sustituir datos mock por datos reales:
 
 ## 8. Riesgos y mitigaciones
 
-| Riesgo | Impacto | Mitigación |
-|---|---|---|
-| Recomendaciones IA poco útiles | Alto | Reglas/heurísticas como base + IA como capa explicativa |
-| Tiempo insuficiente para todo el MVP | Alto | Priorización estricta P0/P1, recortar F06-F09 si necesario |
-| Cold starts en Render (free tier) | Bajo | Aceptable para MVP, documentar como limitación |
-| Costes de API de Claude | Medio | Caché de recomendaciones, limitar llamadas por usuario/día |
-| Complejidad del parseo .fit/.gpx | Medio | Empezar con mock, parseo como feature separada |
+| Riesgo                               | Impacto | Mitigación                                                 |
+| ------------------------------------ | ------- | ---------------------------------------------------------- |
+| Recomendaciones IA poco útiles       | Alto    | Reglas/heurísticas como base + IA como capa explicativa    |
+| Tiempo insuficiente para todo el MVP | Alto    | Priorización estricta P0/P1, recortar F06-F09 si necesario |
+| Cold starts en Render (free tier)    | Bajo    | Aceptable para MVP, documentar como limitación             |
+| Costes de API de Claude              | Medio   | Caché de recomendaciones, limitar llamadas por usuario/día |
+| Complejidad del parseo .fit/.gpx     | Medio   | Empezar con mock, parseo como feature separada             |

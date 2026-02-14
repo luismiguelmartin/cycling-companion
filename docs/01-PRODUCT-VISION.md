@@ -62,16 +62,16 @@ No basta con decir "hoy toca intervalos". Un ciclista de 40+ necesita recomendac
 
 Cycling Companion se diferencia por:
 
-| Aspecto | Strava | Garmin Connect | Cycling Companion |
-|---|---|---|---|
-| Trazado de rutas | ✅ | ✅ | ❌ (fuera de MVP) |
-| Mapas | ✅ | ✅ | ❌ (fuera de MVP) |
-| Potencia + FC | ✅ | ✅ | ✅ |
-| Planificación semanal inteligente | ❌ | ❌ | ✅ (IA-driven) |
-| Análisis de tendencias simplificado | ✅ (complejo) | ✅ (complejo) | ✅ (claro y accionable) |
-| Recomendaciones personalizadas | Limitado | Limitado | ✅ (entrenamiento + nutrición + descanso) |
-| Social / segmentos | ✅ | ❌ | ❌ |
-| Entrenador IA integrado | ❌ | ❌ | ✅ |
+| Aspecto                             | Strava        | Garmin Connect | Cycling Companion                         |
+| ----------------------------------- | ------------- | -------------- | ----------------------------------------- |
+| Trazado de rutas                    | ✅            | ✅             | ❌ (fuera de MVP)                         |
+| Mapas                               | ✅            | ✅             | ❌ (fuera de MVP)                         |
+| Potencia + FC                       | ✅            | ✅             | ✅                                        |
+| Planificación semanal inteligente   | ❌            | ❌             | ✅ (IA-driven)                            |
+| Análisis de tendencias simplificado | ✅ (complejo) | ✅ (complejo)  | ✅ (claro y accionable)                   |
+| Recomendaciones personalizadas      | Limitado      | Limitado       | ✅ (entrenamiento + nutrición + descanso) |
+| Social / segmentos                  | ✅            | ❌             | ❌                                        |
+| Entrenador IA integrado             | ❌            | ❌             | ✅                                        |
 
 ---
 
@@ -138,6 +138,7 @@ No es una pantalla, sino una capa que opera en toda la app:
 - **Tono**: cercano, motivador, basado en datos. Como un entrenador experimentado que te conoce.
 
 Internamente se implementa como:
+
 - LLM (Claude) como capa explicativa
 - Reglas + heurísticas para lógica de entrenamiento (no depender solo del LLM)
 - Datos del usuario como contexto (RAG simplificado)
