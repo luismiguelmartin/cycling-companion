@@ -1,14 +1,6 @@
 import { z } from "zod";
 
-export const activityTypeEnum = z.enum([
-  "intervals",
-  "endurance",
-  "recovery",
-  "tempo",
-  "rest",
-  "outdoor",
-  "indoor",
-]);
+export const activityTypeEnum = z.enum(["intervals", "endurance", "recovery", "tempo", "rest"]);
 export type ActivityType = z.infer<typeof activityTypeEnum>;
 
 export const activitySchema = z.object({

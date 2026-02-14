@@ -31,7 +31,7 @@ export function ImportActivityContent() {
   const [form, setForm] = useState<ImportFormData>({
     name: "",
     date: "",
-    type: "outdoor",
+    type: "endurance",
     duration_h: "",
     duration_m: "",
     duration_s: "",
@@ -191,9 +191,11 @@ export function ImportActivityContent() {
                     value={form.type}
                     onChange={(v) => upd("type", v)}
                     options={[
-                      { value: "outdoor", label: "Exterior" },
-                      { value: "indoor", label: "Rodillo" },
-                      { value: "recovery", label: "Recuperacion" },
+                      { value: "endurance", label: "Resistencia" },
+                      { value: "intervals", label: "Intervalos" },
+                      { value: "tempo", label: "Tempo" },
+                      { value: "recovery", label: "Recuperación" },
+                      { value: "rest", label: "Descanso" },
                     ]}
                   />
                   <RPEInput value={form.rpe} onChange={(v) => upd("rpe", v)} />
@@ -280,14 +282,16 @@ export function ImportActivityContent() {
                 </div>
                 <div className="flex-1">
                   <SelectField
-                    label="Tipo de salida"
+                    label="Tipo de sesión"
                     value={form.type}
                     onChange={(v) => upd("type", v)}
                     required
                     options={[
-                      { value: "outdoor", label: "Exterior" },
-                      { value: "indoor", label: "Rodillo" },
-                      { value: "recovery", label: "Recuperacion" },
+                      { value: "endurance", label: "Resistencia" },
+                      { value: "intervals", label: "Intervalos" },
+                      { value: "tempo", label: "Tempo" },
+                      { value: "recovery", label: "Recuperación" },
+                      { value: "rest", label: "Descanso" },
                     ]}
                   />
                 </div>

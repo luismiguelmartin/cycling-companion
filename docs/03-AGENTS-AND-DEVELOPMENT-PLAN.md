@@ -30,7 +30,7 @@ Los agentes locales (Claude Code) se encargan de razonamiento, diseño y decisio
 │  └─────────┘  └──────────┘  └──────────────┘    │
 │       ▲                                           │
 │       │ Mockups JSX + DESIGN-SYSTEM.md            │
-│       │ (docs/designs/ + docs/)                   │
+│       │ (docs/design/ + docs/)                   │
 └──────────────┬───────────────────────────────────┘
                │ Push código / Issues
                ▼
@@ -71,7 +71,7 @@ Los agentes locales (Claude Code) se encargan de razonamiento, diseño y decisio
 El flujo de diseño utiliza **mockups JSX funcionales** como fuente de verdad visual, documentados en un design system completo.
 
 ```
-Mockups JSX (docs/designs/)  +  DESIGN-SYSTEM.md (docs/)
+Mockups JSX (docs/design/)  +  DESIGN-SYSTEM.md (docs/)
                             │
                             ▼
                    Agente UX/Implementer Local (Claude Code)
@@ -80,7 +80,7 @@ Mockups JSX (docs/designs/)  +  DESIGN-SYSTEM.md (docs/)
                    → Implementa siguiendo la guía de conversión del DESIGN-SYSTEM.md
 ```
 
-**Archivos fuente** (en `docs/designs/`, excluidos de git):
+**Archivos fuente** (en `docs/design/`, excluidos de git):
 - `screen-00-login-onboarding.jsx` — Login + Onboarding (4 pasos)
 - `cycling-companion-full-app.jsx` — App principal (6 pantallas)
 
@@ -103,7 +103,7 @@ Estos agentes se invocan manualmente mediante Claude Code. No son servicios aut�
 | **Nombre**      | `ux-interpreter`                                                                                                                                |
 | **Rol**         | Interpretar mockups JSX y el design system para extraer especificación funcional de cada pantalla                                                |
 | **Entorno**     | Claude Code (local)                                                                                                                             |
-| **Input**       | Mockups JSX (`docs/designs/`) + `docs/DESIGN-SYSTEM.md`                                                                                        |
+| **Input**       | Mockups JSX (`docs/design/`) + `docs/DESIGN-SYSTEM.md`                                                                                        |
 | **Output**      | Especificación funcional por pantalla con componentes, datos y flujos de interacción                                                            |
 | **Prompt base** | "Analiza el mockup JSX y la sección correspondiente del DESIGN-SYSTEM.md. Extrae: componentes, jerarquía, estados, flujos de interacción, datos necesarios, tokens de tema aplicables." |
 
@@ -372,17 +372,17 @@ jobs:
 
 ## 3. Resumen de agentes
 
-| ID  | Nombre         | Tipo   | Trigger                | Fase     |
-| --- | -------------- | ------ | ---------------------- | -------- |
-| L1  | UX Interpreter | Local  | Manual                 | Fase 1   |
-| L2  | Architect      | Local  | Manual                 | Fase 1   |
-| L3  | Planner        | Local  | Manual                 | Fase 1-2 |
-| L4  | Implementer    | Local  | Manual                 | Fase 1   |
-| R1  | Issue Analyzer | Remoto | Label `ai-analyze`     | Fase 2   |
-| R2  | PR Generator   | Remoto | Label `ai-generate-pr` | Fase 3   |
-| R3  | PR Reviewer    | Remoto | PR abierta             | Fase 2   |
-| R4  | CI/CD          | Remoto | Push/PR                | Fase 1   |
-| R5  | Doc Generator  | Remoto | PR mergeada            | Fase 3   |
+| ID  | Nombre         | Tipo   | Trigger                | Fase     | Estado (2026-02-14) |
+| --- | -------------- | ------ | ---------------------- | -------- | ------------------- |
+| L1  | UX Interpreter | Local  | Manual                 | Fase 1   | ✅ Usado (8 pantallas) |
+| L2  | Architect      | Local  | Manual                 | Fase 1   | ✅ Usado (8 pantallas) |
+| L3  | Planner        | Local  | Manual                 | Fase 1-2 | ✅ Usado (6 pantallas) |
+| L4  | Implementer    | Local  | Manual                 | Fase 1   | ✅ Usado (6 pantallas implementadas) |
+| R1  | Issue Analyzer | Remoto | Label `ai-analyze`     | Fase 2   | ⏳ Pendiente |
+| R2  | PR Generator   | Remoto | Label `ai-generate-pr` | Fase 3   | ⏳ Pendiente |
+| R3  | PR Reviewer    | Remoto | PR abierta             | Fase 2   | ⏳ Pendiente |
+| R4  | CI/CD          | Remoto | Push/PR                | Fase 1   | ✅ Activo (ci.yml) |
+| R5  | Doc Generator  | Remoto | PR mergeada            | Fase 3   | ⏳ Pendiente |
 
 ---
 
@@ -479,13 +479,13 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 | 5   | Implementar RPE input post-actividad                   | L4              |
 | 5   | Activar agente R1 (Issue Analyzer) en issues nuevas    | R1 (primer uso) |
 
-**Entregables semana 3**:
+**Entregables semana 3**: ✅ COMPLETADOS (parcialmente)
 
-- Lista de actividades funcional
-- Detalle de actividad con gráficas
-- Importación manual
-- PR Review automático funcionando
-- Issue Analysis automático funcionando
+- ✅ Lista de actividades funcional (filtros, búsqueda, paginación)
+- ✅ Detalle de actividad con gráficas (Recharts)
+- ✅ Importación manual + upload .fit/.gpx
+- ⏳ PR Review automático (R3 pendiente de configuración)
+- ⏳ Issue Analysis automático (R1 pendiente de configuración)
 
 #### Semana 4: Planificación y comparativas
 
@@ -502,13 +502,13 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 | 5   | Implementar perfil y ajustes                               | L4     |
 | 5   | Alertas de sobrecarga (reglas + banner)                    | L4     |
 
-**Entregables semana 4**:
+**Entregables semana 4**: 🔄 EN PROGRESO
 
-- Planificación semanal con IA
-- Comparativa de semanas
-- Perfil editable
-- Alertas de sobrecarga
-- **MVP completo** (todas las pantallas funcionales)
+- ⏳ Planificación semanal (especificada L1/L2/L3, pendiente implementación)
+- ⏳ Comparativa de semanas / Insights (especificada L1/L2/L3, pendiente implementación)
+- ✅ Perfil editable (implementado)
+- ⏳ Alertas de sobrecarga (pendiente)
+- ⏳ **MVP completo**: faltan pantallas 05 (Plan Semanal) y 07 (Insights)
 
 **Retrospectiva**: Evaluar calidad de reviews IA vs reviews propias.
 
@@ -788,14 +788,16 @@ Para los agentes R1 y R2 que usan Claude, hay dos opciones:
 
 ## 10. Checklist de arranque
 
-Antes de empezar la semana 1:
+> Estado actualizado: 2026-02-14
 
-- [ ] Crear proyecto en Supabase
-- [ ] Configurar Google OAuth en Google Cloud Console + Supabase
-- [ ] Crear repo en GitHub (público si quieres Actions gratis ilimitado)
-- [ ] Cuenta en Vercel conectada al repo
+- [x] Crear proyecto en Supabase (con 2 migraciones aplicadas)
+- [x] Configurar Google OAuth en Google Cloud Console + Supabase (ref: `docs/GOOGLE-OAUTH-SETUP.md`)
+- [x] Crear repo en GitHub
+- [x] Cuenta en Vercel conectada al repo
 - [ ] Cuenta en Render conectada al repo
 - [ ] API key de Anthropic (para agentes remotos y entrenador IA)
-- [ ] Preparar mockups JSX en `docs/designs/` y documentar en `docs/DESIGN-SYSTEM.md`
-- [ ] Crear archivo `CLAUDE.md` con convenciones del proyecto
-- [ ] Tener este documento y el PRD accesibles en `/docs/`
+- [x] Preparar mockups JSX en `docs/design/` y documentar en `docs/DESIGN-SYSTEM.md`
+- [x] Crear archivo `CLAUDE.md` con convenciones del proyecto
+- [x] Tener este documento y el PRD accesibles en `/docs/`
+- [x] Configurar ESLint 9 + Prettier + Turborepo
+- [x] CI pipeline básico (GitHub Actions: lint, typecheck, format, build)

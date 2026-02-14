@@ -33,7 +33,7 @@ export function RecentActivityItem({
   avgPower,
   avgHR,
 }: RecentActivityItemProps) {
-  const activityType = ACTIVITY_TYPES[type as ActivityTypeKey] ?? ACTIVITY_TYPES.outdoor;
+  const activityType = ACTIVITY_TYPES[type as ActivityTypeKey] ?? ACTIVITY_TYPES.endurance;
 
   return (
     <Link

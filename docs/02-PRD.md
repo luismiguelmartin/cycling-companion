@@ -33,7 +33,7 @@ El producto se desarrolla como caso de uso real de un pipeline AI-first integrad
 | **Recharts o Chart.js**         | Gráficas de rendimiento (potencia, FC, tendencias). Recharts por integración natural con React.        |
 | **shadcn/ui**                   | Componentes accesibles y personalizables sobre Radix UI + Tailwind.                                    |
 
-**Diseño visual**: Basado en mockups JSX de referencia (`docs/designs/`, excluidos de git) y documentado en `docs/DESIGN-SYSTEM.md` (pantallas, tokens, componentes, guía de conversión JSX→Next.js+Tailwind).
+**Diseño visual**: Basado en mockups JSX de referencia (`docs/design/`, excluidos de git) y documentado en `docs/DESIGN-SYSTEM.md` (pantallas, tokens, componentes, guía de conversión JSX→Next.js+Tailwind).
 
 #### PWA
 
@@ -100,7 +100,7 @@ activities
 ├── user_id (UUID, NOT NULL, FK → users, ON DELETE CASCADE)
 ├── name (TEXT, NOT NULL)
 ├── date (DATE, NOT NULL)
-├── type (activity_type ENUM: 'outdoor' | 'indoor' | 'recovery')  ← ⚠️ ver nota abajo
+├── type (activity_type ENUM: 'intervals' | 'endurance' | 'recovery' | 'tempo' | 'rest')
 ├── duration_seconds (INTEGER, NOT NULL, CHECK > 0)
 ├── distance_km (DECIMAL(8,2), CHECK ≥ 0)
 ├── avg_power_watts (INTEGER, CHECK ≥ 0)
@@ -137,12 +137,11 @@ activity_metrics (series temporales)
 └── speed_kmh (DECIMAL(5,2), nullable, CHECK ≥ 0)
 ```
 
-**⚠️ Nota sobre `activity_type`**: La ENUM en base de datos usa `('outdoor', 'indoor', 'recovery')` (migration 001). Sin embargo, el diseño visual y las constantes del frontend (`packages/shared/src/constants/activity-types.ts`) manejan 5 tipos: `intervals`, `endurance`, `tempo`, `recovery`, `rest`. Esta diferencia se resolverá en una migración futura (Fase 2) que actualizará el ENUM de la base de datos para alinearlo con el diseño.
-
-**Decisiones de diseño aplicadas (migration 002)**:
+**Decisiones de diseño aplicadas (migrations 002 + 003)**:
 - `goal` cambió de `goal_type` ENUM a TEXT con CHECK constraint (ADR-004: más flexible para migraciones futuras)
 - `display_name`, `age`, `weight_kg` son NOT NULL (obligatorios en el onboarding)
 - CHECKs más estrictos en `ftp` (< 1000), `max_hr` (< 250), `rest_hr` (< 200), `weight_kg` (< 300)
+- `activity_type` ENUM actualizado de `('outdoor', 'indoor', 'recovery')` a `('intervals', 'endurance', 'recovery', 'tempo', 'rest')` (migration 003) — alineado con el diseño del producto
 
 ### 3.4 IA / LLM
 
@@ -512,7 +511,6 @@ La arquitectura ya soporta datos reales:
 | Cold starts en Render (free tier)    | Bajo    | Aceptable para MVP, documentar como limitación             |
 | Costes de API de Claude              | Medio   | Caché de recomendaciones, limitar llamadas por usuario/día |
 | Complejidad del parseo .fit/.gpx     | Medio   | Empezar con mock, parseo como feature separada             |
-| ENUM activity_type desalineado       | Bajo    | DB usa outdoor/indoor/recovery; frontend usa 5 tipos. Migración pendiente en Fase 2 |
 
 ---
 

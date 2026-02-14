@@ -23,7 +23,7 @@ const MOCK_NAMES = [
   "Subida al puerto",
 ];
 
-const MOCK_TYPES = ["outdoor", "indoor", "recovery"] as const;
+const MOCK_TYPES = ["intervals", "endurance", "recovery", "tempo"] as const;
 
 export function generateMockActivity(): ImportFormData {
   return {

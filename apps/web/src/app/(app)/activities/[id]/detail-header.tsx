@@ -7,7 +7,7 @@ interface DetailHeaderProps {
 }
 
 export function DetailHeader({ name, type, dateFormatted }: DetailHeaderProps) {
-  const activityType = ACTIVITY_TYPES[type as ActivityTypeKey] ?? ACTIVITY_TYPES.outdoor;
+  const activityType = ACTIVITY_TYPES[type as ActivityTypeKey] ?? ACTIVITY_TYPES.endurance;
 
   return (
     <div>

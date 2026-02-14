@@ -14,7 +14,7 @@ describe("ACTIVITY_FILTERS", () => {
     expect(ACTIVITY_FILTERS).toHaveProperty("tempo");
   });
 
-  it("no incluye rest", () => {
+  it("no incluye rest (no tiene sentido filtrar por descanso)", () => {
     expect(ACTIVITY_FILTERS).not.toHaveProperty("rest");
   });
 

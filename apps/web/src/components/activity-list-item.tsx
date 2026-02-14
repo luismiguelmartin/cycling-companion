@@ -31,7 +31,7 @@ export function ActivityListItem({
   avgHR,
   rpe,
 }: ActivityListItemProps) {
-  const activityType = ACTIVITY_TYPES[type as ActivityTypeKey] ?? ACTIVITY_TYPES.outdoor;
+  const activityType = ACTIVITY_TYPES[type as ActivityTypeKey] ?? ACTIVITY_TYPES.endurance;
 
   return (
     <Link

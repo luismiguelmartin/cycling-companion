@@ -31,7 +31,7 @@ INSERT INTO activities (
   '<USER_ID>',
   'Ruta del Puerto - Salida larga',
   CURRENT_DATE - INTERVAL '3 days',
-  'outdoor',
+  'endurance',
   10800,  -- 3 horas
   95.5,
   195,
@@ -44,7 +44,7 @@ INSERT INTO activities (
   true  -- Marcar como actividad de referencia
 );
 
--- Actividad 2: Sesión de intervalos indoor (hace 2 días)
+-- Actividad 2: Sesión de intervalos (hace 2 días)
 INSERT INTO activities (
   user_id,
   name,
@@ -63,7 +63,7 @@ INSERT INTO activities (
   '<USER_ID>',
   'Intervalos 4x8min @ FTP',
   CURRENT_DATE - INTERVAL '2 days',
-  'indoor',
+  'intervals',
   3600,  -- 1 hora
   0,  -- Indoor, sin distancia real
   210,
@@ -106,7 +106,7 @@ INSERT INTO activities (
   'Piernas cansadas del día anterior. Ritmo muy suave.'
 );
 
--- Actividad 4: Salida matinal (hoy)
+-- Actividad 4: Tempo (hoy)
 INSERT INTO activities (
   user_id,
   name,
@@ -125,7 +125,7 @@ INSERT INTO activities (
   '<USER_ID>',
   'Salida matinal - Tempo',
   CURRENT_DATE,
-  'outdoor',
+  'tempo',
   5400,  -- 1.5 horas
   52.3,
   185,
@@ -140,14 +140,14 @@ INSERT INTO activities (
 -- Actividades adicionales de semanas anteriores (para tener historial)
 -- Semana -1
 INSERT INTO activities (user_id, name, date, type, duration_seconds, distance_km, avg_power_watts, avg_hr_bpm, max_hr_bpm, avg_cadence_rpm, tss, rpe) VALUES
-('<USER_ID>', 'Salida club - Ritmo grupo', CURRENT_DATE - INTERVAL '7 days', 'outdoor', 7200, 80.0, 175, 140, 165, 84, 110, 6),
-('<USER_ID>', 'Series cortas 10x1min', CURRENT_DATE - INTERVAL '9 days', 'indoor', 3000, 0, 230, 162, 182, 95, 65, 8),
-('<USER_ID>', 'Rodaje suave', CURRENT_DATE - INTERVAL '10 days', 'outdoor', 4500, 48.0, 150, 130, 148, 80, 50, 4);
+('<USER_ID>', 'Salida club - Ritmo grupo', CURRENT_DATE - INTERVAL '7 days', 'endurance', 7200, 80.0, 175, 140, 165, 84, 110, 6),
+('<USER_ID>', 'Series cortas 10x1min', CURRENT_DATE - INTERVAL '9 days', 'intervals', 3000, 0, 230, 162, 182, 95, 65, 8),
+('<USER_ID>', 'Rodaje suave', CURRENT_DATE - INTERVAL '10 days', 'endurance', 4500, 48.0, 150, 130, 148, 80, 50, 4);
 
 -- Semana -2
 INSERT INTO activities (user_id, name, date, type, duration_seconds, distance_km, avg_power_watts, avg_hr_bpm, max_hr_bpm, avg_cadence_rpm, tss, rpe) VALUES
-('<USER_ID>', 'Subida Puerto Alto - Test', CURRENT_DATE - INTERVAL '14 days', 'outdoor', 9000, 70.0, 200, 152, 170, 87, 150, 9),
-('<USER_ID>', 'Sweet Spot 3x15min', CURRENT_DATE - INTERVAL '16 days', 'indoor', 4200, 0, 205, 150, 168, 90, 95, 7),
+('<USER_ID>', 'Subida Puerto Alto - Test', CURRENT_DATE - INTERVAL '14 days', 'tempo', 9000, 70.0, 200, 152, 170, 87, 150, 9),
+('<USER_ID>', 'Sweet Spot 3x15min', CURRENT_DATE - INTERVAL '16 days', 'intervals', 4200, 0, 205, 150, 168, 90, 95, 7),
 ('<USER_ID>', 'Recuperación Z1', CURRENT_DATE - INTERVAL '17 days', 'recovery', 3600, 30.0, 110, 115, 130, 72, 30, 2);
 
 -- ==============================================================================
@@ -207,7 +207,7 @@ INSERT INTO weekly_plans (
       },
       {
         "day": "Sábado",
-        "type": "long_ride",
+        "type": "endurance",
         "intensity": "Salida larga Z2, algunos picos Z3",
         "duration": "2.5-3h",
         "nutrition_tip": "Ingesta cada 45min (geles, barritas). Electrolitos constantes.",
@@ -242,7 +242,7 @@ INSERT INTO weekly_plans (
       {"day": "Miércoles", "type": "recovery", "intensity": "Z1", "duration": "45 min", "nutrition_tip": "Ligero.", "rest_tip": "Movilidad."},
       {"day": "Jueves", "type": "tempo", "intensity": "3x15min @ Z3", "duration": "75 min", "nutrition_tip": "Gel si es necesario.", "rest_tip": "Foam rolling."},
       {"day": "Viernes", "type": "rest", "intensity": "Descanso o Z1", "duration": "30 min", "nutrition_tip": "Hidratación.", "rest_tip": "Preparar fin de semana."},
-      {"day": "Sábado", "type": "long_ride", "intensity": "Z2 con picos", "duration": "3h", "nutrition_tip": "Cada 45min ingesta.", "rest_tip": "Recuperación activa."},
+      {"day": "Sábado", "type": "endurance", "intensity": "Z2 con picos", "duration": "3h", "nutrition_tip": "Cada 45min ingesta.", "rest_tip": "Recuperación activa."},
       {"day": "Domingo", "type": "endurance", "intensity": "Z2 constante", "duration": "2h", "nutrition_tip": "Desayuno completo.", "rest_tip": "Descanso tarde."}
     ]
   }',

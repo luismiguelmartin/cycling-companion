@@ -29,9 +29,9 @@ describe("generateMockActivity", () => {
     expect(mock.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
-  it("genera un tipo válido (outdoor, indoor o recovery)", () => {
+  it("genera un tipo válido (intervals, endurance, recovery o tempo)", () => {
     const mock = generateMockActivity();
-    expect(["outdoor", "indoor", "recovery"]).toContain(mock.type);
+    expect(["intervals", "endurance", "recovery", "tempo"]).toContain(mock.type);
   });
 
   it("genera duración con horas entre 1 y 3", () => {
