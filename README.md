@@ -27,6 +27,7 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 **Fase actual**: Fase 2 — MVP funcional (frontend completo, backend/IA pendientes)
 
 ### Completado
+
 - ✅ Monorepo configurado (Turborepo + pnpm)
 - ✅ Autenticación con Google OAuth (Supabase Auth)
 - ✅ Onboarding wizard (4 pasos)
@@ -39,6 +40,7 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 - ✅ 22 especificaciones L1/L2/L3 para 8 pantallas
 
 ### Pendiente
+
 - ⬜ API Fastify: solo tiene `/health`, faltan endpoints CRUD y de IA
 - ⬜ Integración Claude API: entrenador virtual (análisis actividades, generación planes)
 - ⬜ Importación real de actividades (pantalla UI lista, sin conexión a backend)
@@ -60,33 +62,33 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 
 ## 🛠 Stack Tecnológico
 
-| Capa | Tecnología |
-|------|-----------|
-| **Frontend** | Next.js 16 (App Router), React 19, TypeScript 5.7, Tailwind CSS 3.4 |
-| **Componentes UI** | shadcn/ui, Radix UI, Lucide React (iconos), Recharts (gráficas) |
-| **Backend** | Fastify 5, TypeScript, Zod (validación) |
-| **Base de Datos** | Supabase (PostgreSQL + Auth + Storage + RLS) |
-| **Autenticación** | Supabase Auth con Google OAuth |
-| **IA** | Claude API (Anthropic) para recomendaciones |
-| **Monorepo** | Turborepo + pnpm |
-| **Testing** | Vitest, React Testing Library |
-| **Tipografía** | DM Sans (400/500/600/700) |
+| Capa               | Tecnología                                                          |
+| ------------------ | ------------------------------------------------------------------- |
+| **Frontend**       | Next.js 16 (App Router), React 19, TypeScript 5.7, Tailwind CSS 3.4 |
+| **Componentes UI** | shadcn/ui, Radix UI, Lucide React (iconos), Recharts (gráficas)     |
+| **Backend**        | Fastify 5, TypeScript, Zod (validación)                             |
+| **Base de Datos**  | Supabase (PostgreSQL + Auth + Storage + RLS)                        |
+| **Autenticación**  | Supabase Auth con Google OAuth                                      |
+| **IA**             | Claude API (Anthropic) para recomendaciones                         |
+| **Monorepo**       | Turborepo + pnpm                                                    |
+| **Testing**        | Vitest, React Testing Library                                       |
+| **Tipografía**     | DM Sans (400/500/600/700)                                           |
 
 ---
 
 ## 🖥 Pantallas
 
-| Ruta | Pantalla | Fuente de datos |
-|------|----------|-----------------|
-| `/auth/login` | Login con Google OAuth | Supabase Auth |
-| `/onboarding` | Onboarding wizard (4 pasos: perfil → objetivos → zonas → resumen) | Supabase |
-| `/` | Dashboard: KPIs, gráficas de potencia/carga, coach IA, actividades recientes | Supabase + mock |
-| `/activities` | Lista de actividades con filtros por tipo y búsqueda | Supabase |
-| `/activities/[id]` | Detalle: métricas, gráfica temporal (potencia/FC/cadencia), análisis IA | Supabase |
-| `/activities/import` | Importar actividad: entrada manual o subida de archivo | Solo UI |
-| `/plan` | Planificación semanal: grid 7 días, tips nutrición/descanso, barra de carga | Mock data |
-| `/insights` | Insights: comparativa entre periodos, radar de rendimiento, análisis IA | Supabase (cálculos client) |
-| `/profile` | Perfil: datos personales, zonas potencia/FC, ajustes (tema, unidades) | Supabase |
+| Ruta                 | Pantalla                                                                     | Fuente de datos            |
+| -------------------- | ---------------------------------------------------------------------------- | -------------------------- |
+| `/auth/login`        | Login con Google OAuth                                                       | Supabase Auth              |
+| `/onboarding`        | Onboarding wizard (4 pasos: perfil → objetivos → zonas → resumen)            | Supabase                   |
+| `/`                  | Dashboard: KPIs, gráficas de potencia/carga, coach IA, actividades recientes | Supabase + mock            |
+| `/activities`        | Lista de actividades con filtros por tipo y búsqueda                         | Supabase                   |
+| `/activities/[id]`   | Detalle: métricas, gráfica temporal (potencia/FC/cadencia), análisis IA      | Supabase                   |
+| `/activities/import` | Importar actividad: entrada manual o subida de archivo                       | Solo UI                    |
+| `/plan`              | Planificación semanal: grid 7 días, tips nutrición/descanso, barra de carga  | Mock data                  |
+| `/insights`          | Insights: comparativa entre periodos, radar de rendimiento, análisis IA      | Supabase (cálculos client) |
+| `/profile`           | Perfil: datos personales, zonas potencia/FC, ajustes (tema, unidades)        | Supabase                   |
 
 ---
 
@@ -257,15 +259,15 @@ cycling-companion/
 
 ## 📚 Documentación
 
-| Documento | Descripción |
-|-----------|-------------|
-| [01-PRODUCT-VISION.md](docs/01-PRODUCT-VISION.md) | Visión del producto y propuesta de valor |
-| [02-PRD.md](docs/02-PRD.md) | PRD completo: modelo de datos, endpoints, flujo IA |
-| [03-AGENTS-AND-DEVELOPMENT-PLAN.md](docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md) | Plan de agentes y desarrollo con timeline |
-| [DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md) | Design system: pantallas, tokens, componentes, conversión JSX→Next.js |
-| [GOOGLE-OAUTH-SETUP.md](docs/GOOGLE-OAUTH-SETUP.md) | Guía de configuración de Google OAuth |
-| [SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md) | Guía de configuración de Supabase |
-| `docs/specs/` | 22 especificaciones L1 (UX), L2 (técnico), L3 (issues) para 8 pantallas |
+| Documento                                                                   | Descripción                                                             |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| [01-PRODUCT-VISION.md](docs/01-PRODUCT-VISION.md)                           | Visión del producto y propuesta de valor                                |
+| [02-PRD.md](docs/02-PRD.md)                                                 | PRD completo: modelo de datos, endpoints, flujo IA                      |
+| [03-AGENTS-AND-DEVELOPMENT-PLAN.md](docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md) | Plan de agentes y desarrollo con timeline                               |
+| [DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md)                                   | Design system: pantallas, tokens, componentes, conversión JSX→Next.js   |
+| [GOOGLE-OAUTH-SETUP.md](docs/GOOGLE-OAUTH-SETUP.md)                         | Guía de configuración de Google OAuth                                   |
+| [SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md)                                 | Guía de configuración de Supabase                                       |
+| `docs/specs/`                                                               | 22 especificaciones L1 (UX), L2 (técnico), L3 (issues) para 8 pantallas |
 
 ---
 
@@ -275,22 +277,22 @@ Este proyecto implementa un pipeline multi-agente para integrar IA en el ciclo d
 
 ### Agentes Locales (Claude Code)
 
-| Agente | Rol | Trigger |
-|--------|-----|---------|
-| **L1: UX Interpreter** | Mockups → especificación funcional | Manual |
-| **L2: Architect** | Especificación → diseño técnico | Manual |
-| **L3: Planner** | Diseño → issues incrementales | Manual |
-| **L4: Implementer** | Implementar código con supervisión | Manual |
+| Agente                 | Rol                                | Trigger |
+| ---------------------- | ---------------------------------- | ------- |
+| **L1: UX Interpreter** | Mockups → especificación funcional | Manual  |
+| **L2: Architect**      | Especificación → diseño técnico    | Manual  |
+| **L3: Planner**        | Diseño → issues incrementales      | Manual  |
+| **L4: Implementer**    | Implementar código con supervisión | Manual  |
 
 ### Agentes Remotos (GitHub Actions) — planificados
 
-| Agente | Rol | Trigger |
-|--------|-----|---------|
-| **R1: Issue Analyzer** | Analizar impacto y complejidad | Label `ai-analyze` |
-| **R2: PR Generator** | Generar PR completa desde issue | Label `ai-generate-pr` |
-| **R3: PR Reviewer** | Code review automático | PR abierta |
-| **R4: CI/CD** | Lint, test, build | Push/PR |
-| **R5: Doc Generator** | Actualizar CHANGELOG, README | PR mergeada |
+| Agente                 | Rol                             | Trigger                |
+| ---------------------- | ------------------------------- | ---------------------- |
+| **R1: Issue Analyzer** | Analizar impacto y complejidad  | Label `ai-analyze`     |
+| **R2: PR Generator**   | Generar PR completa desde issue | Label `ai-generate-pr` |
+| **R3: PR Reviewer**    | Code review automático          | PR abierta             |
+| **R4: CI/CD**          | Lint, test, build               | Push/PR                |
+| **R5: Doc Generator**  | Actualizar CHANGELOG, README    | PR mergeada            |
 
 ---
 
@@ -323,12 +325,12 @@ Este proyecto implementa un pipeline multi-agente para integrar IA en el ciclo d
 
 ## 📅 Fases de Desarrollo
 
-| Fase | Descripción | Estado |
-|------|-------------|--------|
-| **Fase 1** | Cimientos: monorepo, CI, Auth, deploy, schema DB | ✅ Completada |
-| **Fase 2** | MVP funcional: pantallas frontend, datos mock, specs | 🔄 En curso |
-| **Fase 3** | Core features: API endpoints, integración Claude, import real | ⬜ Pendiente |
-| **Fase 4** | Refinamiento: agentes remotos, evaluación, documentación | ⬜ Pendiente |
+| Fase       | Descripción                                                   | Estado        |
+| ---------- | ------------------------------------------------------------- | ------------- |
+| **Fase 1** | Cimientos: monorepo, CI, Auth, deploy, schema DB              | ✅ Completada |
+| **Fase 2** | MVP funcional: pantallas frontend, datos mock, specs          | 🔄 En curso   |
+| **Fase 3** | Core features: API endpoints, integración Claude, import real | ⬜ Pendiente  |
+| **Fase 4** | Refinamiento: agentes remotos, evaluación, documentación      | ⬜ Pendiente  |
 
 ---
 
