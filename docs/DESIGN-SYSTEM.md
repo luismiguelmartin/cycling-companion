@@ -10,7 +10,7 @@ Referencia visual extraída de los mockups JSX. Usar como guía para implementar
 
 ## 1. Pantallas
 
-### 1.0a Login (`LoginScreen`)
+### Screen-00a: Login (`LoginScreen`)
 **Ruta sugerida**: `/login`
 **Fuente**: `screen-00-login-onboarding.jsx`
 
@@ -42,7 +42,7 @@ Referencia visual extraída de los mockups JSX. Usar como guía para implementar
 
 ---
 
-### 1.0b Onboarding (`OnboardingScreen`)
+### Screen-00b: Onboarding (`OnboardingScreen`)
 **Ruta sugerida**: `/onboarding`
 **Fuente**: `screen-00-login-onboarding.jsx`
 
@@ -112,7 +112,7 @@ LoginScreen → (onLogin) → OnboardingScreen → (onComplete) → Pantalla con
 
 ---
 
-### 1.1 Dashboard (`DashboardPage`)
+### Screen-01: Dashboard (`DashboardPage`)
 **Ruta sugerida**: `/` o `/dashboard`
 
 | Elemento | Descripción | Datos |
@@ -129,7 +129,7 @@ LoginScreen → (onLogin) → OnboardingScreen → (onComplete) → Pantalla con
 
 ---
 
-### 1.2 Lista de Actividades (`ActivitiesPage`)
+### Screen-03: Lista de Actividades (`ActivitiesPage`)
 **Ruta sugerida**: `/activities`
 
 | Elemento | Descripción | Datos |
@@ -144,7 +144,7 @@ LoginScreen → (onLogin) → OnboardingScreen → (onComplete) → Pantalla con
 
 ---
 
-### 1.3 Detalle de Actividad (`DetailPage`)
+### Screen-04: Detalle de Actividad (`DetailPage`)
 **Ruta sugerida**: `/activities/:id`
 
 | Elemento | Descripción | Datos |
@@ -159,7 +159,7 @@ LoginScreen → (onLogin) → OnboardingScreen → (onComplete) → Pantalla con
 
 ---
 
-### 1.4 Planificación Semanal (`PlanPage`)
+### Screen-05: Planificación Semanal (`PlanPage`)
 **Ruta sugerida**: `/plan`
 
 | Elemento | Descripción | Datos |
@@ -175,7 +175,7 @@ LoginScreen → (onLogin) → OnboardingScreen → (onComplete) → Pantalla con
 
 ---
 
-### 1.5 Insights / Comparar (`InsightsPage`)
+### Screen-07: Insights / Comparar (`InsightsPage`)
 **Ruta sugerida**: `/insights`
 
 | Elemento | Descripción | Datos |
@@ -191,7 +191,7 @@ LoginScreen → (onLogin) → OnboardingScreen → (onComplete) → Pantalla con
 
 ---
 
-### 1.6 Perfil (`ProfilePage`)
+### Screen-06: Perfil (`ProfilePage`)
 **Ruta sugerida**: `/profile`
 
 | Elemento | Descripción | Datos |

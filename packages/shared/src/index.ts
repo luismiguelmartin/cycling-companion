@@ -8,5 +8,21 @@ export {
   type UserProfile,
 } from "./schemas/user-profile";
 
+export {
+  activityTypeEnum,
+  activitySchema,
+  type ActivityType,
+  type Activity,
+} from "./schemas/activity";
+
 // Constants
 export { GOALS, ONBOARDING_STEPS } from "./constants/goals";
+export { NAV_ITEMS } from "./constants/navigation";
+export { ACTIVITY_TYPES, type ActivityTypeKey } from "./constants/activity-types";
+export {
+  POWER_ZONES,
+  HR_ZONES,
+  calculateZones,
+  type ZoneDefinition,
+  type CalculatedZone,
+} from "./constants/zones";

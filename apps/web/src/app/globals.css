@@ -33,6 +33,20 @@
     /* Surface */
     --surface-bg: #ffffff;
     --surface-elevated: #f8fafc;
+
+    /* Sidebar */
+    --sidebar-bg: linear-gradient(180deg, #ffffff, #f1f5f9);
+    --active-nav-bg: rgba(249, 115, 22, 0.08);
+    --accent: #ea580c;
+    --hover-bg: rgba(0, 0, 0, 0.04);
+
+    /* Dashboard page */
+    --page-bg: #f8f9fb;
+
+    /* Chart tokens */
+    --grid-color: #e2e8f0;
+    --tooltip-bg: #ffffff;
+    --tooltip-border: #e2e8f0;
   }
 
   /* ===== Dark theme ===== */
@@ -58,5 +72,19 @@
 
     --surface-bg: #0f172a;
     --surface-elevated: #1e293b;
+
+    /* Sidebar */
+    --sidebar-bg: linear-gradient(180deg, #0f1923, #162032);
+    --active-nav-bg: rgba(249, 115, 22, 0.12);
+    --accent: #f97316;
+    --hover-bg: rgba(255, 255, 255, 0.04);
+
+    /* Dashboard page */
+    --page-bg: #0c1320;
+
+    /* Chart tokens */
+    --grid-color: rgba(255, 255, 255, 0.04);
+    --tooltip-bg: rgba(15, 25, 35, 0.95);
+    --tooltip-border: rgba(255, 255, 255, 0.1);
   }
 }
