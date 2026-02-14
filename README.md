@@ -8,8 +8,10 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 
 ## 📋 Índice
 
+- [Estado del Proyecto](#estado-del-proyecto)
 - [Propuesta de Valor](#propuesta-de-valor)
 - [Stack Tecnológico](#stack-tecnológico)
+- [Pantallas](#pantallas)
 - [Arquitectura](#arquitectura)
 - [Instalación](#instalación)
 - [Desarrollo](#desarrollo)
@@ -17,6 +19,31 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 - [Documentación](#documentación)
 - [Limitaciones MVP](#limitaciones-mvp)
 - [Licencia](#licencia)
+
+---
+
+## 📊 Estado del Proyecto
+
+**Fase actual**: Fase 2 — MVP funcional (frontend completo, backend/IA pendientes)
+
+### Completado
+- ✅ Monorepo configurado (Turborepo + pnpm)
+- ✅ Autenticación con Google OAuth (Supabase Auth)
+- ✅ Onboarding wizard (4 pasos)
+- ✅ 9 pantallas frontend implementadas (ver [Pantallas](#pantallas))
+- ✅ 32 componentes reutilizables
+- ✅ 16 archivos de test (103 tests)
+- ✅ 4 schemas Zod compartidos + 7 módulos de constantes
+- ✅ 3 migraciones SQL (schema, onboarding, activity types)
+- ✅ Design system documentado (dark/light theme)
+- ✅ 22 especificaciones L1/L2/L3 para 8 pantallas
+
+### Pendiente
+- ⬜ API Fastify: solo tiene `/health`, faltan endpoints CRUD y de IA
+- ⬜ Integración Claude API: entrenador virtual (análisis actividades, generación planes)
+- ⬜ Importación real de actividades (pantalla UI lista, sin conexión a backend)
+- ⬜ Plan semanal real (usa datos mock; falta consultar tabla `weekly_plans`)
+- ⬜ Deploy a producción (Vercel + Render + Supabase)
 
 ---
 
@@ -33,61 +60,49 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 
 ## 🛠 Stack Tecnológico
 
-### Monorepo con Turborepo + pnpm
+| Capa | Tecnología |
+|------|-----------|
+| **Frontend** | Next.js 16 (App Router), React 19, TypeScript 5.7, Tailwind CSS 3.4 |
+| **Componentes UI** | shadcn/ui, Radix UI, Lucide React (iconos), Recharts (gráficas) |
+| **Backend** | Fastify 5, TypeScript, Zod (validación) |
+| **Base de Datos** | Supabase (PostgreSQL + Auth + Storage + RLS) |
+| **Autenticación** | Supabase Auth con Google OAuth |
+| **IA** | Claude API (Anthropic) para recomendaciones |
+| **Monorepo** | Turborepo + pnpm |
+| **Testing** | Vitest, React Testing Library |
+| **Tipografía** | DM Sans (400/500/600/700) |
 
-```
-cycling-companion/
-├── apps/
-│   ├── web/          Next.js 16 (App Router, TypeScript, Tailwind CSS)
-│   └── api/          Fastify (TypeScript, Zod validation, Swagger)
-├── packages/
-│   └── shared/       Types compartidos, validaciones Zod
-├── prompts/          Prompts versionados para IA
-├── docs/             Documentación del producto y desarrollo
-└── data/mock/        Datos mock para desarrollo
-```
+---
 
-### Stack Principal
+## 🖥 Pantallas
 
-| Capa              | Tecnología                                                                |
-| ----------------- | ------------------------------------------------------------------------- |
-| **Frontend**      | Next.js 16 (LTS), React 19, TypeScript, Tailwind CSS, Recharts, shadcn/ui |
-| **Backend**       | Fastify, TypeScript, Zod (validación), Swagger (documentación)            |
-| **Base de Datos** | Supabase (PostgreSQL + Auth + Storage + RLS)                              |
-| **Autenticación** | Supabase Auth con Google OAuth                                            |
-| **IA**            | Claude API (Anthropic) para recomendaciones                               |
-| **Deploy**        | Vercel (frontend), Render (API), Supabase (DB)                            |
-| **CI/CD**         | GitHub Actions                                                            |
+| Ruta | Pantalla | Fuente de datos |
+|------|----------|-----------------|
+| `/auth/login` | Login con Google OAuth | Supabase Auth |
+| `/onboarding` | Onboarding wizard (4 pasos: perfil → objetivos → zonas → resumen) | Supabase |
+| `/` | Dashboard: KPIs, gráficas de potencia/carga, coach IA, actividades recientes | Supabase + mock |
+| `/activities` | Lista de actividades con filtros por tipo y búsqueda | Supabase |
+| `/activities/[id]` | Detalle: métricas, gráfica temporal (potencia/FC/cadencia), análisis IA | Supabase |
+| `/activities/import` | Importar actividad: entrada manual o subida de archivo | Solo UI |
+| `/plan` | Planificación semanal: grid 7 días, tips nutrición/descanso, barra de carga | Mock data |
+| `/insights` | Insights: comparativa entre periodos, radar de rendimiento, análisis IA | Supabase (cálculos client) |
+| `/profile` | Perfil: datos personales, zonas potencia/FC, ajustes (tema, unidades) | Supabase |
 
 ---
 
 ## 🏗 Arquitectura
 
-### Modelo de Datos
+### Modelo de Datos (3 migraciones SQL)
 
-**users**
+**users** — Perfil: edad, peso, FTP, FC máx/reposo, objetivo (performance/health/weight_loss/recovery)
 
-- Perfil: edad, peso, FTP (Functional Threshold Power), FC máxima/reposo
-- Objetivo: performance | health | weight_loss | recovery
-- Zonas de potencia y FC calculadas automáticamente
+**activities** — Métricas: duración, distancia, potencia, FC, cadencia, TSS, RPE (1-10), análisis IA (JSONB), notas
 
-**activities**
+**weekly_plans** — Plan semanal: 7 días (tipo, intensidad, duración, tips nutrición/descanso), rationale IA
 
-- Métricas: duración, distancia, potencia media, FC media, cadencia, TSS
-- RPE: Rating of Perceived Exertion (input subjetivo 1-10)
-- ai_analysis: análisis generado por Claude (JSONB)
-- raw_file_url: archivo .fit/.gpx original (Supabase Storage)
+**activity_metrics** — Series temporales: potencia, FC, cadencia, velocidad por segundo
 
-**weekly_plans**
-
-- plan_data: estructura JSONB con 7 días (tipo, intensidad, duración, tips)
-- ai_rationale: explicación del plan generado
-
-**activity_metrics**
-
-- Series temporales: potencia, FC, cadencia, velocidad por segundo
-
-### Endpoints API Principales
+### Endpoints API (planificados)
 
 ```
 /api/v1/
@@ -98,12 +113,14 @@ cycling-companion/
 ├── /insights          Comparativas y tendencias
 ├── /profile           Perfil del usuario
 └── /ai
-    ├── /ai/analyze-activity   Análisis post-sesión
-    ├── /ai/weekly-plan        Generación de plan semanal
-    └── /ai/weekly-summary     Resumen comparativo
+    ├── /analyze-activity   Análisis post-sesión
+    ├── /weekly-plan        Generación de plan semanal
+    └── /weekly-summary     Resumen comparativo
 ```
 
-### Flujo de Recomendaciones IA
+> **Nota**: Actualmente solo `/health` está implementado. Los endpoints listados son el diseño objetivo.
+
+### Flujo de Recomendaciones IA (diseño)
 
 ```
 1. Recopilar contexto (perfil + últimas N actividades + plan actual)
@@ -119,14 +136,6 @@ cycling-companion/
 6. Presentar al usuario con explicación clara
 ```
 
-**Principios del entrenador IA:**
-
-- Cercano pero profesional
-- Basado en datos, nunca inventado
-- Motivador sin ser condescendiente
-- Siempre explica el porqué
-- La IA recomienda, nunca decide sola
-
 ---
 
 ## 🚀 Instalación
@@ -141,88 +150,55 @@ cycling-companion/
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/username/cycling-companion.git
+git clone https://github.com/luismiguelmartin/cycling-companion.git
 cd cycling-companion
 
 # 2. Instalar dependencias
 pnpm install
 
 # 3. Configurar variables de entorno
-cp apps/web/.env.example apps/web/.env.local
+cp apps/web/.env.example apps/web/.env
 cp apps/api/.env.example apps/api/.env
 
 # 4. Editar .env con tus credenciales:
-#    - SUPABASE_URL y SUPABASE_ANON_KEY
-#    - ANTHROPIC_API_KEY (para Claude)
-#    - Otras credenciales según sea necesario
+#    - SUPABASE_URL y SUPABASE_ANON_KEY (apps/web y apps/api)
+#    - ANTHROPIC_API_KEY (apps/api, para Claude)
 ```
 
 ### Configurar Base de Datos
 
 ```bash
-# Generar tipos de Supabase
-pnpm db:types
-
 # Ejecutar migraciones (desde Supabase Dashboard o CLI)
 supabase db push
 
 # Seed de datos mock (opcional, para desarrollo)
-pnpm db:seed
+# Ejecutar supabase/seed_personalized.sql desde el Dashboard SQL Editor
 ```
 
 ---
 
 ## 💻 Desarrollo
 
-### Ejecutar el Proyecto Completo
-
 ```bash
-# Ejecutar frontend + backend + monitoreo
+# Ejecutar frontend + backend
 pnpm dev
-```
 
-El proyecto estará disponible en:
-
-- **Frontend**: http://localhost:3000
-- **API**: http://localhost:3001
-- **Swagger API Docs**: http://localhost:3001/api/v1/docs
-
-### Comandos Útiles
-
-```bash
-# Ejecutar solo frontend
+# Solo frontend (http://localhost:3000)
 pnpm --filter web dev
 
-# Ejecutar solo backend
+# Solo backend (http://localhost:3001)
 pnpm --filter api dev
-
-# Build completo
-pnpm build
-
-# Lint (ESLint + Prettier)
-pnpm lint
-
-# Type-checking
-pnpm typecheck
-
-# Tests
-pnpm test
-
-# Tests con coverage
-pnpm test:coverage
 ```
 
-### Desarrollo con Datos Mock
-
-Durante las fases iniciales, usa datos mock en `/data/mock/`:
-
-- `activities.json`: 20-30 actividades de ejemplo
-- `user-profile.json`: perfil de usuario ejemplo
-
-Carga estos datos con:
+### Comandos de Validación
 
 ```bash
-pnpm db:seed
+pnpm build           # Build de todo el proyecto
+pnpm lint            # ESLint en los 3 paquetes (vía Turborepo)
+pnpm typecheck       # Type-check en los 3 paquetes
+pnpm test            # Tests en los 3 paquetes (Vitest)
+pnpm format          # Prettier: formatear todo
+pnpm format:check    # Prettier: verificar formato sin modificar
 ```
 
 ---
@@ -232,119 +208,106 @@ pnpm db:seed
 ```
 cycling-companion/
 ├── apps/
-│   ├── web/                          # Next.js Frontend
+│   ├── web/                        # Next.js 16 Frontend
 │   │   ├── src/
-│   │   │   ├── app/                  # App Router
-│   │   │   ├── components/           # Componentes React
-│   │   │   ├── lib/                  # Utilidades
-│   │   │   └── styles/               # Tailwind config
-│   │   ├── package.json
-│   │   └── tsconfig.json
+│   │   │   ├── app/                # App Router (9 rutas)
+│   │   │   │   ├── (auth)/         #   Login, Onboarding, OAuth callback
+│   │   │   │   └── (app)/          #   Dashboard, Activities, Plan, Insights, Profile
+│   │   │   ├── components/         # 32 componentes reutilizables
+│   │   │   │   ├── charts/         #   Recharts (power-trend, daily-load, radar, activity)
+│   │   │   │   └── ui/             #   shadcn/ui (button, switch, tabs)
+│   │   │   └── lib/                # Utilidades (Supabase, cálculos, formateo)
+│   │   └── vitest.config.ts
 │   │
-│   └── api/                          # Fastify Backend
-│       ├── src/
-│       │   ├── routes/               # Rutas API
-│       │   ├── services/             # Lógica de negocio
-│       │   ├── middleware/           # Middleware Fastify
-│       │   └── utils/                # Utilidades
-│       ├── package.json
-│       └── tsconfig.json
+│   └── api/                        # Fastify 5 Backend (minimal)
+│       └── src/
+│           └── index.ts            # Solo /health por ahora
 │
 ├── packages/
-│   └── shared/                       # Tipos y validaciones compartidas
-│       ├── src/
-│       │   ├── types/                # Tipos TypeScript
-│       │   ├── validation/           # Esquemas Zod
-│       │   └── constants/            # Constantes
-│       └── package.json
+│   └── shared/                     # Types y validaciones compartidas
+│       └── src/
+│           ├── schemas/            # 4 schemas Zod (user, activity, plan, insights)
+│           └── constants/          # 7 módulos (goals, zones, types, rpe, filters, etc.)
 │
-├── prompts/                          # Prompts versionados para IA
-│   ├── system/                       # Prompts del sistema
-│   ├── remote/                       # Prompts para agentes remotos
-│   └── product/                      # Prompts de producto
+├── supabase/
+│   ├── migrations/                 # 3 migraciones SQL
+│   │   ├── 001_initial_schema.sql
+│   │   ├── 002_alter_users_for_onboarding.sql
+│   │   └── 003_align_activity_type_enum.sql
+│   ├── seed.sql                    # Seed genérico (placeholder <USER_ID>)
+│   └── seed_personalized.sql       # Seed con datos de ejemplo
 │
-├── docs/                             # Documentación
-│   ├── 01-PRODUCT-VISION.md
-│   ├── 02-PRD.md
-│   ├── 03-AGENTS-AND-DEVELOPMENT-PLAN.md
-│   └── architecture/
+├── docs/
+│   ├── 01-PRODUCT-VISION.md        # Visión del producto
+│   ├── 02-PRD.md                   # Product Requirements Document
+│   ├── 03-AGENTS-AND-DEVELOPMENT-PLAN.md  # Plan de agentes
+│   ├── DESIGN-SYSTEM.md            # Design system (tokens, componentes, conversión JSX)
+│   ├── GOOGLE-OAUTH-SETUP.md       # Guía configuración OAuth
+│   ├── SUPABASE-SETUP.md           # Guía configuración Supabase
+│   └── specs/                      # 22 especificaciones L1/L2/L3
 │
-├── data/
-│   └── mock/                         # Datos mock para desarrollo
-│       ├── activities.json
-│       └── user-profile.json
-│
-├── pnpm-workspace.yaml               # Configuración del workspace
-├── turbo.json                        # Configuración de Turborepo
-├── tsconfig.json                     # TypeScript base
-├── CLAUDE.md                         # Instrucciones para Claude Code
-└── README.md                         # Este archivo
+├── turbo.json                      # Configuración Turborepo
+├── pnpm-workspace.yaml             # Workspace pnpm
+├── eslint.config.mjs               # ESLint 9 flat config
+├── CLAUDE.md                       # Instrucciones para Claude Code
+└── README.md
 ```
 
 ---
 
 ## 📚 Documentación
 
-Documentación completa disponible en `/docs/`:
-
-- **[01-PRODUCT-VISION.md](docs/01-PRODUCT-VISION.md)** - Visión del producto y propuesta de valor
-- **[02-PRD.md](docs/02-PRD.md)** - Product Requirements Document completo
-- **[03-AGENTS-AND-DEVELOPMENT-PLAN.md](docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md)** - Plan de agentes y desarrollo con timeline
-
-### Prompts IA
-
-Los prompts para Claude API están versionados en `/prompts/`:
-
-```
-prompts/
-├── system/          Prompts del sistema (contexto base)
-├── remote/          Prompts para agentes remotos (GitHub Actions)
-└── product/         Prompts de producto (análisis, planes, insights)
-```
+| Documento | Descripción |
+|-----------|-------------|
+| [01-PRODUCT-VISION.md](docs/01-PRODUCT-VISION.md) | Visión del producto y propuesta de valor |
+| [02-PRD.md](docs/02-PRD.md) | PRD completo: modelo de datos, endpoints, flujo IA |
+| [03-AGENTS-AND-DEVELOPMENT-PLAN.md](docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md) | Plan de agentes y desarrollo con timeline |
+| [DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md) | Design system: pantallas, tokens, componentes, conversión JSX→Next.js |
+| [GOOGLE-OAUTH-SETUP.md](docs/GOOGLE-OAUTH-SETUP.md) | Guía de configuración de Google OAuth |
+| [SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md) | Guía de configuración de Supabase |
+| `docs/specs/` | 22 especificaciones L1 (UX), L2 (técnico), L3 (issues) para 8 pantallas |
 
 ---
 
 ## ⚙️ Pipeline AI-First
 
-Este proyecto implementa un pipeline multi-agente documentado en `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md`.
+Este proyecto implementa un pipeline multi-agente para integrar IA en el ciclo de desarrollo.
 
 ### Agentes Locales (Claude Code)
 
-| Agente                 | Rol                                 | Trigger |
-| ---------------------- | ----------------------------------- | ------- |
-| **L1: UX Interpreter** | Capturas → especificación funcional | Manual  |
-| **L2: Architect**      | Especificación → diseño técnico     | Manual  |
-| **L3: Planner**        | Diseño → issues incrementales       | Manual  |
-| **L4: Implementer**    | Implementar código con supervisión  | Manual  |
+| Agente | Rol | Trigger |
+|--------|-----|---------|
+| **L1: UX Interpreter** | Mockups → especificación funcional | Manual |
+| **L2: Architect** | Especificación → diseño técnico | Manual |
+| **L3: Planner** | Diseño → issues incrementales | Manual |
+| **L4: Implementer** | Implementar código con supervisión | Manual |
 
-### Agentes Remotos (GitHub Actions)
+### Agentes Remotos (GitHub Actions) — planificados
 
-| Agente                 | Rol                             | Trigger                |
-| ---------------------- | ------------------------------- | ---------------------- |
-| **R1: Issue Analyzer** | Analizar impact y complejidad   | Label `ai-analyze`     |
-| **R2: PR Generator**   | Generar PR completa desde issue | Label `ai-generate-pr` |
-| **R3: PR Reviewer**    | Code review automático          | PR abierta             |
-| **R4: CI/CD**          | Lint, test, build               | Push/PR                |
-| **R5: Doc Generator**  | Actualizar CHANGELOG, README    | PR mergeada            |
+| Agente | Rol | Trigger |
+|--------|-----|---------|
+| **R1: Issue Analyzer** | Analizar impacto y complejidad | Label `ai-analyze` |
+| **R2: PR Generator** | Generar PR completa desde issue | Label `ai-generate-pr` |
+| **R3: PR Reviewer** | Code review automático | PR abierta |
+| **R4: CI/CD** | Lint, test, build | Push/PR |
+| **R5: Doc Generator** | Actualizar CHANGELOG, README | PR mergeada |
 
 ---
 
-## 🔒 Seguridad y Privacidad
+## 🔒 Seguridad
 
 - **RLS (Row Level Security)**: Cada usuario solo ve sus propios datos
 - **Autenticación**: JWT gestionado por Supabase, cookies httpOnly
 - **Validación**: Todos los inputs validados con Zod
 - **Secrets**: Variables de entorno, nunca commitear API keys
-- **HTTPS**: Obligatorio en producción
 
 ---
 
 ## 🎯 Limitaciones MVP
 
-- **Cold starts en Render**: Tier gratuito ~30s después de 15min inactividad
 - **Sin integración directa con Strava/Garmin**: Solo importación manual
-- **Sin app móvil nativa**: PWA básica con `next-pwa`
 - **Solo español**: Multi-idioma fuera de scope
+- **Cold starts en Render**: Tier gratuito ~30s después de 15min inactividad
 - **Costes Claude API**: Implementar caché, limitar llamadas/usuario/día
 
 ### Fuera del Alcance del MVP
@@ -353,59 +316,36 @@ Este proyecto implementa un pipeline multi-agente documentado en `docs/03-AGENTS
 - Rol de entrenador humano multi-atleta
 - Mapas y trazado de rutas
 - Funcionalidad social (compartir, competir)
-- Notificaciones push
-- Gamificación
-- Integración con wearables (sueño, recuperación)
+- Notificaciones push, gamificación
+- App móvil nativa / integración con wearables
 
 ---
 
 ## 📅 Fases de Desarrollo
 
-**Fase 1 (Actual)**: Cimientos
-
-1. Setup monorepo + CI + Auth + Deploy
-2. Dashboard con datos mock
-3. Lista y detalle de actividades
-
-**Fase 2**: Core Features 4. Planificación semanal + comparativas 5. Agentes remotos completos
-
-**Fase 3**: Refinamiento 6. Features secundarias 7. Evaluación y documentación
+| Fase | Descripción | Estado |
+|------|-------------|--------|
+| **Fase 1** | Cimientos: monorepo, CI, Auth, deploy, schema DB | ✅ Completada |
+| **Fase 2** | MVP funcional: pantallas frontend, datos mock, specs | 🔄 En curso |
+| **Fase 3** | Core features: API endpoints, integración Claude, import real | ⬜ Pendiente |
+| **Fase 4** | Refinamiento: agentes remotos, evaluación, documentación | ⬜ Pendiente |
 
 ---
 
 ## 🤝 Contribución
 
-Las contribuciones siguen el pipeline AI-first documentado en `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md`.
-
 ### Convenciones
 
 - **Commits**: Español con formato `feat:`, `fix:`, `refactor:`, `docs:`
-- **PRs**: Pequeñas y enfocadas, enlazar con issues
-- **TypeScript**: Modo estricto, types en `packages/shared`
+- **PRs**: Pequeñas y enfocadas (< 400 líneas), enlazar con issues
+- **TypeScript**: Modo estricto, types compartidos en `packages/shared`
 - **Tests**: Unitarios para lógica compleja, integración para endpoints críticos
-
----
-
-## 📞 Soporte
-
-Para reportar bugs o sugerencias, abre un issue en GitHub con el template correspondiente.
 
 ---
 
 ## 📄 Licencia
 
-Cycling Companion © 2025. Todos los derechos reservados.
-
----
-
-## 🔗 Enlaces Útiles
-
-- [Supabase](https://supabase.com)
-- [Next.js 16](https://nextjs.org)
-- [Fastify](https://fastify.dev)
-- [Turborepo](https://turbo.build)
-- [Claude API](https://claude.ai/api)
-- [Tailwind CSS](https://tailwindcss.com)
+Cycling Companion © 2026. Todos los derechos reservados.
 
 ---
 
