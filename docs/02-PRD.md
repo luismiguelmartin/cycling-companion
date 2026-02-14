@@ -8,7 +8,7 @@
 | **Versión**             | MVP v1.0                                                   |
 | **Autor**               | Luis Miguel Martín                                         |
 | **Fecha**               | Febrero 2026                                               |
-| **Contexto**            | TFM — Pipeline AI-first aplicado al desarrollo de software |
+| **Contexto**            | Pipeline AI-first aplicado al desarrollo de software |
 | **Plazo de desarrollo** | 6-8 semanas                                                |
 
 ---
@@ -17,7 +17,7 @@
 
 Desarrollar una plataforma web que permita a ciclistas amateur (40+) visualizar sus datos de entrenamiento, recibir recomendaciones personalizadas de un entrenador IA, y planificar su semana de forma inteligente.
 
-El producto se desarrolla como caso de uso real dentro de un TFM sobre integración de IA en el SDLC.
+El producto se desarrolla como caso de uso real de un pipeline AI-first integrado en el SDLC.
 
 ---
 

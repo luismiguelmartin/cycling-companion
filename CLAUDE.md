@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Contexto del Proyecto
 
-**Cycling Companion** es una plataforma web de análisis y planificación de entrenamiento para ciclistas amateur (40+). Banco de pruebas para un TFM sobre integración de IA en el ciclo de vida del desarrollo (pipeline AI-first).
+**Cycling Companion** es una plataforma web de análisis y planificación de entrenamiento para ciclistas amateur (40+). Banco de pruebas para un pipeline AI-first de integración de IA en el ciclo de vida del desarrollo.
 
 **Propuesta de valor**: Entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables.
 

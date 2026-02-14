@@ -6,7 +6,7 @@
 
 A diferencia de Strava o Garmin Connect, Cycling Companion no intenta ser una red social ni un visor de mapas. Se enfoca en lo que estas plataformas no resuelven bien: **decirte qué hacer con tus datos**, no solo mostrártelos.
 
-El producto actúa además como **banco de pruebas real** para un TFM sobre integración de IA en el ciclo de vida del desarrollo de software (pipeline AI-first).
+El producto actúa además como **banco de pruebas real** para una metodología de desarrollo basada en un pipeline AI-first integrado en el ciclo de vida del software.
 
 ---
 
@@ -194,13 +194,13 @@ Permitir exportar el plan semanal como imagen o PDF para compartir con un entren
 
 ---
 
-## 9. Rol del producto dentro del TFM
+## 9. Rol del producto dentro del pipeline AI-first
 
-Cycling Companion **no es el objetivo del TFM**, sino su banco de pruebas. El producto existe para:
+Cycling Companion **no es el objetivo principal**, sino el banco de pruebas del pipeline AI-first. El producto existe para:
 
 - Generar issues, PRs y bugs reales sobre los que opera el pipeline AI-first
 - Demostrar que la arquitectura multi-agente funciona en un contexto real
 - Medir el impacto de la IA en el ciclo de desarrollo mediante métricas objetivas
-- Proporcionar un demo tangible para la defensa del TFM
+- Proporcionar un demo tangible de la metodología de desarrollo
 
-El protagonista del TFM es el **pipeline AI-first**. El producto es el terreno donde se demuestra.
+El protagonista es el **pipeline AI-first**. El producto es el terreno donde se demuestra.

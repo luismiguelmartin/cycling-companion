@@ -2,7 +2,7 @@
 
 Plataforma web de análisis y planificación de entrenamiento para ciclistas amateur (40+), impulsada por IA.
 
-**Cycling Companion** es un banco de pruebas para un Trabajo de Fin de Máster sobre integración de IA en el ciclo de vida del desarrollo (pipeline AI-first). Proporciona un entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables de entrenamiento, nutrición y descanso.
+**Cycling Companion** es un banco de pruebas para un pipeline AI-first de integración de IA en el ciclo de vida del desarrollo. Proporciona un entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables de entrenamiento, nutrición y descanso.
 
 ---
 
@@ -369,7 +369,7 @@ Este proyecto implementa un pipeline multi-agente documentado en `docs/03-AGENTS
 
 **Fase 2**: Core Features 4. Planificación semanal + comparativas 5. Agentes remotos completos
 
-**Fase 3**: Refinamiento 6. Features secundarias 7. Evaluación y documentación del TFM
+**Fase 3**: Refinamiento 6. Features secundarias 7. Evaluación y documentación
 
 ---
 
@@ -409,4 +409,4 @@ Cycling Companion © 2025. Todos los derechos reservados.
 
 ---
 
-**Desarrollado como TFM sobre integración de IA en el ciclo de vida del desarrollo.**
+**Desarrollado con un pipeline AI-first de integración de IA en el ciclo de vida del desarrollo.**

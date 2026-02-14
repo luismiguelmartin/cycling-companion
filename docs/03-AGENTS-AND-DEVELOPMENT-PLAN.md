@@ -396,7 +396,7 @@ El desarrollo se organiza en **4 fases** distribuidas en **7 semanas**, diseñad
 Fase 1: Cimientos (humano + agentes locales básicos)
 Fase 2: MVP funcional (agentes locales maduros + CI remoto)
 Fase 3: Pipeline AI-first (agentes remotos completos)
-Fase 4: Pulido y evaluación (métricas + documentación TFM)
+Fase 4: Pulido y evaluación (métricas + documentación)
 ```
 
 ---
@@ -505,7 +505,7 @@ Fase 4: Pulido y evaluación (métricas + documentación TFM)
 
 ### FASE 3 — Pipeline AI-First Completo (Semanas 5-6)
 
-**Objetivo**: Activar todos los agentes remotos. Generar features nuevas vía PRs automáticas. Esta es la fase central del TFM.
+**Objetivo**: Activar todos los agentes remotos. Generar features nuevas vía PRs automáticas. Esta es la fase central del proyecto.
 
 #### Semana 5: Agentes remotos completos
 
@@ -546,9 +546,9 @@ Fase 4: Pulido y evaluación (métricas + documentación TFM)
 
 ---
 
-### FASE 4 — Evaluación y Documentación TFM (Semana 7)
+### FASE 4 — Evaluación y Documentación (Semana 7)
 
-**Objetivo**: Cerrar el ciclo, medir resultados, documentar para la memoria del TFM.
+**Objetivo**: Cerrar el ciclo, medir resultados, documentar aprendizajes y conclusiones.
 
 | Día | Tarea                                                             |
 | --- | ----------------------------------------------------------------- |
@@ -769,7 +769,7 @@ Para los agentes R1 y R2 que usan Claude, hay dos opciones:
 
 - OpenSpec y herramientas similares añaden una capa de abstracción que puede ser útil en equipos, pero para un desarrollador individual con Claude Code, el **modo plan** es suficiente y más flexible.
 - Ventaja de Claude Code plan: trabaja directamente sobre tu código, entiende el contexto del repo, no necesita configuración extra.
-- El valor del TFM está en documentar cómo usas los prompts y el modo plan, no en qué herramienta de orquestación usas.
+- El valor está en documentar cómo usas los prompts y el modo plan, no en qué herramienta de orquestación usas.
 
 **Decisión**: Usar Claude Code plan mode + archivo `CLAUDE.md` como "sistema nervioso local".
 
