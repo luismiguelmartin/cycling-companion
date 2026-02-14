@@ -54,8 +54,23 @@ pnpm --filter api dev       # Solo backend
 pnpm build                  # Build de todo el proyecto
 pnpm lint                   # ESLint en los 3 paquetes (vía Turborepo)
 pnpm typecheck              # Type-check en los 3 paquetes
+pnpm test                   # Tests en los 3 paquetes
 pnpm format                 # Prettier: formatear todo
 pnpm format:check           # Prettier: verificar formato sin modificar
+```
+
+### Variables de entorno
+```bash
+# apps/web/.env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_API_URL=http://localhost:3001
+
+# apps/api/.env
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+ANTHROPIC_API_KEY=
+PORT=3001
 ```
 
 ---
@@ -126,8 +141,10 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 
 ### Al trabajar en nuevas features:
 1. Revisar el PRD (`docs/02-PRD.md`) para entender el contexto funcional
-2. Mantener consistencia con el tono y estructura del código existente
-3. No sobre-ingeniería: implementar solo lo necesario para la issue actual
+2. Consultar `docs/DESIGN-SYSTEM.md` para implementar UI (pantallas, tokens, componentes, guía de conversión JSX→Tailwind)
+3. Los mockups JSX originales están en `docs/designs/` (excluidos de git) — usar `docs/DESIGN-SYSTEM.md` como referencia documentada
+4. Mantener consistencia con el tono y estructura del código existente
+5. No sobre-ingeniería: implementar solo lo necesario para la issue actual
 
 ### Al crear issues:
 - Usar template estructurado: descripción, criterios de aceptación, archivos afectados
@@ -148,3 +165,4 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 | Visión del producto | `docs/01-PRODUCT-VISION.md` |
 | PRD completo (modelo de datos, endpoints, flujo IA) | `docs/02-PRD.md` |
 | Plan de agentes y desarrollo | `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md` |
+| Design system (pantallas, tokens, componentes, conversión JSX→Next.js) | `docs/DESIGN-SYSTEM.md` |

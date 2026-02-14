@@ -109,7 +109,7 @@ Vista rápida del estado de entrenamiento del ciclista:
 - **Sugerencias IA por día**: tipo de entreno, intensidad estimada, duración
 - **Recomendaciones complementarias**: hidratación, nutrición pre/post, horas de sueño sugeridas
 - Botón "Recalcular plan" (regenera basándose en actividades recientes)
-- Colores por tipo de entreno (resistencia, intervalos, recuperación, descanso)
+- Colores por tipo de entreno (intervalos, resistencia, tempo, recuperación, descanso)
 - Indicadores visuales de carga acumulada
 
 ### 5.5 Comparar semanas / tendencias

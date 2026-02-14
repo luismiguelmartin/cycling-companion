@@ -10,14 +10,14 @@ Remoto = ejecutar y verificar
 Humano = supervisar y validar
 ```
 
-Los agentes locales (Cursor + Claude Code) se encargan de razonamiento, diseño y decisiones arquitectónicas. Los agentes remotos (GitHub Actions + Claude) ejecutan tareas repetitivas, generan PRs y hacen code review. El desarrollador siempre tiene la última palabra.
+Los agentes locales (Claude Code) se encargan de razonamiento, diseño y decisiones arquitectónicas. Los agentes remotos (GitHub Actions + Claude) ejecutan tareas repetitivas, generan PRs y hacen code review. El desarrollador siempre tiene la última palabra.
 
 ### 1.2 Diagrama de arquitectura
 
 ```
 ┌──────────────────────────────────────────────────┐
 │                 DESARROLLADOR                     │
-│              (Cursor + Claude Code)               │
+│                 (Claude Code)                     │
 └──────────────┬───────────────────────────────────┘
                │
                ▼
@@ -29,8 +29,8 @@ Los agentes locales (Cursor + Claude Code) se encargan de razonamiento, diseño 
 │  │  Agent  │→ │  tecto   │→ │    Agent     │    │
 │  └─────────┘  └──────────┘  └──────────────┘    │
 │       ▲                                           │
-│       │ Capturas de pantalla                      │
-│       │ (Google Stitch / Claude)                  │
+│       │ Mockups JSX + DESIGN-SYSTEM.md            │
+│       │ (docs/designs/ + docs/)                   │
 └──────────────┬───────────────────────────────────┘
                │ Push código / Issues
                ▼
@@ -68,25 +68,31 @@ Los agentes locales (Cursor + Claude Code) se encargan de razonamiento, diseño 
 
 ### 1.3 Entrada de diseño
 
-En lugar de Figma con MCP, el flujo de diseño utiliza **capturas de pantalla** generadas con Google Stitch o Claude como input visual. Los agentes locales interpretan estas capturas para extraer componentes, flujos y estructura.
+El flujo de diseño utiliza **mockups JSX funcionales** como fuente de verdad visual, documentados en un design system completo.
 
 ```
-Google Stitch / Claude → Capturas PNG/JPG
+Mockups JSX (docs/designs/)  +  DESIGN-SYSTEM.md (docs/)
                             │
                             ▼
-                   Agente UX Local (Claude Code)
-                   → Interpreta las pantallas
-                   → Extrae componentes y flujos
-                   → Genera especificación funcional
+                   Agente UX/Implementer Local (Claude Code)
+                   → Lee el design system (pantallas, tokens, componentes)
+                   → Convierte JSX inline styles → Tailwind + shadcn/ui
+                   → Implementa siguiendo la guía de conversión del DESIGN-SYSTEM.md
 ```
+
+**Archivos fuente** (en `docs/designs/`, excluidos de git):
+- `screen-00-login-onboarding.jsx` — Login + Onboarding (4 pasos)
+- `cycling-companion-full-app.jsx` — App principal (6 pantallas)
+
+**Referencia documentada**: `docs/DESIGN-SYSTEM.md` contiene todas las pantallas, tokens de tema, paleta de colores, tipografía, componentes reutilizables y guía de conversión JSX→Next.js.
 
 ---
 
 ## 2. Definición de agentes
 
-### 2.1 Agentes locales (Cursor + Claude Code)
+### 2.1 Agentes locales (Claude Code)
 
-Estos agentes se invocan manualmente o mediante el modo plan de Claude Code. No son servicios autónomos, sino **patrones de uso** de Claude Code con prompts y contexto específicos.
+Estos agentes se invocan manualmente mediante Claude Code. No son servicios autónomos, sino **patrones de uso** de Claude Code con prompts y contexto específicos.
 
 ---
 
@@ -95,23 +101,23 @@ Estos agentes se invocan manualmente o mediante el modo plan de Claude Code. No 
 | Campo           | Valor                                                                                                                                           |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Nombre**      | `ux-interpreter`                                                                                                                                |
-| **Rol**         | Interpretar capturas de pantalla de diseño y extraer especificación funcional                                                                   |
+| **Rol**         | Interpretar mockups JSX y el design system para extraer especificación funcional de cada pantalla                                                |
 | **Entorno**     | Claude Code (local)                                                                                                                             |
-| **Input**       | Capturas de pantalla (PNG/JPG) del diseño                                                                                                       |
-| **Output**      | Documento de especificación funcional por pantalla (`/docs/screens/*.md`)                                                                       |
-| **Prompt base** | "Analiza esta captura de pantalla de UI. Extrae: componentes visibles, jerarquía, estados posibles, flujos de interacción, datos que necesita." |
+| **Input**       | Mockups JSX (`docs/designs/`) + `docs/DESIGN-SYSTEM.md`                                                                                        |
+| **Output**      | Especificación funcional por pantalla con componentes, datos y flujos de interacción                                                            |
+| **Prompt base** | "Analiza el mockup JSX y la sección correspondiente del DESIGN-SYSTEM.md. Extrae: componentes, jerarquía, estados, flujos de interacción, datos necesarios, tokens de tema aplicables." |
 
 **Qué hace**:
 
-- Identifica componentes UI en cada captura (cards, tablas, gráficos, formularios)
-- Describe el flujo de interacción (qué pasa al hacer clic en cada elemento)
-- Lista los datos necesarios para cada componente
-- Detecta estados (vacío, cargando, error, con datos)
-- Genera un markdown estructurado por pantalla
+- Lee los mockups JSX y el DESIGN-SYSTEM.md para entender cada pantalla
+- Identifica componentes UI, su jerarquía y las props/datos que necesitan
+- Describe el flujo de interacción (navegación, acciones, estados)
+- Lista los tokens de tema y componentes reutilizables del design system aplicables
+- Identifica las transformaciones necesarias (inline styles → Tailwind, responsive manual → breakpoints)
 
 **Qué NO hace**:
 
-- No genera código
+- No genera código de implementación final
 - No toma decisiones de arquitectura
 - No modifica el repositorio
 
@@ -124,8 +130,8 @@ Estos agentes se invocan manualmente o mediante el modo plan de Claude Code. No 
 | **Nombre**      | `architect`                                                                                                                                                                                 |
 | **Rol**         | Traducir especificación funcional en diseño técnico                                                                                                                                         |
 | **Entorno**     | Claude Code (local)                                                                                                                                                                         |
-| **Input**       | Especificaciones funcionales de L1 + PRD                                                                                                                                                    |
-| **Output**      | Diseño técnico (`/docs/architecture/*.md`), ADRs, estructura de archivos                                                                                                                    |
+| **Input**       | Especificaciones funcionales de L1 + PRD + `docs/DESIGN-SYSTEM.md` (estructura de archivos sugerida en sección 6)                                                                            |
+| **Output**      | Diseño técnico, ADRs, estructura de archivos                                                                                                                                                |
 | **Prompt base** | "Dado este requisito funcional y el stack del proyecto (Next.js + Fastify + Supabase), propone: componentes React necesarios, endpoints API, esquema de datos, archivos a crear/modificar." |
 
 **Qué hace**:
@@ -175,14 +181,15 @@ Estos agentes se invocan manualmente o mediante el modo plan de Claude Code. No 
 | ----------- | ------------------------------------------------------------- |
 | **Nombre**  | `implementer`                                                 |
 | **Rol**     | Asistir en la implementación de código con supervisión humana |
-| **Entorno** | Cursor + Claude Code (local)                                  |
-| **Input**   | Issue con diseño técnico                                      |
+| **Entorno** | Claude Code (local)                                           |
+| **Input**   | Issue con diseño técnico + `docs/DESIGN-SYSTEM.md` (para UI)  |
 | **Output**  | Código, tests, commits                                        |
 | **Modo**    | Claude Code Plan mode → Human review → Execute                |
 
 **Qué hace**:
 
 - Lee la issue y el diseño técnico asociado
+- Consulta `docs/DESIGN-SYSTEM.md` para implementar UI (tokens, componentes, guía de conversión JSX→Tailwind)
 - Propone plan de implementación (modo plan de Claude Code)
 - Genera código con tests
 - El desarrollador revisa, ajusta y aprueba antes de commit
@@ -329,42 +336,24 @@ jobs:
 name: CI
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
 
 jobs:
-  lint:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
-      - run: npm ci
-      - run: npm run lint
-
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-      - run: npm ci
-      - run: npm run typecheck
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-      - run: npm ci
-      - run: npm run test
-
-  build:
-    runs-on: ubuntu-latest
-    needs: [lint, typecheck, test]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-      - run: npm ci
-      - run: npm run build
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm format:check
+      - run: pnpm build
 ```
 
 ---
@@ -421,14 +410,14 @@ Fase 4: Pulido y evaluación (métricas + documentación TFM)
 | Día | Tarea                                                     | Agente      |
 | --- | --------------------------------------------------------- | ----------- |
 | 1   | Crear monorepo con Turborepo (Next.js + Fastify + shared) | Manual + L4 |
-| 1   | Configurar TypeScript, ESLint, Prettier                   | Manual      |
+| 1   | Configurar TypeScript, ESLint 9, Prettier                 | Manual + L4 |
 | 2   | Setup Supabase: proyecto, tablas base, RLS                | Manual      |
 | 2   | Configurar Supabase Auth con Google                       | Manual      |
 | 3   | Implementar login/logout + protección de rutas            | L4          |
-| 3   | Setup GitHub repo + branch protection + PR template       | Manual      |
-| 4   | Configurar CI básico (R4): lint + typecheck + test        | Manual      |
+| 3   | Setup GitHub repo + branch protection                     | Manual      |
+| 4   | Configurar CI básico (R4): lint + typecheck + build       | Manual + L4 |
 | 4   | Primer deploy: Vercel (front) + Render (API)              | Manual      |
-| 5   | Onboarding flow (3-4 pasos)                               | L4          |
+| 5   | Onboarding flow (4 pasos según DESIGN-SYSTEM.md §1.0b)   | L4          |
 
 **Entregables semana 1**:
 
@@ -441,7 +430,7 @@ Fase 4: Pulido y evaluación (métricas + documentación TFM)
 
 | Día | Tarea                                                     | Agente          |
 | --- | --------------------------------------------------------- | --------------- |
-| 1   | Interpretar capturas de diseño del dashboard              | L1 (primer uso) |
+| 1   | Interpretar mockups JSX + DESIGN-SYSTEM.md del dashboard  | L1 (primer uso) |
 | 1   | Generar especificación funcional del dashboard            | L1              |
 | 2   | Diseño técnico: componentes + API del dashboard           | L2 (primer uso) |
 | 2   | Crear issues para el dashboard                            | L3 (primer uso) |
@@ -469,7 +458,7 @@ Fase 4: Pulido y evaluación (métricas + documentación TFM)
 
 | Día | Tarea                                                  | Agente          |
 | --- | ------------------------------------------------------ | --------------- |
-| 1   | Interpretar capturas: lista de actividades + detalle   | L1              |
+| 1   | Interpretar mockups: lista de actividades + detalle    | L1              |
 | 1   | Diseño técnico                                         | L2              |
 | 2   | Crear issues incrementales                             | L3              |
 | 2   | Implementar lista de actividades (tabla + filtros)     | L4              |
@@ -491,7 +480,7 @@ Fase 4: Pulido y evaluación (métricas + documentación TFM)
 
 | Día | Tarea                                                      | Agente |
 | --- | ---------------------------------------------------------- | ------ |
-| 1   | Interpretar capturas: planificación semanal + comparativas | L1     |
+| 1   | Interpretar mockups: planificación semanal + comparativas  | L1     |
 | 1   | Diseño técnico                                             | L2     |
 | 2   | Implementar endpoint IA: /ai/weekly-plan                   | L4     |
 | 2   | Integrar Claude API para generación de plan                | L4     |
@@ -653,7 +642,7 @@ SUPABASE_ANON_KEY     → Para tests de integración
 Mañana:
 1. Revisar issues pendientes en GitHub
 2. Elegir siguiente issue (por prioridad)
-3. Si es nueva pantalla → L1 (interpretar diseño) → L2 (diseño técnico)
+3. Si es nueva pantalla → consultar DESIGN-SYSTEM.md + mockups JSX → L1 → L2
 4. Si ya tiene diseño → L4 (implementar con Claude Code plan mode)
 5. Crear PR → CI automático (R4) + Review IA (R3)
 6. Revisar comentarios de R3, ajustar si necesario
@@ -673,22 +662,22 @@ Tarde (fase 3):
 ## 7. Prompts versionados — Estructura
 
 ```
-/prompts/
+/prompts/                          (se creará progresivamente en fases 2-3)
 ├── system/
-│   ├── ux-interpreter.md      → Prompt para L1
-│   ├── architect.md           → Prompt para L2
-│   ├── planner.md             → Prompt para L3
-│   └── implementer.md         → Prompt para L4
+│   ├── ux-interpreter.md          → Prompt para L1 (interpretar mockups JSX + DESIGN-SYSTEM.md)
+│   ├── architect.md               → Prompt para L2
+│   ├── planner.md                 → Prompt para L3
+│   └── implementer.md            → Prompt para L4
 ├── remote/
-│   ├── issue-analyzer.md      → Prompt para R1
-│   ├── pr-generator.md        → Prompt para R2
-│   ├── pr-reviewer.md         → Prompt para R3
-│   └── doc-generator.md       → Prompt para R5
+│   ├── issue-analyzer.md          → Prompt para R1
+│   ├── pr-generator.md            → Prompt para R2
+│   ├── pr-reviewer.md             → Prompt para R3
+│   └── doc-generator.md           → Prompt para R5
 ├── product/
-│   ├── training-coach.md      → Prompt del entrenador IA
-│   ├── activity-analyzer.md   → Prompt para análisis de sesión
-│   └── plan-generator.md      → Prompt para plan semanal
-└── CONVENTIONS.md             → Reglas comunes a todos los prompts
+│   ├── training-coach.md          → Prompt del entrenador IA
+│   ├── activity-analyzer.md       → Prompt para análisis de sesión
+│   └── plan-generator.md          → Prompt para plan semanal
+└── CONVENTIONS.md                 → Reglas comunes a todos los prompts
 ```
 
 Cada prompt incluye:
@@ -778,12 +767,11 @@ Para los agentes R1 y R2 que usan Claude, hay dos opciones:
 
 **Análisis**:
 
-- OpenSpec y herramientas similares añaden una capa de abstracción que puede ser útil en equipos, pero para un desarrollador individual con Claude Code, el **modo plan** de Claude Code es suficiente y más flexible.
+- OpenSpec y herramientas similares añaden una capa de abstracción que puede ser útil en equipos, pero para un desarrollador individual con Claude Code, el **modo plan** es suficiente y más flexible.
 - Ventaja de Claude Code plan: trabaja directamente sobre tu código, entiende el contexto del repo, no necesita configuración extra.
 - El valor del TFM está en documentar cómo usas los prompts y el modo plan, no en qué herramienta de orquestación usas.
-- Si en algún momento necesitas más estructura, puedes crear un `CLAUDE.md` en la raíz del repo con convenciones y reglas que Claude Code respetará automáticamente.
 
-**Recomendación**: Usar Claude Code plan mode + archivo `CLAUDE.md` como "sistema nervioso local". No añadir OpenSpec al stack.
+**Decisión**: Usar Claude Code plan mode + archivo `CLAUDE.md` como "sistema nervioso local".
 
 ---
 
@@ -797,6 +785,6 @@ Antes de empezar la semana 1:
 - [ ] Cuenta en Vercel conectada al repo
 - [ ] Cuenta en Render conectada al repo
 - [ ] API key de Anthropic (para agentes remotos y entrenador IA)
-- [ ] Generar capturas de diseño en Google Stitch o Claude
+- [ ] Preparar mockups JSX en `docs/designs/` y documentar en `docs/DESIGN-SYSTEM.md`
 - [ ] Crear archivo `CLAUDE.md` con convenciones del proyecto
 - [ ] Tener este documento y el PRD accesibles en `/docs/`

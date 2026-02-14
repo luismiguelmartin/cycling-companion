@@ -33,6 +33,8 @@ El producto se desarrolla como caso de uso real dentro de un TFM sobre integraci
 | **Recharts o Chart.js**         | Gráficas de rendimiento (potencia, FC, tendencias). Recharts por integración natural con React.        |
 | **shadcn/ui**                   | Componentes accesibles y personalizables sobre Radix UI + Tailwind.                                    |
 
+**Diseño visual**: Basado en mockups JSX de referencia (`docs/designs/`, excluidos de git) y documentado en `docs/DESIGN-SYSTEM.md` (pantallas, tokens, componentes, guía de conversión JSX→Next.js+Tailwind).
+
 #### PWA
 
 - Service worker con `next-pwa`
@@ -95,7 +97,7 @@ activities
 ├── user_id (FK → users)
 ├── name
 ├── date
-├── type (enum: outdoor | indoor | recovery)
+├── type (enum: intervals | endurance | tempo | recovery | rest)
 ├── duration_seconds
 ├── distance_km
 ├── avg_power_watts
@@ -136,7 +138,7 @@ activity_metrics (series temporales simplificadas)
 | Componente                  | Tecnología                                                                 |
 | --------------------------- | -------------------------------------------------------------------------- |
 | **LLM principal**           | Claude (vía API de Anthropic)                                              |
-| **Capa de prompts**         | Prompts versionados en el repo (`/prompts/*.md`)                           |
+| **Capa de prompts**         | Prompts versionados en el repo (directorio `/prompts/`, se crearán en fase 2-3) |
 | **Contexto**                | Datos del usuario + actividades recientes + plan actual (RAG simplificado) |
 | **Reglas de entrenamiento** | Heurísticas en código (umbrales de TSS, zonas, progresión)                 |
 | **Guardrails**              | La IA recomienda, nunca decide. Siempre muestra razonamiento.              |
@@ -184,21 +186,22 @@ activity_metrics (series temporales simplificadas)
 ```
 cycling-companion/
 ├── apps/
-│   ├── web/          → Next.js frontend
-│   └── api/          → Fastify backend
+│   ├── web/          → Next.js 16 frontend (App Router, React 19, Tailwind CSS)
+│   └── api/          → Fastify 5 backend (TypeScript, Zod)
 ├── packages/
-│   └── shared/       → Types, validaciones Zod, constantes
-├── prompts/          → Prompts versionados para IA
-├── docs/             → ADRs, diseño, decisiones
+│   └── shared/       → Types compartidos, validaciones Zod, constantes
+├── docs/
+│   ├── designs/      → Mockups JSX de referencia (excluidos de git)
+│   ├── DESIGN-SYSTEM.md → Guía visual: pantallas, tokens, componentes, conversión JSX→Next.js
+│   ├── 01-PRODUCT-VISION.md
+│   ├── 02-PRD.md
+│   └── 03-AGENTS-AND-DEVELOPMENT-PLAN.md
 ├── .github/
-│   ├── workflows/    → GitHub Actions (CI + AI-first pipeline)
-│   ├── ISSUE_TEMPLATE/
-│   └── PULL_REQUEST_TEMPLATE.md
-├── scripts/          → Scripts de orquestación
-├── data/
-│   └── mock/         → Datos mock de actividades
+│   └── workflows/    → GitHub Actions (CI + agentes remotos AI-first)
 ├── turbo.json        → Turborepo config
-└── package.json      → Workspace root
+├── eslint.config.mjs → ESLint 9 flat config (raíz)
+├── .prettierrc.json  → Prettier config
+└── package.json      → Workspace root (pnpm)
 ```
 
 **Justificación**: Un monorepo simplifica compartir tipos, facilita PRs que tocan front+back, y es más fácil de gestionar con agentes IA que necesitan contexto completo.
@@ -264,7 +267,7 @@ cycling-companion/
 |---|---|
 | Fecha | date, ordenable |
 | Nombre | text |
-| Tipo | badge (outdoor/indoor/recovery) |
+| Tipo | badge (intervals/endurance/tempo/recovery/rest) |
 | Distancia | km, 1 decimal |
 | Tiempo | HH:MM |
 | Potencia media | watts |
@@ -325,7 +328,7 @@ cycling-companion/
 
 - Calendario horizontal (lunes a domingo)
 - Cada día: card con tipo de entreno, intensidad (baja/media/alta), duración estimada
-- Colores: verde (recuperación), amarillo (resistencia), naranja (tempo), rojo (intervalos), gris (descanso)
+- Colores por tipo de entreno (ver `docs/DESIGN-SYSTEM.md` sección 2.2 para paleta exacta)
 - Indicador de carga semanal acumulada (barra de progreso)
 
 **Generación IA**:
@@ -421,7 +424,7 @@ cycling-companion/
 
 **Implementación**:
 
-- Prompts versionados en `/prompts/`
+- Prompts versionados en `/prompts/` (se crearán progresivamente en fases 2-3)
 - Contexto construido programáticamente (no RAG complejo, sino template filling)
 - Reglas de entrenamiento en código como primer filtro (la IA complementa, no sustituye)
 - Respuestas en JSON estructurado, parseadas en frontend para presentación
@@ -434,7 +437,7 @@ Para la fase inicial de desarrollo, se proporcionan datos mock que simulan activ
 
 ### Estructura de datos mock
 
-Archivo `/data/mock/activities.json`:
+Archivo `data/mock/activities.json` (se creará cuando se implemente F03-F04):
 
 - 20-30 actividades distribuidas en 6 semanas
 - Variedad de tipos (outdoor, indoor, recovery)
@@ -442,7 +445,7 @@ Archivo `/data/mock/activities.json`:
 - Algunos con series temporales simplificadas
 - Progresión lógica (mejora gradual con algún bajón)
 
-Archivo `/data/mock/user-profile.json`:
+Archivo `data/mock/user-profile.json`:
 
 - Usuario ejemplo: 45 años, 78kg, FTP 195W, FC max 172, objetivo: performance
 

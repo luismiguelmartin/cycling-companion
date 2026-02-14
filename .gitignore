@@ -33,3 +33,6 @@ supabase/.temp/
 # Claude Code local
 .claude.local.md
 .claude/
+
+# Design files
+docs/designs/
