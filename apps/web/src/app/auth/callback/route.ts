@@ -1,0 +1,29 @@
+import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
+
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url);
+  const code = searchParams.get("code");
+  // Si se especifica next, se usa esa URL, sino se va al root
+  const next = searchParams.get("next") ?? "/";
+
+  if (code) {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error) {
+      const forwardedHost = request.headers.get("x-forwarded-host"); // original origin before load balancer
+      const isLocalEnv = process.env.NODE_ENV === "development";
+      if (isLocalEnv) {
+        // En local, usamos localhost
+        return NextResponse.redirect(`${origin}${next}`);
+      } else if (forwardedHost) {
+        return NextResponse.redirect(`https://${forwardedHost}${next}`);
+      } else {
+        return NextResponse.redirect(`${origin}${next}`);
+      }
+    }
+  }
+
+  // Si hay error, redirigir a una página de error
+  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+}

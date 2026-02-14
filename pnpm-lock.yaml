@@ -42,7 +42,7 @@ importers:
   apps/api:
     dependencies:
       '@supabase/supabase-js':
-        specifier: ^2.47.0
+        specifier: ^2.95.3
         version: 2.95.3
       dotenv:
         specifier: ^16.4.7
@@ -69,8 +69,11 @@ importers:
 
   apps/web:
     dependencies:
+      '@supabase/ssr':
+        specifier: ^0.8.0
+        version: 0.8.0(@supabase/supabase-js@2.95.3)
       '@supabase/supabase-js':
-        specifier: ^2.47.0
+        specifier: ^2.95.3
         version: 2.95.3
       next:
         specifier: ^16.0.0
@@ -654,6 +657,11 @@ packages:
   '@supabase/realtime-js@2.95.3':
     resolution: {integrity: sha512-D7EAtfU3w6BEUxDACjowWNJo/ZRo7sDIuhuOGKHIm9FHieGeoJV5R6GKTLtga/5l/6fDr2u+WcW/m8I9SYmaIw==}
     engines: {node: '>=20.0.0'}
+
+  '@supabase/ssr@0.8.0':
+    resolution: {integrity: sha512-/PKk8kNFSs8QvvJ2vOww1mF5/c5W8y42duYtXvkOSe+yZKRgTTZywYG2l41pjhNomqESZCpZtXuWmYjFRMV+dw==}
+    peerDependencies:
+      '@supabase/supabase-js': ^2.76.1
 
   '@supabase/storage-js@2.95.3':
     resolution: {integrity: sha512-4GxkJiXI3HHWjxpC3sDx1BVrV87O0hfX+wvJdqGv67KeCu+g44SPnII8y0LL/Wr677jB7tpjAxKdtVWf+xhc9A==}
@@ -2560,6 +2568,11 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+
+  '@supabase/ssr@0.8.0(@supabase/supabase-js@2.95.3)':
+    dependencies:
+      '@supabase/supabase-js': 2.95.3
+      cookie: 1.1.1
 
   '@supabase/storage-js@2.95.3':
     dependencies:
