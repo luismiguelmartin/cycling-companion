@@ -15,12 +15,15 @@ supabase/
 ## 🚀 Setup Rápido
 
 ### 1. Crear proyecto en Supabase
+
 Ver la guía completa en [`docs/SUPABASE-SETUP.md`](../docs/SUPABASE-SETUP.md)
 
 ### 2. Ejecutar migración inicial
+
 Copia el contenido de `migrations/001_initial_schema.sql` en el SQL Editor de Supabase y ejecútalo.
 
 ### 3. Configurar variables de entorno
+
 ```bash
 # Frontend
 cp apps/web/.env.example apps/web/.env.local
@@ -32,6 +35,7 @@ cp apps/api/.env.example apps/api/.env
 ```
 
 ### 4. (Opcional) Cargar datos de prueba
+
 1. Autentícate en la app
 2. Copia tu `user_id` desde Authentication → Users
 3. Reemplaza `<USER_ID>` en `seed.sql` con tu ID real
@@ -42,11 +46,11 @@ cp apps/api/.env.example apps/api/.env
 ### Tablas principales
 
 | Tabla              | Descripción                                       |
-|--------------------|---------------------------------------------------|
+| ------------------ | ------------------------------------------------- |
 | `users`            | Perfil del ciclista (FTP, FC, peso, objetivo)     |
 | `activities`       | Actividades registradas (salidas, entrenamientos) |
-| `weekly_plans`     | Planes semanales generados por la IA             |
-| `activity_metrics` | Series temporales de métricas (para .fit/.gpx)   |
+| `weekly_plans`     | Planes semanales generados por la IA              |
+| `activity_metrics` | Series temporales de métricas (para .fit/.gpx)    |
 
 ### RLS (Row Level Security)
 
@@ -67,6 +71,7 @@ Ver configuración en [`docs/SUPABASE-SETUP.md`](../docs/SUPABASE-SETUP.md) secc
 Bucket configurado: `activity-files`
 
 Estructura de carpetas:
+
 ```
 activity-files/
 └── <user_id>/
@@ -139,6 +144,7 @@ Cuando necesites hacer cambios en el schema:
 4. Documenta el cambio en el commit
 
 **Ejemplo**:
+
 ```sql
 -- 002_add_activity_weather.sql
 ALTER TABLE activities

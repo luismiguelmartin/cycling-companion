@@ -29,9 +29,7 @@ export default async function LoginPage() {
 
         {/* Welcome Message */}
         <div className="mt-8 text-center">
-          <h2 className="text-2xl font-semibold text-slate-800 dark:text-slate-200">
-            Bienvenido
-          </h2>
+          <h2 className="text-2xl font-semibold text-slate-800 dark:text-slate-200">Bienvenido</h2>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
             Inicia sesión para acceder a tu dashboard de entrenamiento
           </p>

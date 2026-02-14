@@ -49,15 +49,15 @@ cycling-companion/
 
 ### Stack Principal
 
-| Capa | Tecnología |
-|------|-----------|
-| **Frontend** | Next.js 16 (LTS), React 19, TypeScript, Tailwind CSS, Recharts, shadcn/ui |
-| **Backend** | Fastify, TypeScript, Zod (validación), Swagger (documentación) |
-| **Base de Datos** | Supabase (PostgreSQL + Auth + Storage + RLS) |
-| **Autenticación** | Supabase Auth con Google OAuth |
-| **IA** | Claude API (Anthropic) para recomendaciones |
-| **Deploy** | Vercel (frontend), Render (API), Supabase (DB) |
-| **CI/CD** | GitHub Actions |
+| Capa              | Tecnología                                                                |
+| ----------------- | ------------------------------------------------------------------------- |
+| **Frontend**      | Next.js 16 (LTS), React 19, TypeScript, Tailwind CSS, Recharts, shadcn/ui |
+| **Backend**       | Fastify, TypeScript, Zod (validación), Swagger (documentación)            |
+| **Base de Datos** | Supabase (PostgreSQL + Auth + Storage + RLS)                              |
+| **Autenticación** | Supabase Auth con Google OAuth                                            |
+| **IA**            | Claude API (Anthropic) para recomendaciones                               |
+| **Deploy**        | Vercel (frontend), Render (API), Supabase (DB)                            |
+| **CI/CD**         | GitHub Actions                                                            |
 
 ---
 
@@ -66,21 +66,25 @@ cycling-companion/
 ### Modelo de Datos
 
 **users**
+
 - Perfil: edad, peso, FTP (Functional Threshold Power), FC máxima/reposo
 - Objetivo: performance | health | weight_loss | recovery
 - Zonas de potencia y FC calculadas automáticamente
 
 **activities**
+
 - Métricas: duración, distancia, potencia media, FC media, cadencia, TSS
 - RPE: Rating of Perceived Exertion (input subjetivo 1-10)
 - ai_analysis: análisis generado por Claude (JSONB)
 - raw_file_url: archivo .fit/.gpx original (Supabase Storage)
 
 **weekly_plans**
+
 - plan_data: estructura JSONB con 7 días (tipo, intensidad, duración, tips)
 - ai_rationale: explicación del plan generado
 
 **activity_metrics**
+
 - Series temporales: potencia, FC, cadencia, velocidad por segundo
 
 ### Endpoints API Principales
@@ -116,6 +120,7 @@ cycling-companion/
 ```
 
 **Principios del entrenador IA:**
+
 - Cercano pero profesional
 - Basado en datos, nunca inventado
 - Motivador sin ser condescendiente
@@ -177,6 +182,7 @@ pnpm dev
 ```
 
 El proyecto estará disponible en:
+
 - **Frontend**: http://localhost:3000
 - **API**: http://localhost:3001
 - **Swagger API Docs**: http://localhost:3001/api/v1/docs
@@ -209,10 +215,12 @@ pnpm test:coverage
 ### Desarrollo con Datos Mock
 
 Durante las fases iniciales, usa datos mock en `/data/mock/`:
+
 - `activities.json`: 20-30 actividades de ejemplo
 - `user-profile.json`: perfil de usuario ejemplo
 
 Carga estos datos con:
+
 ```bash
 pnpm db:seed
 ```
@@ -302,22 +310,22 @@ Este proyecto implementa un pipeline multi-agente documentado en `docs/03-AGENTS
 
 ### Agentes Locales (Claude Code)
 
-| Agente | Rol | Trigger |
-|--------|-----|---------|
-| **L1: UX Interpreter** | Capturas → especificación funcional | Manual |
-| **L2: Architect** | Especificación → diseño técnico | Manual |
-| **L3: Planner** | Diseño → issues incrementales | Manual |
-| **L4: Implementer** | Implementar código con supervisión | Manual |
+| Agente                 | Rol                                 | Trigger |
+| ---------------------- | ----------------------------------- | ------- |
+| **L1: UX Interpreter** | Capturas → especificación funcional | Manual  |
+| **L2: Architect**      | Especificación → diseño técnico     | Manual  |
+| **L3: Planner**        | Diseño → issues incrementales       | Manual  |
+| **L4: Implementer**    | Implementar código con supervisión  | Manual  |
 
 ### Agentes Remotos (GitHub Actions)
 
-| Agente | Rol | Trigger |
-|--------|-----|---------|
-| **R1: Issue Analyzer** | Analizar impact y complejidad | Label `ai-analyze` |
-| **R2: PR Generator** | Generar PR completa desde issue | Label `ai-generate-pr` |
-| **R3: PR Reviewer** | Code review automático | PR abierta |
-| **R4: CI/CD** | Lint, test, build | Push/PR |
-| **R5: Doc Generator** | Actualizar CHANGELOG, README | PR mergeada |
+| Agente                 | Rol                             | Trigger                |
+| ---------------------- | ------------------------------- | ---------------------- |
+| **R1: Issue Analyzer** | Analizar impact y complejidad   | Label `ai-analyze`     |
+| **R2: PR Generator**   | Generar PR completa desde issue | Label `ai-generate-pr` |
+| **R3: PR Reviewer**    | Code review automático          | PR abierta             |
+| **R4: CI/CD**          | Lint, test, build               | Push/PR                |
+| **R5: Doc Generator**  | Actualizar CHANGELOG, README    | PR mergeada            |
 
 ---
 
@@ -354,17 +362,14 @@ Este proyecto implementa un pipeline multi-agente documentado en `docs/03-AGENTS
 ## 📅 Fases de Desarrollo
 
 **Fase 1 (Actual)**: Cimientos
+
 1. Setup monorepo + CI + Auth + Deploy
 2. Dashboard con datos mock
 3. Lista y detalle de actividades
 
-**Fase 2**: Core Features
-4. Planificación semanal + comparativas
-5. Agentes remotos completos
+**Fase 2**: Core Features 4. Planificación semanal + comparativas 5. Agentes remotos completos
 
-**Fase 3**: Refinamiento
-6. Features secundarias
-7. Evaluación y documentación del TFM
+**Fase 3**: Refinamiento 6. Features secundarias 7. Evaluación y documentación del TFM
 
 ---
 
