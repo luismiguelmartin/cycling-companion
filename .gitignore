@@ -35,4 +35,4 @@ supabase/.temp/
 .claude/
 
 # Design files
-docs/designs/
+docs/design/
