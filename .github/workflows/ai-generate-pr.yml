@@ -46,7 +46,7 @@ jobs:
           claude_args: |
             --model claude-sonnet-4-5-20250929
             --max-turns 30
-            --allowedTools "Read,Glob,Grep,Edit,Write,Bash(*)"
+            --allowedTools "Read,Glob,Grep,Edit,Write,Bash(git *),Bash(pnpm *),Bash(gh *),Bash(cat *),Bash(ls *),Bash(find *),Bash(echo *)"
           prompt: |
             Eres el PR Generator (R2) del proyecto Cycling Companion.
 
