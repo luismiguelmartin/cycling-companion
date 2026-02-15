@@ -141,6 +141,28 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 
 **Labels del sistema**: `ai-analyze`, `ai-generate-pr`, `ai-generated`, `ai-reviewed`, `priority:p0/p1/p2`, `type:feature/bug/refactor/docs`, `phase:1/2/3`
 
+### Metodología por Fase
+
+**Fase 2 (Frontend):**
+- Pipeline completo: L1 (UX) → L2 (Técnico) → L3 (Issues) → L4 (Implementación)
+- Specs L1/L2/L3 generadas **antes** de implementar
+- 22 archivos de specs en `docs/specs/`
+
+**Fase 3 (Backend) — Bloques 0-2:**
+- Implementación directa desde plan general (`phase3-backend-plan.md`)
+- Specs L2 (diseño técnico) generadas **retroactivamente** tras commits:
+  - `L2-backend-00-infrastructure.md` (Bloque 0: infraestructura base)
+  - `L2-backend-01-profile.md` (Bloque 1: endpoints GET/PATCH perfil)
+  - `L2-backend-02-activities.md` (Bloque 2: CRUD actividades)
+- **Rationale**: Contratos API claros en PRD, schemas Zod compartidos, iteración rápida
+
+**Fase 3 (Backend) — Bloque 3+:**
+- Pipeline completo: L1 → L2 → L3 → L4 → L5 (QA/Tester)
+- Specs generadas **antes** de implementar
+- **Rationale**: Lógica IA compleja, prompts a diseñar, parseo archivos, mayor beneficio de diseño previo
+
+**Conclusión**: Metodología híbrida — aplicar pipeline completo donde aporta más valor (features complejas), permitir implementación directa para CRUD predecible.
+
 ---
 
 ## Notas para Claude Code
