@@ -18,11 +18,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Claude Code (pinned version)
-        run: |
-          npm install -g @anthropic-ai/claude-code@2.1.18
-          echo "CLAUDE_PATH=$(which claude)" >> $GITHUB_ENV
-
       - name: Save issue context
         run: |
           echo '${{ github.event.issue.number }}' > /tmp/issue-number.txt
@@ -35,30 +30,17 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          path_to_claude_code_executable: ${{ env.CLAUDE_PATH }}
-          show_full_output: true
           claude_args: |
             --model claude-haiku-4-5-20251001
-            --max-turns 10
+            --max-turns 5
           use_sticky_comment: "true"
           prompt: |
-            Eres el Issue Analyzer (R1) del proyecto Cycling Companion.
+            Lee /tmp/issue-number.txt, /tmp/issue-title.txt y /tmp/issue-body.txt.
+            Lee CLAUDE.md para contexto.
 
-            Lee /tmp/issue-number.txt, /tmp/issue-title.txt y /tmp/issue-body.txt para conocer la issue.
-            Lee CLAUDE.md para contexto del proyecto y prompts/remote/issue-analyzer.md para instrucciones de tu rol.
-
-            Analiza la issue y genera un comentario estructurado en español con:
-
-            ## Analisis IA de la Issue
-            ### Complejidad
-            Baja / Media / Alta con justificacion.
-            ### Archivos Afectados
-            Lista archivos/directorios a modificar (usa el codebase real).
-            ### Riesgos
-            Riesgos tecnicos, de regresion o seguridad.
-            ### Tests Necesarios
-            Tests unitarios o de integracion a añadir.
-            ### Approach Sugerido
-            Pasos concretos para implementar.
-            ### Estimacion
-            Esfuerzo S/M/L con justificacion.
+            Genera un comentario breve en español:
+            ## Analisis IA
+            - **Complejidad**: Baja/Media/Alta
+            - **Archivos**: lista de archivos a modificar
+            - **Approach**: pasos concretos
+            - **Estimacion**: S/M/L

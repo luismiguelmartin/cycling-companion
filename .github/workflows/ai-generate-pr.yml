@@ -31,11 +31,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Claude Code (pinned version)
-        run: |
-          npm install -g @anthropic-ai/claude-code@2.1.18
-          echo "CLAUDE_PATH=$(which claude)" >> $GITHUB_ENV
-
       - name: Save issue context
         run: |
           echo '${{ github.event.issue.number }}' > /tmp/issue-number.txt
@@ -48,22 +43,14 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          path_to_claude_code_executable: ${{ env.CLAUDE_PATH }}
           claude_args: |
             --model claude-sonnet-4-5-20250929
-            --max-turns 30
+            --max-turns 15
           prompt: |
-            Eres el PR Generator (R2) del proyecto Cycling Companion.
+            Lee /tmp/issue-number.txt, /tmp/issue-title.txt y /tmp/issue-body.txt para la issue.
+            Lee CLAUDE.md para convenciones.
 
-            Lee los archivos /tmp/issue-number.txt, /tmp/issue-title.txt y /tmp/issue-body.txt para conocer la issue a implementar.
-
-            Lee el archivo CLAUDE.md para entender el contexto completo del proyecto.
-            Lee tambien prompts/remote/pr-generator.md para instrucciones de tu rol.
-
-            Instrucciones:
-            1. Planifica: Identifica archivos a crear/modificar. Convenciones: TypeScript estricto, Zod en shared, Tests con Vitest, componentes PascalCase/kebab-case, API Fastify con Zod.
-            2. Implementa el codigo. Dependencias ya instaladas.
-            3. Valida: pnpm lint, pnpm typecheck, pnpm test. Corrige errores antes de crear PR.
-            4. Crea la PR: branch ai/issue-NUMERO-slug, titulo descriptivo en español con prefijo feat:/fix:/refactor:, body con Closes #NUMERO, label ai-generated.
-
-            IMPORTANTE: No modifiques archivos fuera del scope. No sobre-ingenierices. Si es demasiado compleja, comenta en la issue.
+            Implementa el cambio. Dependencias ya instaladas.
+            Valida: pnpm lint, pnpm typecheck, pnpm test --filter=shared (solo si tocas shared).
+            Crea PR: branch ai/issue-NUMERO-slug, titulo con feat:/fix:, body con Closes #NUMERO, label ai-generated.
+            No sobre-ingenierices. Si es compleja, comenta en la issue.
