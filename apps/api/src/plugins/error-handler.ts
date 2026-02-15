@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyError, FastifyReply, FastifyRequest } from "fastify";
+import fp from "fastify-plugin";
 import { ZodError } from "zod";
 
 /**
@@ -27,7 +28,7 @@ interface ErrorResponse {
 /**
  * Fastify plugin for centralized error handling.
  */
-export async function errorHandler(fastify: FastifyInstance) {
+async function errorHandlerPlugin(fastify: FastifyInstance) {
   fastify.setErrorHandler(
     (
       error: FastifyError | AppError | ZodError | Error,
@@ -124,3 +125,5 @@ function getErrorCode(statusCode: number): string {
       return statusCode >= 500 ? "INTERNAL_ERROR" : "CLIENT_ERROR";
   }
 }
+
+export const errorHandler = fp(errorHandlerPlugin);
