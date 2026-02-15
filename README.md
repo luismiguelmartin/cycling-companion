@@ -33,14 +33,14 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 
 ### Estado del Proyecto
 
-**Fase actual**: Fase 2 completada ✅ → Fase 3 — Backend + IA
+**Fase actual**: Fase 3 completada ✅ → Fase 4 — Evaluación y documentación
 
 | Fase       | Descripción                                                   | Estado        |
 | ---------- | ------------------------------------------------------------- | ------------- |
 | **Fase 1** | Cimientos: monorepo, CI, Auth, deploy, schema DB              | ✅ Completada |
 | **Fase 2** | MVP funcional: pantallas frontend, datos mock, specs          | ✅ Completada |
-| **Fase 3** | Core features: API endpoints, integración Claude, import real | ⏳ En curso   |
-| **Fase 4** | Refinamiento: agentes remotos, evaluación, documentación      | ⬜ Pendiente  |
+| **Fase 3** | Core features: API endpoints, integración Claude, import real | ✅ Completada |
+| **Fase 4** | Refinamiento: agentes remotos, evaluación, documentación      | ⏳ Pendiente  |
 
 ### Completado
 
@@ -49,21 +49,23 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 - ✅ Onboarding wizard (4 pasos)
 - ✅ **9 pantallas frontend implementadas** (todas las rutas del MVP)
 - ✅ 32 componentes reutilizables
-- ✅ **27 archivos de test (278 tests)**: 71 web + 77 shared + 130 API
+- ✅ **29 archivos de test (290 tests)**: 72 web + 82 shared + 136 API
 - ✅ 5 schemas Zod compartidos + 7 módulos de constantes + utils de training
 - ✅ 4 migraciones SQL (schema, onboarding, activity types, ai_cache)
 - ✅ Design system documentado (dark/light theme)
-- ✅ 22 especificaciones L1/L2/L3 (frontend) + 8 specs L2-backend (API)
+- ✅ 22 especificaciones L1/L2/L3 (frontend) + 9 specs L2-backend (API)
 - ✅ **API Fastify completa**: 15+ endpoints (CRUD + IA + upload)
 - ✅ **4 endpoints IA** con Claude API (cache, fallback, rate limit)
-- ✅ **Importación real** de archivos .fit/.gpx
+- ✅ **Importación real** de archivos .fit/.gpx con Normalized Power, extensiones Garmin
+- ✅ **Frontend migrado** de Supabase directo → API backend (Bloque 8)
+- ✅ **Análisis IA** auto-trigger tras importar + botón manual en detalle
 - ✅ **Deploy producción**: Vercel + Render + Supabase
 
-### Próximos Pasos (Fase 3 — Bloque 8)
+### Próximos Pasos (Fase 4)
 
-- ⏳ Migrar frontend de Supabase directo → API backend
-- ⏳ Conectar pantallas con endpoints reales (Dashboard, Plan, Insights, Import)
 - ⏳ Agentes remotos (PR Generator, PR Reviewer, Doc Generator)
+- ⏳ Evaluación: métricas de pipeline AI-first vs desarrollo tradicional
+- ⏳ Documentación final y conclusiones
 
 ---
 
@@ -222,7 +224,7 @@ cycling-companion/
 │   ├── DESIGN-SYSTEM.md            # Design system (tokens, componentes, conversión JSX)
 │   ├── GOOGLE-OAUTH-SETUP.md       # Guía configuración OAuth
 │   ├── SUPABASE-SETUP.md           # Guía configuración Supabase
-│   └── specs/                      # 22 especificaciones L1/L2/L3
+│   └── specs/                      # 27 especificaciones L1/L2/L3
 │
 ├── turbo.json                      # Configuración Turborepo
 ├── pnpm-workspace.yaml             # Workspace pnpm
@@ -303,14 +305,14 @@ cycling-companion/
 | Ruta                 | Pantalla      | Descripción                                                       | Fuente de datos            |
 | -------------------- | ------------- | ----------------------------------------------------------------- | -------------------------- |
 | `/auth/login`        | Login         | Autenticación con Google OAuth                                    | Supabase Auth              |
-| `/onboarding`        | Onboarding    | Wizard de 4 pasos: perfil → objetivos → zonas → resumen           | Supabase                   |
-| `/`                  | Dashboard     | KPIs, gráficas de potencia/carga, coach IA, últimas actividades   | Supabase + mock            |
-| `/activities`        | Lista         | Tabla paginada con filtros por tipo y búsqueda por nombre         | Supabase                   |
-| `/activities/[id]`   | Detalle       | Métricas, gráficas temporales (potencia/FC/cadencia), análisis IA | Supabase                   |
-| `/activities/import` | Importar      | Entrada manual o subida de archivo (.fit/.gpx)                    | Solo UI                    |
-| `/plan`              | Planificación | Grid semanal (7 días), tips nutrición/descanso, barra de carga    | Mock data (Fase 3: real)   |
-| `/insights`          | Insights      | Comparativa entre periodos, radar de rendimiento, análisis IA     | Supabase + cálculos client |
-| `/profile`           | Perfil        | Datos personales, zonas potencia/FC, ajustes tema/unidades        | Supabase                   |
+| `/onboarding`        | Onboarding    | Wizard de 4 pasos: perfil → objetivos → zonas → resumen           | API backend                |
+| `/`                  | Dashboard     | KPIs, gráficas de potencia/carga, coach IA, últimas actividades   | API backend                |
+| `/activities`        | Lista         | Tabla paginada con filtros por tipo y búsqueda por nombre         | API backend                |
+| `/activities/[id]`   | Detalle       | Métricas, gráficas temporales (potencia/FC/cadencia), análisis IA | API backend                |
+| `/activities/import` | Importar      | Entrada manual o subida de archivo (.fit/.gpx)                    | API backend                |
+| `/plan`              | Planificación | Grid semanal (7 días), tips nutrición/descanso, barra de carga    | API backend                |
+| `/insights`          | Insights      | Comparativa entre periodos, radar de rendimiento, análisis IA     | API backend                |
+| `/profile`           | Perfil        | Datos personales, zonas potencia/FC, ajustes tema/unidades        | API backend                |
 
 ### Características Principales
 
@@ -338,15 +340,17 @@ cycling-companion/
 #### F04 — Importar Actividad
 
 - Modo manual: formulario con datos (nombre, fecha, tipo, duración, distancia, etc.)
-- Modo archivo: upload .fit/.gpx (Fase 3)
-- Opción: generar datos mock automáticos
+- Modo archivo: upload .fit/.gpx con parseo de extensiones Garmin (FC, cadencia, potencia, velocidad)
+- Normalized Power (NP) calculado automáticamente para TSS preciso
+- RPE y notas editables en ambos modos
+- Análisis IA auto-trigger tras importar
 
 #### F05 — Detalle de Actividad
 
 - KPI Cards: distancia, tiempo, potencia, FC, cadencia, TSS
-- Gráficas temporales si hay series de datos
+- Gráficas temporales con eje X en kilómetros (potencia/FC/cadencia vs distancia)
 - RPE registrado
-- **Análisis IA**: explicación de la sesión y prioridades
+- **Análisis IA**: botón "Generar análisis" + auto-trigger tras importar
 - Notas personales editables
 - Checkbox: marcar como "sesión de referencia"
 
@@ -404,7 +408,7 @@ Internamente implementado con:
 | [GOOGLE-OAUTH-SETUP.md](docs/GOOGLE-OAUTH-SETUP.md)                         | Guía de configuración de Google OAuth en Supabase                       |
 | [SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md)                                 | Guía de configuración de Supabase y base de datos                       |
 | [CLAUDE.md](CLAUDE.md)                                                      | Instrucciones para Claude Code (este repositorio)                       |
-| `docs/specs/`                                                               | 22 especificaciones L1 (UX), L2 (técnico), L3 (issues) para 8 pantallas |
+| `docs/specs/`                                                               | 27 especificaciones L1/L2/L3 (8 pantallas + 9 bloques backend) |
 
 ---
 
@@ -447,7 +451,7 @@ Este proyecto implementa un pipeline multi-agente para integrar IA en el ciclo d
 - **Sin integración directa con Strava/Garmin**: Solo importación manual
 - **Solo español**: Multi-idioma fuera de scope
 - **Cold starts en Render**: Tier gratuito ~30s después de 15min inactividad
-- **Costes Claude API**: Implementar caché, limitar llamadas/usuario/día
+- **Costes Claude API**: Caché implementada + rate limit 20/usuario/día
 
 ### Fuera del Alcance del MVP
 

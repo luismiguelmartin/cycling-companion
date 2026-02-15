@@ -224,7 +224,7 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 | Planificación semanal | ✅ Implementada (Fase 2) | Vista semanal, sugerencias IA, recomendaciones |
 | Insights / Comparar | ✅ Implementada (Fase 2) | Comparativas, radar, análisis tendencias |
 
-### Backend API (Fase 3 — Bloques 0-7 completados ✅)
+### Backend API (Fase 3 — Bloques 0-8 completados ✅)
 
 | Bloque | Endpoints | Estado |
 |--------|-----------|--------|
@@ -232,23 +232,25 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 | 1 — Perfil | `GET/PATCH /api/v1/profile` | ✅ |
 | 2 — Actividades | `GET/POST/PATCH/DELETE /api/v1/activities`, `GET /activities/:id/metrics` | ✅ |
 | 3 — Insights | `GET /api/v1/insights`, `GET /api/v1/insights/overload-check` | ✅ |
-| 4 — Training Rules | Cálculos CTL/ATL/TSB, alertas, zonas en `packages/shared` | ✅ |
+| 4 — Training Rules | Cálculos CTL/ATL/TSB, NP, alertas, zonas en `packages/shared` | ✅ |
 | 5 — IA (Claude API) | `POST /api/v1/ai/analyze-activity`, `POST /ai/weekly-plan`, `POST /ai/weekly-summary`, `GET /ai/coach-tip` | ✅ |
 | 6 — Weekly Plan | `GET/PATCH/DELETE /api/v1/plan` | ✅ |
-| 7 — Import | `POST /api/v1/activities/upload` (.fit/.gpx) | ✅ |
+| 7 — Import | `POST /api/v1/activities/upload` (.fit/.gpx, NP, Garmin extensions) | ✅ |
+| 8 — Frontend Migration | Frontend migrado de Supabase directo → API backend | ✅ |
 
 ### Artefactos de diseño y especificación
 
 - **Design System**: `docs/DESIGN-SYSTEM.md` — guía completa con tokens, componentes, paleta y guía de conversión JSX→Next.js
 - **Mockups JSX**: `docs/design/` — fuente de verdad visual (excluidos de git)
-- **Especificaciones**: 22 archivos L1/L2/L3 (frontend) + 8 archivos L2-backend (API) en `docs/specs/`
-- **Schemas compartidos**: `packages/shared/src/` — 5 schemas Zod + 7 módulos de constantes + utils de training
+- **Especificaciones**: 22 archivos L1/L2/L3 (frontend) + 9 archivos L2-backend (API) en `docs/specs/`
+- **Schemas compartidos**: `packages/shared/src/` — 5 schemas Zod + 7 módulos de constantes + utils de training (TSS, IF, CTL/ATL/TSB, NP)
 
 ### Infraestructura
 
 - Monorepo Turborepo + pnpm operativo
 - CI/CD: GitHub Actions separados (frontend + backend)
 - Base de datos: Supabase con 5 tablas + RLS + 4 migraciones aplicadas
+- Frontend migrado completamente a API backend (Bloque 8)
 - Auth: Google OAuth via Supabase Auth
 - Deploy: Vercel (frontend) + Render (API) + Supabase (DB)
-- Tests: 27 archivos, 278 tests (71 web + 77 shared + 130 API)
+- Tests: 29 archivos, 290 tests (72 web + 82 shared + 136 API)

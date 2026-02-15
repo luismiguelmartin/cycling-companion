@@ -395,7 +395,7 @@ El desarrollo se organiza en **4 fases** distribuidas en **7 semanas**, diseñad
 ```
 Fase 1: Cimientos                    ✅ COMPLETADA
 Fase 2: MVP funcional (frontend)     ✅ COMPLETADA
-Fase 3: Backend + IA                 🔄 EN PROGRESO (Bloques 0-7 completados, Bloque 8 pendiente)
+Fase 3: Backend + IA                 ✅ COMPLETADA (Bloques 0-8 todos completados)
 Fase 4: Pulido y evaluación          ⏳ PENDIENTE
 ```
 
@@ -537,24 +537,26 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 - ✅ API Fastify con 15+ endpoints funcionales
 - ✅ 4 endpoints IA con Claude API, caché, fallback y rate limiting
 - ✅ Importación real de archivos .fit/.gpx
-- ✅ 130 tests API + 77 tests shared (207 total backend)
+- ✅ 136 tests API + 82 tests shared (218 total backend)
 - ✅ 4 migraciones SQL aplicadas
-- ✅ 8 specs L2-backend generadas
+- ✅ 9 specs L2-backend generadas (Bloques 0-8)
 - ✅ Deploy en producción (Render)
 
 #### Semana 6: Frontend migration + Agentes remotos
 
-| Día | Tarea                                                           | Agente       |
-| --- | --------------------------------------------------------------- | ------------ |
-| 1   | Bloque 8: Migrar frontend de Supabase directo → API backend     | L4           |
-| 2   | Configurar agente R2 (PR Generator)                             | Manual       |
-| 2   | Probar flujo completo: issue → ai-analyze → ai-generate-pr → PR | R1 + R2      |
-| 3   | Configurar agente R5 (Doc Generator)                            | Manual       |
-| 3   | Probar: merge → changelog automático                            | R5           |
-| 4   | Crear 3-5 issues de features secundarias para probar pipeline   | L3           |
-| 4   | Ejecutar pipeline completo en 1-2 features                      | R1 + R2 + R3 |
-| 5   | Comparar: PR generada por IA vs PR manual (misma feature)       | Evaluación   |
-| 5   | Documentar flujos, ajustar prompts, versionar prompts           | Manual       |
+| Día | Tarea                                                           | Agente       | Estado |
+| --- | --------------------------------------------------------------- | ------------ | ------ |
+| 1   | Bloque 8: Migrar frontend de Supabase directo → API backend     | L4           | ✅ |
+| 1   | Fix GPX import (Garmin extensions, NP, moving time, km axis)    | L4           | ✅ |
+| 1   | Análisis IA: botón manual + auto-trigger tras import            | L4           | ✅ |
+| 2   | Configurar agente R2 (PR Generator)                             | Manual       | ⏳ Fase 4 |
+| 2   | Probar flujo completo: issue → ai-analyze → ai-generate-pr → PR | R1 + R2     | ⏳ Fase 4 |
+| 3   | Configurar agente R5 (Doc Generator)                            | Manual       | ⏳ Fase 4 |
+| 3   | Probar: merge → changelog automático                            | R5           | ⏳ Fase 4 |
+| 4   | Crear 3-5 issues de features secundarias para probar pipeline   | L3           | ⏳ Fase 4 |
+| 4   | Ejecutar pipeline completo en 1-2 features                      | R1 + R2 + R3 | ⏳ Fase 4 |
+| 5   | Comparar: PR generada por IA vs PR manual (misma feature)       | Evaluación   | ⏳ Fase 4 |
+| 5   | Documentar flujos, ajustar prompts, versionar prompts           | Manual       | ⏳ Fase 4 |
 
 **Features secundarias sugeridas para probar el pipeline**:
 
@@ -564,15 +566,17 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 4. Dark mode toggle
 5. Estadísticas de "mejor semana" en el dashboard
 
-**Entregables fase 3**:
+**Entregables fase 3**: ✅ COMPLETADA
 
 - ✅ Backend API completo con 15+ endpoints
 - ✅ 4 endpoints IA con Claude API (cache + fallback + rate limit)
-- ✅ Importación real .fit/.gpx
-- ✅ 278 tests (27 archivos): 71 web + 77 shared + 130 API
-- ⏳ Frontend migrado a API backend (Bloque 8)
-- ⏳ Pipeline AI-first end-to-end
-- ⏳ Comparativa pipeline tradicional vs AI-first
+- ✅ Importación real .fit/.gpx con Normalized Power y extensiones Garmin
+- ✅ Frontend migrado a API backend (Bloque 8)
+- ✅ Análisis IA: auto-trigger tras import + botón manual en detalle
+- ✅ Gráficas de actividad con eje X en kilómetros
+- ✅ 290 tests (29 archivos): 72 web + 82 shared + 136 API
+- ⏳ Pipeline AI-first end-to-end (movido a Fase 4)
+- ⏳ Comparativa pipeline tradicional vs AI-first (movido a Fase 4)
 
 ---
 

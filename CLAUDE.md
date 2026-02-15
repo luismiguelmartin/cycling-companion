@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Propuesta de valor**: Entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables.
 
-**Fase actual**: Fase 3 — Backend + IA (Bloques 0-7 completados, Bloque 8 en curso)
+**Fase actual**: Fase 3 completada ✅ → Fase 4 pendiente (evaluación, agentes remotos)
 
 ---
 
@@ -239,20 +239,20 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 
 ## Estado de Implementación
 
-### Pantallas implementadas (frontend) — Fase 2 Completada ✅
+### Pantallas (frontend) — Todas migradas a API backend ✅
 | Ruta | Pantalla | Datos |
 |------|----------|-------|
 | `/auth/login` | Login (Google OAuth) | Supabase Auth |
-| `/onboarding` | Onboarding wizard (4 pasos) | Supabase |
-| `/` | Dashboard (KPIs, gráficas, coach IA) | Supabase + mock |
-| `/activities` | Lista de actividades (filtros, búsqueda) | Supabase |
-| `/activities/[id]` | Detalle de actividad (métricas, chart) | Supabase |
-| `/activities/import` | Importar actividad (manual/archivo) | Solo UI |
-| `/plan` | Planificación semanal (7 días, tips) | Implementada (Fase 2) |
-| `/insights` | Insights (comparativas, radar, análisis) | Implementada (Fase 2) |
-| `/profile` | Perfil (datos, zonas, ajustes) | Supabase |
+| `/onboarding` | Onboarding wizard (4 pasos) | API backend |
+| `/` | Dashboard (KPIs, gráficas, coach IA) | API backend |
+| `/activities` | Lista de actividades (filtros, búsqueda) | API backend |
+| `/activities/[id]` | Detalle de actividad (métricas, chart km, análisis IA) | API backend |
+| `/activities/import` | Importar actividad (manual + .fit/.gpx) | API backend |
+| `/plan` | Planificación semanal (7 días, tips) | API backend |
+| `/insights` | Insights (comparativas, radar, análisis) | API backend |
+| `/profile` | Perfil (datos, zonas, ajustes) | API backend |
 
-### Backend API — Fase 3 Bloques 0-7 Completados ✅
+### Backend API — Fase 3 Bloques 0-8 Completados ✅
 
 | Bloque | Endpoints |
 |--------|-----------|
@@ -260,18 +260,15 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 | 1 — Perfil | `GET/PATCH /api/v1/profile` |
 | 2 — Actividades | `GET/POST/PATCH/DELETE /api/v1/activities`, `GET /activities/:id/metrics` |
 | 3 — Insights | `GET /api/v1/insights`, `GET /insights/overload-check` |
-| 4 — Training Rules | `calculateTrainingLoad`, `evaluateTrainingAlerts` en shared |
+| 4 — Training Rules | `calculateTrainingLoad`, `evaluateTrainingAlerts`, `calculateNP` en shared |
 | 5 — IA | `POST /ai/analyze-activity`, `POST /ai/weekly-plan`, `POST /ai/weekly-summary`, `GET /ai/coach-tip` |
 | 6 — Plan | `GET/PATCH/DELETE /api/v1/plan` |
-| 7 — Import | `POST /api/v1/activities/upload` (.fit/.gpx multipart) |
-
-### Próximos Pasos — Bloque 8: Frontend Migration
-- Migrar frontend de Supabase directo → API backend
-- Conectar Dashboard, Plan, Insights, Import con endpoints reales
+| 7 — Import | `POST /api/v1/activities/upload` (.fit/.gpx, NP, Garmin extensions) |
+| 8 — Frontend Migration | Todas las pantallas migradas de Supabase directo → API backend |
 
 ### Métricas
 - **Componentes**: 32 en `apps/web/src/components/`
-- **Tests**: 27 archivos (278 tests) — 71 web + 77 shared + 130 API
+- **Tests**: 29 archivos (290 tests) — 72 web + 82 shared + 136 API
 - **Migraciones SQL**: 4 (001 schema, 002 onboarding, 003 activity_type, 004 ai_cache)
 - **Schemas Zod compartidos**: 5 (user-profile, activity, weekly-plan, insights, ai-response)
 - **Constantes compartidas**: 7 módulos + 2 utils (training-calculations, training-rules)
@@ -293,6 +290,10 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 - Batch insert de métricas en chunks de 1000 para evitar límites de DB.
 - Auth en API: JWT via `supabase.auth.getUser(token)` en plugin `auth.ts` con `fastify-plugin`.
 - `ActivityCreateInput` (z.input) para parámetros que aceptan defaults de Zod (ej: `type` con default "endurance").
+- GPX Garmin extensions: gpxjs genera `ext["gpxtpx:TrackPointExtension"]["gpxtpx:hr"]`, no `ext.heartRate`. Usar `extractFromExtensions()`.
+- `createActivity` acepta `normalizedPowerWatts` como 4to parámetro para TSS más preciso.
+- Análisis IA se dispara fire-and-forget tras import: `analyzeActivity(userId, id).catch(() => {})`.
+- API client split: `lib/api/server.ts` (Server Components) y `lib/api/client.ts` (Client Components) — NO mezclar.
 
 ---
 
@@ -304,6 +305,6 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 | PRD completo (modelo de datos, endpoints, flujo IA) | `docs/02-PRD.md` |
 | Plan de agentes y desarrollo | `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md` |
 | Design system (pantallas, tokens, componentes, conversión JSX→Next.js) | `docs/DESIGN-SYSTEM.md` |
-| Especificaciones por pantalla (22 archivos L1/L2/L3 para 8 pantallas) | `docs/specs/` |
+| Especificaciones (27 archivos L1/L2/L3: 8 pantallas + 9 bloques backend) | `docs/specs/` |
 | Configuración Google OAuth | `docs/GOOGLE-OAUTH-SETUP.md` |
 | Configuración Supabase | `docs/SUPABASE-SETUP.md` |

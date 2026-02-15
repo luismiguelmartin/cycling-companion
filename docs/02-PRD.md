@@ -324,12 +324,16 @@ cycling-companion/
 - Formulario manual: nombre, fecha, tipo, duración, distancia, potencia media, FC media, cadencia, RPE
 - Opción de generar datos mock automáticos (botón "generar actividad de ejemplo")
 
-**Modo archivo (fase posterior)**:
+**Modo archivo** (implementado):
 
-- Upload de .fit o .gpx
-- Parseo server-side (librería `fit-file-parser` para .fit, `gpxparser` para .gpx)
-- Extracción de métricas y series temporales
-- Almacenamiento del archivo original en Supabase Storage
+- Upload de .fit o .gpx (multipart via `@fastify/multipart`)
+- Parseo server-side: `fit-file-parser` (.fit), `@we-gold/gpxjs` (.gpx)
+- Soporte extensiones Garmin namespaced (`gpxtpx:TrackPointExtension`)
+- Extracción: potencia, FC, cadencia, velocidad (series temporales)
+- Normalized Power (NP) calculado automáticamente (algoritmo de Coggan)
+- TSS calculado con NP (más preciso que avg power)
+- Moving time en vez de elapsed time para GPX
+- Análisis IA auto-trigger tras importar (fire-and-forget)
 
 ---
 
@@ -555,5 +559,6 @@ La arquitectura ya soporta datos reales:
 | 5 — IA (Claude API) | `L2-backend-05-ai-endpoints.md` | ✅ |
 | 6 — Weekly Plan | `L2-backend-06-weekly-plan.md` | ✅ |
 | 7 — Import | `L2-backend-07-import.md` | ✅ |
+| 8 — Frontend Migration | `L2-backend-08-frontend-migration.md` | ✅ |
 
 **Convención de nombres**: `L{nivel}-screen-{número_PRD}-{nombre}.md` (frontend), `L2-backend-{bloque}-{nombre}.md` (backend)
