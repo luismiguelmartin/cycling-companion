@@ -75,3 +75,16 @@ export {
   type TrainingAlert,
   type AlertParams,
 } from "./utils/training-rules";
+
+// AI response schemas
+export {
+  aiActivityAnalysisSchema,
+  aiCoachTipSchema,
+  aiWeeklySummarySchema,
+  aiPlanDaySchema,
+  aiWeeklyPlanResponseSchema,
+  type AIActivityAnalysis,
+  type AICoachTip,
+  type AIWeeklySummary,
+  type AIWeeklyPlanResponse,
+} from "./schemas/ai-response";

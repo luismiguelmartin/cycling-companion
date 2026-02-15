@@ -152,10 +152,7 @@ export function calculateWeeklyTSS(
  * Clasifica la zona dominante de una actividad según potencia media vs FTP.
  * Usa POWER_ZONES de constants/zones.ts.
  */
-export function classifyActivityZone(
-  avgPower: number | null,
-  ftp: number | null,
-): string | null {
+export function classifyActivityZone(avgPower: number | null, ftp: number | null): string | null {
   if (!avgPower || !ftp) return null;
   const ratio = avgPower / ftp;
   const zone = POWER_ZONES.find((z) => ratio >= z.minPct && ratio <= z.maxPct);
