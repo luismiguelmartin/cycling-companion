@@ -20,11 +20,13 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Save PR context
+        run: |
+          echo '${{ github.event.pull_request.number }}' > /tmp/pr-number.txt
+          echo '${{ github.event.pull_request.title }}' > /tmp/pr-title.txt
+
       - name: Update CHANGELOG with Claude
         uses: anthropics/claude-code-action@v1
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: |
@@ -34,16 +36,16 @@ jobs:
           prompt: |
             Eres el Doc Generator (R5) del proyecto Cycling Companion.
 
-            La PR mergeada es la numero $PR_NUMBER con titulo: $PR_TITLE
+            Lee /tmp/pr-number.txt y /tmp/pr-title.txt para saber que PR se acaba de mergear.
 
             Tu tarea: actualizar CHANGELOG.md con una entrada para esta PR.
 
             Instrucciones:
-            1. Lee el CHANGELOG.md actual
-            2. Determina la categoria (Añadido/Cambiado/Corregido/Eliminado)
-            3. Añade una entrada bajo ## [Sin versionar] en la categoria correcta
-            4. Formato: - Descripcion concisa del cambio (#numero_pr)
-            5. Haz commit con mensaje: docs: actualizar CHANGELOG (#numero_pr)
+            1. Lee CHANGELOG.md actual
+            2. Determina categoria: Añadido, Cambiado, Corregido o Eliminado
+            3. Añade entrada bajo ## [Sin versionar] en la categoria correcta
+            4. Formato: - Descripcion concisa del cambio (#NUMERO_PR)
+            5. Haz commit: docs: actualizar CHANGELOG (#NUMERO_PR)
             6. Push a main
 
-            Reglas: escribe en español, se conciso, no dupliques entradas, manten formato Keep a Changelog.
+            Reglas: español, conciso, no duplicar, formato Keep a Changelog.

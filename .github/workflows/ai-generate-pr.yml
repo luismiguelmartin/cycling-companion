@@ -31,17 +31,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Save issue body to file
+      - name: Save issue context
         run: |
-          cat <<'ISSUE_EOF' > /tmp/issue-body.txt
+          echo '${{ github.event.issue.number }}' > /tmp/issue-number.txt
+          echo '${{ github.event.issue.title }}' > /tmp/issue-title.txt
+          cat <<'ISSUE_BODY_EOF' > /tmp/issue-body.txt
           ${{ github.event.issue.body }}
-          ISSUE_EOF
+          ISSUE_BODY_EOF
 
       - name: Generate PR with Claude
         uses: anthropics/claude-code-action@v1
-        env:
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: |
@@ -51,41 +50,15 @@ jobs:
           prompt: |
             Eres el PR Generator (R2) del proyecto Cycling Companion.
 
-            ## Issue a implementar
-
-            - Issue numero: $ISSUE_NUMBER
-            - Titulo: $ISSUE_TITLE
-            - Lee /tmp/issue-body.txt para ver la descripcion completa de la issue
-
-            ## Contexto
+            Lee los archivos /tmp/issue-number.txt, /tmp/issue-title.txt y /tmp/issue-body.txt para conocer la issue a implementar.
 
             Lee el archivo CLAUDE.md para entender el contexto completo del proyecto.
-            Lee tambien el archivo prompts/remote/pr-generator.md para las instrucciones detalladas de tu rol.
+            Lee tambien prompts/remote/pr-generator.md para instrucciones de tu rol.
 
-            ## Instrucciones
+            Instrucciones:
+            1. Planifica: Identifica archivos a crear/modificar. Convenciones: TypeScript estricto, Zod en shared, Tests con Vitest, componentes PascalCase/kebab-case, API Fastify con Zod.
+            2. Implementa el codigo. Dependencias ya instaladas.
+            3. Valida: pnpm lint, pnpm typecheck, pnpm test. Corrige errores antes de crear PR.
+            4. Crea la PR: branch ai/issue-NUMERO-slug, titulo descriptivo en español con prefijo feat:/fix:/refactor:, body con Closes #NUMERO, label ai-generated.
 
-            1. Planifica: Identifica los archivos a crear/modificar. Sigue las convenciones del proyecto:
-               - TypeScript estricto (no any)
-               - Schemas Zod en packages/shared si aplica
-               - Tests con Vitest
-               - Componentes React: PascalCase, archivos kebab-case
-               - API Fastify: validacion Zod en cada route
-
-            2. Implementa: Escribe el codigo necesario. Las dependencias ya estan instaladas (pnpm install ya se ejecuto).
-
-            3. Valida: Ejecuta los siguientes comandos para verificar tu codigo:
-               - pnpm lint — debe pasar sin errores
-               - pnpm typecheck — debe pasar sin errores
-               - pnpm test — debe pasar sin errores
-               Si alguno falla, corrige los errores antes de crear la PR.
-
-            4. Crea la PR:
-               - Branch: ai/issue-$ISSUE_NUMBER-slug-descriptivo
-               - Titulo: Descriptivo, en español, prefijo feat:, fix:, refactor:, etc.
-               - Body: Incluye Closes #$ISSUE_NUMBER
-               - Label: Añade ai-generated
-
-            IMPORTANTE:
-            - Nunca modifiques archivos fuera del scope de la issue
-            - No sobre-ingenierices: implementa solo lo necesario
-            - Si la issue es demasiado compleja o ambigua, comenta en la issue explicando por que
+            IMPORTANTE: No modifiques archivos fuera del scope. No sobre-ingenierices. Si es demasiado compleja, comenta en la issue.
