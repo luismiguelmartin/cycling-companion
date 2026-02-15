@@ -378,11 +378,11 @@ jobs:
 | L2  | Architect      | Local  | Manual                 | Fase 1-3 | ✅ Usado (8 pantallas + 8 bloques backend) |
 | L3  | Planner        | Local  | Manual                 | Fase 1-2 | ✅ Usado (6 pantallas) |
 | L4  | Implementer    | Local  | Manual                 | Fase 1-3 | ✅ Usado (8 pantallas + 8 bloques backend) |
-| R1  | Issue Analyzer | Remoto | Label `ai-analyze`     | Fase 2   | ⏳ Pendiente |
-| R2  | PR Generator   | Remoto | Label `ai-generate-pr` | Fase 3   | ⏳ Pendiente |
-| R3  | PR Reviewer    | Remoto | PR abierta             | Fase 2   | ⏳ Pendiente |
-| R4  | CI/CD          | Remoto | Push/PR                | Fase 1   | ✅ Activo (ci-frontend.yml + ci-backend.yml) |
-| R5  | Doc Generator  | Remoto | PR mergeada            | Fase 3   | ⏳ Pendiente |
+| R1  | Issue Analyzer | Remoto | Label `ai-analyze`     | Fase 4   | ✅ Activo (`ai-analyze-issue.yml` + `claude-code-action@v1`) |
+| R2  | PR Generator   | Remoto | Label `ai-generate-pr` | Fase 4   | ✅ Activo (`ai-generate-pr.yml` + `claude-code-action@v1`) |
+| R3  | PR Reviewer    | Remoto | PR abierta             | Fase 4   | ✅ Activo (`ai-review-pr.yml` + `claude-code-action@v1`) |
+| R4  | CI/CD          | Remoto | Push/PR                | Fase 1   | ✅ Activo (`ci-frontend.yml` + `ci-backend.yml`) |
+| R5  | Doc Generator  | Remoto | PR mergeada            | Fase 4   | ✅ Activo (`ai-update-changelog.yml` + `claude-code-action@v1`) |
 
 ---
 
@@ -396,7 +396,7 @@ El desarrollo se organiza en **4 fases** distribuidas en **7 semanas**, diseñad
 Fase 1: Cimientos                    ✅ COMPLETADA
 Fase 2: MVP funcional (frontend)     ✅ COMPLETADA
 Fase 3: Backend + IA                 ✅ COMPLETADA (Bloques 0-8 todos completados)
-Fase 4: Pulido y evaluación          ⏳ PENDIENTE
+Fase 4: Agentes remotos + evaluación  🔄 EN PROGRESO (agentes remotos implementados)
 ```
 
 ### Filosofía incremental
@@ -549,14 +549,14 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 | 1   | Bloque 8: Migrar frontend de Supabase directo → API backend     | L4           | ✅ |
 | 1   | Fix GPX import (Garmin extensions, NP, moving time, km axis)    | L4           | ✅ |
 | 1   | Análisis IA: botón manual + auto-trigger tras import            | L4           | ✅ |
-| 2   | Configurar agente R2 (PR Generator)                             | Manual       | ⏳ Fase 4 |
-| 2   | Probar flujo completo: issue → ai-analyze → ai-generate-pr → PR | R1 + R2     | ⏳ Fase 4 |
-| 3   | Configurar agente R5 (Doc Generator)                            | Manual       | ⏳ Fase 4 |
-| 3   | Probar: merge → changelog automático                            | R5           | ⏳ Fase 4 |
-| 4   | Crear 3-5 issues de features secundarias para probar pipeline   | L3           | ⏳ Fase 4 |
-| 4   | Ejecutar pipeline completo en 1-2 features                      | R1 + R2 + R3 | ⏳ Fase 4 |
-| 5   | Comparar: PR generada por IA vs PR manual (misma feature)       | Evaluación   | ⏳ Fase 4 |
-| 5   | Documentar flujos, ajustar prompts, versionar prompts           | Manual       | ⏳ Fase 4 |
+| 2   | Configurar agente R2 (PR Generator)                             | Manual       | ✅ |
+| 2   | Probar flujo completo: issue → ai-analyze → ai-generate-pr → PR | R1 + R2     | ⏳ Pendiente |
+| 3   | Configurar agente R5 (Doc Generator)                            | Manual       | ✅ |
+| 3   | Probar: merge → changelog automático                            | R5           | ⏳ Pendiente |
+| 4   | Crear 3-5 issues de features secundarias para probar pipeline   | L3           | ⏳ Pendiente |
+| 4   | Ejecutar pipeline completo en 1-2 features                      | R1 + R2 + R3 | ⏳ Pendiente |
+| 5   | Comparar: PR generada por IA vs PR manual (misma feature)       | Evaluación   | ⏳ Pendiente |
+| 5   | Documentar flujos, ajustar prompts, versionar prompts           | Manual       | ⏳ Pendiente |
 
 **Features secundarias sugeridas para probar el pipeline**:
 
@@ -575,8 +575,11 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 - ✅ Análisis IA: auto-trigger tras import + botón manual en detalle
 - ✅ Gráficas de actividad con eje X en kilómetros
 - ✅ 290 tests (29 archivos): 72 web + 82 shared + 136 API
-- ⏳ Pipeline AI-first end-to-end (movido a Fase 4)
-- ⏳ Comparativa pipeline tradicional vs AI-first (movido a Fase 4)
+- ✅ Agentes remotos configurados: R1, R2, R3, R5 + @claude interactivo (Fase 4)
+- ✅ 16 labels para pipeline AI-first + label sync automático
+- ✅ CHANGELOG.md con auto-update en merge
+- ⏳ Pipeline AI-first end-to-end: testing con issues reales (Fase 4)
+- ⏳ Comparativa pipeline tradicional vs AI-first (Fase 4)
 
 ---
 

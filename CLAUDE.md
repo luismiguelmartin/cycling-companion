@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Propuesta de valor**: Entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables.
 
-**Fase actual**: Fase 3 completada ✅ → Fase 4 pendiente (evaluación, agentes remotos)
+**Fase actual**: Fase 4 en progreso — Agentes remotos implementados (R1, R2, R3, R5 + @claude)
 
 ---
 
@@ -266,12 +266,29 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 | 7 — Import | `POST /api/v1/activities/upload` (.fit/.gpx, NP, Garmin extensions) |
 | 8 — Frontend Migration | Todas las pantallas migradas de Supabase directo → API backend |
 
+### Agentes Remotos — Fase 4 ✅
+
+| Agente | Workflow | Trigger |
+|--------|----------|---------|
+| R1 — Issue Analyzer | `ai-analyze-issue.yml` | Label `ai-analyze` |
+| R2 — PR Generator | `ai-generate-pr.yml` | Label `ai-generate-pr` |
+| R3 — PR Reviewer | `ai-review-pr.yml` | PR opened/synchronize |
+| R5 — Doc Generator | `ai-update-changelog.yml` | PR merged |
+| @claude Interactive | `ai-claude-interactive.yml` | `@claude` en comentarios |
+| Label Sync | `ai-label-sync.yml` | Push `.github/labels.yml` |
+
+- **Modelo**: `claude-sonnet-4-5-20250929` en todos los agentes
+- **Action**: `anthropics/claude-code-action@v1`
+- **Labels**: 16 en `.github/labels.yml` (AI pipeline + tipo + prioridad + fase)
+- **CHANGELOG**: Auto-actualizado por R5 en cada merge
+
 ### Métricas
 - **Componentes**: 32 en `apps/web/src/components/`
 - **Tests**: 29 archivos (290 tests) — 72 web + 82 shared + 136 API
 - **Migraciones SQL**: 4 (001 schema, 002 onboarding, 003 activity_type, 004 ai_cache)
 - **Schemas Zod compartidos**: 5 (user-profile, activity, weekly-plan, insights, ai-response)
 - **Constantes compartidas**: 7 módulos + 2 utils (training-calculations, training-rules)
+- **Workflows CI/CD**: 8 (2 CI + 5 AI agents + 1 label sync)
 
 ---
 
@@ -305,6 +322,8 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 | PRD completo (modelo de datos, endpoints, flujo IA) | `docs/02-PRD.md` |
 | Plan de agentes y desarrollo | `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md` |
 | Design system (pantallas, tokens, componentes, conversión JSX→Next.js) | `docs/DESIGN-SYSTEM.md` |
-| Especificaciones (27 archivos L1/L2/L3: 8 pantallas + 9 bloques backend) | `docs/specs/` |
+| Especificaciones (28 archivos L1/L2/L3: 8 pantallas + 9 bloques backend + Fase 4) | `docs/specs/` |
+| Spec L2 Fase 4: Agentes Remotos | `docs/specs/L2-phase4-remote-agents.md` |
+| Prompts de agentes remotos (R1, R2, R3, R5) | `prompts/remote/` |
 | Configuración Google OAuth | `docs/GOOGLE-OAUTH-SETUP.md` |
 | Configuración Supabase | `docs/SUPABASE-SETUP.md` |

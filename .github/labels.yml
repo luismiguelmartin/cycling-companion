@@ -1,0 +1,67 @@
+# AI Pipeline
+- name: ai-analyze
+  color: "7B61FF"
+  description: "Trigger: análisis IA de la issue (R1)"
+
+- name: ai-generate-pr
+  color: "2DA44E"
+  description: "Trigger: generar PR automática con IA (R2)"
+
+- name: ai-generated
+  color: "BFD4F2"
+  description: "PR generada automáticamente por IA"
+
+- name: ai-reviewed
+  color: "C2E0C6"
+  description: "PR revisada automáticamente por IA (R3)"
+
+# Tipo
+- name: "type:feature"
+  color: "0075CA"
+  description: "Nueva funcionalidad"
+
+- name: "type:bug"
+  color: "D73A4A"
+  description: "Corrección de error"
+
+- name: "type:refactor"
+  color: "CFD3D7"
+  description: "Mejora técnica sin cambio funcional"
+
+- name: "type:docs"
+  color: "0075CA"
+  description: "Documentación"
+
+- name: "type:test"
+  color: "BFD4F2"
+  description: "Tests"
+
+# Prioridad
+- name: "priority:p0"
+  color: "B60205"
+  description: "Bloqueante — resolver inmediatamente"
+
+- name: "priority:p1"
+  color: "D93F0B"
+  description: "Importante — resolver esta semana"
+
+- name: "priority:p2"
+  color: "0E8A16"
+  description: "Nice to have — resolver cuando sea posible"
+
+# Fase
+- name: "phase:1"
+  color: "E4E669"
+  description: "Fase 1 — Cimientos"
+
+- name: "phase:2"
+  color: "E4E669"
+  description: "Fase 2 — MVP funcional (frontend)"
+
+- name: "phase:3"
+  color: "E4E669"
+  description: "Fase 3 — Backend + IA"
+
+- name: "phase:4"
+  color: "E4E669"
+  description: "Fase 4 — Agentes remotos + evaluación"

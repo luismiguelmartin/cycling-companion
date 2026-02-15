@@ -1,38 +1,103 @@
 # R3 — PR Reviewer (Revisor de PRs)
 
-> **Placeholder** — Se completará en **Fase 2**.
+> **Estado**: ✅ Implementado — Fase 4
 
 ---
 
 ## Rol
 
-Agente remoto (GitHub Actions + Claude) que revisa automáticamente las PRs abiertas o actualizadas, evaluando estilo, complejidad, seguridad y cobertura de tests.
+Agente remoto (GitHub Actions + Claude) que revisa automáticamente las PRs abiertas o actualizadas, evaluando estilo, seguridad, tests y calidad general.
 
-## Trigger
+## Configuración
 
-- PR abierta o sincronizada (push a branch existente).
+| Campo | Valor |
+|-------|-------|
+| **Workflow** | `.github/workflows/ai-review-pr.yml` |
+| **Trigger** | `pull_request.opened` / `pull_request.synchronize` |
+| **Modelo** | `claude-sonnet-4-5-20250929` |
+| **Max turns** | 3 |
+| **Timeout** | 5 minutos |
+| **Permisos** | `contents: read`, `pull-requests: write` |
+| **Excluye** | PRs de `dependabot[bot]`, `github-actions[bot]` |
 
-## Output Esperado
+## Prompt
 
-Comentario de review en la PR con:
+El agente recibe el diff de la PR y acceso al repositorio completo para contexto.
 
-- Resumen de cambios
-- Verificación de convenciones de código
-- Detección de problemas de seguridad (RLS, secrets, inyección)
-- Sugerencias de mejora
-- Aprobación o solicitud de cambios
+### Instrucciones
 
-## TODO — Fase 2
+1. **Leer contexto**: Revisar `CLAUDE.md` para convenciones del proyecto.
+2. **Analizar cambios**: Revisar el diff de la PR completo.
+3. **Generar review**: Publicar comentario estructurado como sticky comment.
+4. **Añadir label**: Añadir `ai-reviewed` a la PR.
 
-- [ ] Definir el prompt completo con criterios de review
-- [ ] Configurar GitHub Action con trigger `pull_request.opened` y `pull_request.synchronize`
-- [ ] Definir criterios de aprobación automática vs manual
-- [ ] Establecer umbral de severidad para bloquear merge
-- [ ] Implementar acceso al diff de la PR
-- [ ] Formato del comentario (inline vs general)
-- [ ] Tests del workflow con PRs de ejemplo
+### Criterios de Review
 
-## Referencia
+#### Calidad del Código
+- TypeScript estricto (no `any`, types correctos)
+- Adherencia a convenciones del proyecto
+- Legibilidad y mantenibilidad
+- Complejidad innecesaria o sobre-ingeniería
 
-- Rol completo: `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md` §2.2 (R3)
-- Labels: `prompts/CONVENTIONS.md` §8
+#### Seguridad
+- RLS policies en cambios de DB
+- Validación de inputs con Zod
+- No exposición de secrets o datos sensibles
+- OWASP top 10 (XSS, SQL injection, etc.)
+
+#### Tests
+- Cobertura de los cambios
+- Calidad de los tests (no solo cobertura)
+- Tests faltantes sugeridos
+
+### Formato de Output
+
+```
+## 🔎 Review IA de la PR
+
+### Resumen de Cambios
+[Descripción concisa]
+
+### Calidad del Código
+[Evaluación]
+
+### Seguridad
+[Evaluación — o "Sin observaciones" si todo OK]
+
+### Tests
+[Evaluación de cobertura y calidad]
+
+### Sugerencias de Mejora
+- [Sugerencia 1]
+- [Sugerencia 2]
+
+### Veredicto
+[✅ Aprobado / ⚠️ Aprobado con sugerencias / 🔍 Requiere atención]
+
+---
+> 🤖 Review generado por R3 (PR Reviewer) — `claude-sonnet-4-5-20250929`
+```
+
+### Reglas
+
+- **INFORMATIVO**: nunca bloquea el merge. El humano siempre decide.
+- Siempre en español
+- Ser constructivo y específico (no genérico)
+- Si la PR es de un bot o trivial, ser más breve
+- No repetir lo obvio del diff
+- Enfocarse en lo que aporta valor al reviewer humano
+
+## Herramientas Disponibles
+
+- Lectura de archivos del repositorio (para contexto)
+- Acceso al diff de la PR
+- Publicación de comentarios en la PR
+- Añadir labels
+
+## Ejemplo de Uso
+
+1. Desarrollador abre PR "feat: añadir campo clima a actividad"
+2. R3 se dispara automáticamente
+3. R3 revisa: cambios en schema, API endpoint, componente, tests
+4. R3 publica review: "Aprobado con sugerencias — falta test para valor null en clima"
+5. R3 añade label `ai-reviewed`

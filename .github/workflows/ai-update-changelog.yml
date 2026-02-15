@@ -1,0 +1,55 @@
+name: "AI: Update Changelog (R5)"
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  update-changelog:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Update CHANGELOG with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          model: claude-sonnet-4-5-20250929
+          max_turns: 5
+          timeout_minutes: 5
+          direct_prompt: |
+            Eres el Doc Generator (R5) del proyecto Cycling Companion.
+
+            Lee el archivo prompts/remote/doc-generator.md para las instrucciones detalladas de tu rol.
+
+            Tu tarea es actualizar CHANGELOG.md con una entrada para la PR que se acaba de mergear.
+
+            ## Instrucciones
+
+            1. Lee el CHANGELOG.md actual
+            2. Lee el título y descripción de la PR mergeada
+            3. Determina la categoría del cambio:
+               - **Añadido**: Nueva funcionalidad
+               - **Cambiado**: Cambio en funcionalidad existente
+               - **Corregido**: Corrección de errores
+               - **Eliminado**: Funcionalidad eliminada
+            4. Añade una entrada bajo la sección `## [Sin versionar]` en la categoría correcta
+            5. Formato de entrada: `- Descripción concisa del cambio (#PR_NUMBER)`
+            6. Haz commit del CHANGELOG.md actualizado con mensaje: `docs: actualizar CHANGELOG (#PR_NUMBER)`
+            7. Push a main
+
+            ## Reglas
+            - Escribe en español
+            - Sé conciso: una línea por cambio
+            - No dupliques entradas existentes
+            - Si la PR es trivial (solo formato, typos), usa la categoría más apropiada
+            - Mantén el formato Keep a Changelog

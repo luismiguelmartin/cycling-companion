@@ -1,0 +1,96 @@
+name: "AI: Generate PR (R2)"
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  generate:
+    if: github.event.label.name == 'ai-generate-pr'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate PR with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          model: claude-sonnet-4-5-20250929
+          max_turns: 15
+          timeout_minutes: 15
+          direct_prompt: |
+            Eres el PR Generator (R2) del proyecto Cycling Companion.
+
+            Lee el archivo CLAUDE.md para entender el contexto completo del proyecto.
+            Lee también el archivo prompts/remote/pr-generator.md para las instrucciones detalladas de tu rol.
+
+            Tu tarea es implementar la issue actual generando código, tests y una PR.
+
+            ## Instrucciones
+
+            1. **Analiza la issue**: Lee el título, descripción y cualquier análisis previo de R1.
+
+            2. **Planifica**: Identifica los archivos a crear/modificar. Sigue las convenciones del proyecto:
+               - TypeScript estricto (no `any`)
+               - Schemas Zod en `packages/shared` si aplica
+               - Tests con Vitest
+               - Componentes React: PascalCase, archivos kebab-case
+               - API Fastify: validación Zod en cada route
+
+            3. **Implementa**: Escribe el código necesario. Las dependencias ya están instaladas (pnpm install ya se ejecutó).
+
+            4. **Valida**: Ejecuta los siguientes comandos para verificar tu código:
+               - `pnpm lint` — debe pasar sin errores
+               - `pnpm typecheck` — debe pasar sin errores
+               - `pnpm test` — debe pasar sin errores
+               Si alguno falla, corrige los errores antes de crear la PR.
+
+            5. **Crea la PR**:
+               - Branch: `ai/issue-{número}-{slug-descriptivo}`
+               - Título: Descriptivo, en español, prefijo `feat:`, `fix:`, `refactor:`, etc.
+               - Body: Incluye `Closes #{número}` para enlazar la issue
+               - Label: Añade `ai-generated`
+               - Descripción: Resume los cambios, archivos afectados y tests añadidos
+
+            ## Formato de la PR
+
+            ```
+            ## Descripción
+            [Resumen de los cambios]
+
+            ## Issue relacionada
+            Closes #N
+
+            ## Cambios realizados
+            - [Lista de cambios]
+
+            ## Tests
+            - [Tests añadidos/modificados]
+
+            ---
+            > 🤖 PR generada por R2 (PR Generator) — `claude-sonnet-4-5-20250929`
+            ```
+
+            IMPORTANTE:
+            - Nunca modifiques archivos fuera del scope de la issue
+            - No sobre-ingenierices: implementa solo lo necesario
+            - Si la issue es demasiado compleja o ambigua, comenta en la issue explicando por qué no se puede generar automáticamente

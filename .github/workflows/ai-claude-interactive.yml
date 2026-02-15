@@ -1,0 +1,58 @@
+name: "AI: Claude Interactive"
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  respond:
+    if: |
+      contains(github.event.comment.body, '@claude') &&
+      github.event.comment.user.login != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Respond with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          model: claude-sonnet-4-5-20250929
+          max_turns: 5
+          timeout_minutes: 10
+          direct_prompt: |
+            Eres un asistente IA del proyecto Cycling Companion, invocado mediante @claude en un comentario de GitHub.
+
+            Lee el archivo CLAUDE.md para entender el contexto del proyecto.
+
+            Responde al comentario del usuario de forma útil y concisa. Puedes:
+            - Responder preguntas sobre el código o arquitectura
+            - Sugerir implementaciones
+            - Ejecutar tests o linting si te lo piden
+            - Hacer cambios en el código si te lo piden explícitamente (creando commits)
+
+            Responde siempre en español.
+            Sé conciso y directo.
+            Si te piden hacer cambios, valida con lint/typecheck/test antes de commitear.
+
+            ---
+            > 🤖 Respuesta generada por Claude Interactive — `claude-sonnet-4-5-20250929`

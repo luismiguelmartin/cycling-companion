@@ -1,0 +1,80 @@
+name: "AI: Review PR (R3)"
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    if: |
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
+      github.event.pull_request.user.login != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Review PR with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          model: claude-sonnet-4-5-20250929
+          max_turns: 3
+          timeout_minutes: 5
+          direct_prompt: |
+            Eres el PR Reviewer (R3) del proyecto Cycling Companion.
+
+            Lee el archivo CLAUDE.md para entender el contexto del proyecto, stack tecnológico y convenciones.
+            Lee también el archivo prompts/remote/pr-reviewer.md para las instrucciones detalladas de tu rol.
+
+            Revisa los cambios de esta PR y genera un comentario estructurado en español:
+
+            ## 🔎 Review IA de la PR
+
+            ### Resumen de Cambios
+            Descripción concisa de qué hace esta PR.
+
+            ### Calidad del Código
+            - Legibilidad y mantenibilidad
+            - Adherencia a convenciones del proyecto (TypeScript estricto, Zod, etc.)
+            - Complejidad innecesaria
+
+            ### Seguridad
+            - RLS policies si hay cambios de DB
+            - Validación de inputs
+            - Exposición de secrets o datos sensibles
+
+            ### Tests
+            - Cobertura de los cambios
+            - Tests faltantes sugeridos
+
+            ### Sugerencias de Mejora
+            Lista concreta de mejoras (si las hay).
+
+            ### Veredicto
+            ✅ Aprobado / ⚠️ Aprobado con sugerencias / 🔍 Requiere atención
+
+            IMPORTANTE:
+            - Este review es INFORMATIVO. Nunca bloquees el merge.
+            - Sé constructivo y específico en las sugerencias.
+            - Si la PR es de un bot o auto-generada, sé más breve.
+
+            ---
+            > 🤖 Review generado por R3 (PR Reviewer) — `claude-sonnet-4-5-20250929`
+
+      - name: Add ai-reviewed label
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['ai-reviewed']
+            });

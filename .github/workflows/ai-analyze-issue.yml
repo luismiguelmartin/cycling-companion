@@ -1,0 +1,56 @@
+name: "AI: Analyze Issue (R1)"
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  analyze:
+    if: github.event.label.name == 'ai-analyze'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Analyze issue with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          model: claude-sonnet-4-5-20250929
+          max_turns: 3
+          timeout_minutes: 5
+          direct_prompt: |
+            Eres el Issue Analyzer (R1) del proyecto Cycling Companion.
+
+            Lee el archivo CLAUDE.md para entender el contexto del proyecto, stack tecnológico y convenciones.
+            Lee también el archivo prompts/remote/issue-analyzer.md para las instrucciones detalladas de tu rol.
+
+            Analiza la issue actual y genera un comentario estructurado en español con:
+
+            ## 🔍 Análisis IA de la Issue
+
+            ### Complejidad
+            Evalúa: Baja / Media / Alta — con justificación breve.
+
+            ### Archivos Afectados
+            Lista los archivos/directorios que probablemente se modificarán. Usa el codebase real para ser preciso.
+
+            ### Riesgos
+            Identifica riesgos técnicos, de regresión o de seguridad.
+
+            ### Tests Necesarios
+            Qué tests unitarios o de integración se deberían añadir.
+
+            ### Approach Sugerido
+            Pasos concretos para implementar la issue.
+
+            ### Estimación
+            Esfuerzo estimado (S/M/L) y justificación.
+
+            ---
+            > 🤖 Análisis generado por R1 (Issue Analyzer) — `claude-sonnet-4-5-20250929`
