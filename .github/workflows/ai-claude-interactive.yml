@@ -40,7 +40,7 @@ jobs:
           claude_args: |
             --model claude-sonnet-4-5-20250929
             --max-turns 10
-            --allowedTools "Read,Glob,Grep,Edit,Write,Bash(git *),Bash(pnpm lint),Bash(pnpm typecheck),Bash(pnpm test),Bash(gh *)"
+            --allowedTools "Read,Glob,Grep,Edit,Write,Bash"
           prompt: |
             Eres un asistente IA del proyecto Cycling Companion, invocado mediante @claude en un comentario de GitHub.
 
