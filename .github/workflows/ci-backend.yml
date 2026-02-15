@@ -4,20 +4,20 @@ on:
   push:
     branches: [main]
     paths:
-      - 'apps/api/**'
-      - 'packages/shared/**'
-      - 'pnpm-lock.yaml'
-      - 'package.json'
-      - 'turbo.json'
-      - '.github/workflows/ci-backend.yml'
+      - "apps/api/**"
+      - "packages/shared/**"
+      - "pnpm-lock.yaml"
+      - "package.json"
+      - "turbo.json"
+      - ".github/workflows/ci-backend.yml"
   pull_request:
     paths:
-      - 'apps/api/**'
-      - 'packages/shared/**'
-      - 'pnpm-lock.yaml'
-      - 'package.json'
-      - 'turbo.json'
-      - '.github/workflows/ci-backend.yml'
+      - "apps/api/**"
+      - "packages/shared/**"
+      - "pnpm-lock.yaml"
+      - "package.json"
+      - "turbo.json"
+      - ".github/workflows/ci-backend.yml"
 
 jobs:
   backend:

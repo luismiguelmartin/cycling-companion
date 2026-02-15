@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import type { ActivityCreate } from "shared";
+import type { ActivityCreateInput } from "shared";
 import {
   listActivities,
   getActivity,
@@ -42,7 +42,7 @@ export default async function activityRoutes(fastify: FastifyInstance) {
     const profile = await getProfile(request.userId);
     const activity = await createActivity(
       request.userId,
-      request.body as ActivityCreate,
+      request.body as ActivityCreateInput,
       profile.ftp,
     );
     return reply.status(201).send({ data: activity });
@@ -53,7 +53,7 @@ export default async function activityRoutes(fastify: FastifyInstance) {
     const activity = await updateActivity(
       request.userId,
       id,
-      request.body as Partial<ActivityCreate>,
+      request.body as Partial<ActivityCreateInput>,
     );
     return { data: activity };
   });

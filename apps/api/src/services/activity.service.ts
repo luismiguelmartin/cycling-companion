@@ -1,4 +1,4 @@
-import { activityCreateSchema, type Activity, type ActivityCreate } from "shared";
+import { activityCreateSchema, type Activity, type ActivityCreateInput } from "shared";
 import { supabaseAdmin } from "./supabase.js";
 import { AppError } from "../plugins/error-handler.js";
 
@@ -93,7 +93,7 @@ export async function getActivity(userId: string, activityId: string): Promise<A
 
 export async function createActivity(
   userId: string,
-  data: ActivityCreate,
+  data: ActivityCreateInput,
   userFtp?: number | null,
 ): Promise<Activity> {
   const parsedData = activityCreateSchema.parse(data);
@@ -126,7 +126,7 @@ export async function createActivity(
 export async function updateActivity(
   userId: string,
   activityId: string,
-  data: Partial<ActivityCreate>,
+  data: Partial<ActivityCreateInput>,
 ): Promise<Activity> {
   const parsedData = activityCreateSchema.partial().parse(data);
 
