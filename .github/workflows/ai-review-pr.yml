@@ -27,7 +27,8 @@ jobs:
           allowed_bots: "claude"
           claude_args: |
             --model claude-haiku-4-5-20251001
-            --max-turns 5
+            --max-turns 8
+            --allowedTools "Read,Glob,Grep"
           use_sticky_comment: "true"
           prompt: |
             Revisa los cambios de esta PR. Genera un comentario breve en español:
