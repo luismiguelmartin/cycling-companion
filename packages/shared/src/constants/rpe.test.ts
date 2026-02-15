@@ -1,5 +1,24 @@
 import { describe, it, expect } from "vitest";
-import { RPE_COLORS, getRPEColor } from "./rpe";
+import { RPE_DESCRIPTIONS, RPE_COLORS, getRPEColor } from "./rpe";
+
+describe("RPE_DESCRIPTIONS", () => {
+  it("tiene exactamente 10 entradas (RPE 1-10)", () => {
+    expect(Object.keys(RPE_DESCRIPTIONS)).toHaveLength(10);
+  });
+
+  it("contiene claves del 1 al 10", () => {
+    for (let i = 1; i <= 10; i++) {
+      expect(RPE_DESCRIPTIONS[i]).toBeDefined();
+    }
+  });
+
+  it("cada descripción es un string no vacío", () => {
+    for (let i = 1; i <= 10; i++) {
+      expect(typeof RPE_DESCRIPTIONS[i]).toBe("string");
+      expect(RPE_DESCRIPTIONS[i].length).toBeGreaterThan(0);
+    }
+  });
+});
 
 describe("RPE_COLORS", () => {
   it("tiene 4 rangos definidos", () => {
