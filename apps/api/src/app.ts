@@ -7,6 +7,7 @@ import profileRoutes from "./routes/profile.js";
 import activityRoutes from "./routes/activities.js";
 import insightsRoutes from "./routes/insights.js";
 import aiRoutes from "./routes/ai.js";
+import planRoutes from "./routes/plans.js";
 
 /**
  * Factory function to build and configure the Fastify application.
@@ -35,6 +36,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       await scope.register(activityRoutes);
       await scope.register(insightsRoutes);
       await scope.register(aiRoutes);
+      await scope.register(planRoutes);
     },
     { prefix: "/api/v1" },
   );
