@@ -32,7 +32,7 @@ export {
 export { ACTIVITY_FILTERS, type ActivityFilterKey } from "./constants/activity-filters";
 export { RPE_DESCRIPTIONS, RPE_COLORS, getRPEColor } from "./constants/rpe";
 export { INTENSITY_LEVELS, type IntensityLevel } from "./constants/intensity-levels";
-export { WEATHER_TYPES, type WeatherTypeKey } from "./constants/weather";
+export { WEATHER_TYPES, type WeatherTypeKey, type WeatherType } from "./constants/weather";
 
 export {
   planDaySchema,
