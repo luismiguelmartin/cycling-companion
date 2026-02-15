@@ -20,15 +20,21 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Install Claude Code (pinned version)
+        run: |
+          npm install -g @anthropic-ai/claude-code@2.1.18
+          echo "CLAUDE_PATH=$(which claude)" >> $GITHUB_ENV
+
       - name: Save PR context
         run: |
-          echo '${{ github.event.pull_request.number }}' > /tmp/pr-number.txt
+          echo '${{ github.event.issue.number || github.event.pull_request.number }}' > /tmp/pr-number.txt
           echo '${{ github.event.pull_request.title }}' > /tmp/pr-title.txt
 
       - name: Update CHANGELOG with Claude
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          path_to_claude_code_executable: ${{ env.CLAUDE_PATH }}
           claude_args: |
             --model claude-haiku-4-5-20251001
             --max-turns 10

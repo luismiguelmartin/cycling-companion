@@ -31,6 +31,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install Claude Code (pinned version)
+        run: |
+          npm install -g @anthropic-ai/claude-code@2.1.18
+          echo "CLAUDE_PATH=$(which claude)" >> $GITHUB_ENV
+
       - name: Save issue context
         run: |
           echo '${{ github.event.issue.number }}' > /tmp/issue-number.txt
@@ -43,6 +48,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          path_to_claude_code_executable: ${{ env.CLAUDE_PATH }}
           claude_args: |
             --model claude-sonnet-4-5-20250929
             --max-turns 30
