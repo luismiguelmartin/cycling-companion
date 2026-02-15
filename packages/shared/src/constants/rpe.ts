@@ -1,3 +1,5 @@
+export const MAX_RPE = 10;
+
 export const RPE_DESCRIPTIONS: Record<number, string> = {
   1: "Reposo total",
   2: "Muy ligero, apenas esfuerzo",
