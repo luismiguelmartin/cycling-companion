@@ -61,6 +61,9 @@ pnpm build                  # Build de todo el proyecto
 pnpm lint                   # ESLint en los 3 paquetes (vía Turborepo)
 pnpm typecheck              # Type-check en los 3 paquetes
 pnpm test                   # Tests en los 3 paquetes
+pnpm test --filter=api      # Solo tests API
+pnpm test --filter=web      # Solo tests frontend
+pnpm test --filter=shared   # Solo tests shared
 pnpm format                 # Prettier: formatear todo
 pnpm format:check           # Prettier: verificar formato sin modificar
 ```
@@ -175,14 +178,9 @@ Cuando una feature requiere **modificar la estructura de la BD** (nuevo campo, t
    - [ ] Documentación de cambios en endpoint si aplica
    ```
 
-### Nota: Automatización futura (Fase 4)
+### Nota sobre automatización
 
-En fases posteriores, se planea automatizar migraciones via GitHub Actions:
-- Agente **R6 — Migration Manager**: detectar `.sql` nuevos, aplicar en CI, validar cambios
-- Requerirá: `SUPABASE_ACCESS_TOKEN` en GitHub Secrets
-- Beneficio: migraciones applicadas automáticamente antes de PR merge
-
-Por ahora, el proceso manual + documentado es suficiente para mantener integridad.
+Las migraciones se aplican manualmente. R6 (Migration Manager) fue descartado del scope del MVP.
 
 ---
 
@@ -190,29 +188,11 @@ Por ahora, el proceso manual + documentado es suficiente para mantener integrida
 
 El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo en `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md`.
 
-**Labels del sistema**: `ai-analyze`, `ai-generate-pr`, `ai-generated`, `ai-reviewed`, `priority:p0/p1/p2`, `type:feature/bug/refactor/docs`, `phase:1/2/3`
+**Labels del sistema**: `ai-analyze`, `ai-generate-pr`, `ai-generated`, `ai-reviewed`, `priority:p0/p1/p2`, `type:feature/bug/refactor/docs/test`, `phase:1/2/3/4`
 
-### Metodología por Fase
+### Metodología
 
-**Fase 2 (Frontend):**
-- Pipeline completo: L1 (UX) → L2 (Técnico) → L3 (Issues) → L4 (Implementación)
-- Specs L1/L2/L3 generadas **antes** de implementar
-- 22 archivos de specs en `docs/specs/`
-
-**Fase 3 (Backend) — Bloques 0-2:**
-- Implementación directa desde plan general (`phase3-backend-plan.md`)
-- Specs L2 (diseño técnico) generadas **retroactivamente** tras commits:
-  - `L2-backend-00-infrastructure.md` (Bloque 0: infraestructura base)
-  - `L2-backend-01-profile.md` (Bloque 1: endpoints GET/PATCH perfil)
-  - `L2-backend-02-activities.md` (Bloque 2: CRUD actividades)
-- **Rationale**: Contratos API claros en PRD, schemas Zod compartidos, iteración rápida
-
-**Fase 3 (Backend) — Bloque 3+:**
-- Pipeline completo: L1 → L2 → L3 → L4 → L5 (QA/Tester)
-- Specs generadas **antes** de implementar
-- **Rationale**: Lógica IA compleja, prompts a diseñar, parseo archivos, mayor beneficio de diseño previo
-
-**Conclusión**: Metodología híbrida — aplicar pipeline completo donde aporta más valor (features complejas), permitir implementación directa para CRUD predecible.
+Metodología híbrida: pipeline completo (L1→L2→L3→L4) para features complejas, implementación directa para CRUD predecible. Specs en `docs/specs/` (28 archivos).
 
 ---
 
@@ -296,6 +276,11 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 
 ### General
 - GitHub repo owner es `luismiguelmartin` (no `lm-martin`). Verificar en URLs de badges y links.
+
+### Agentes Remotos (GitHub Actions)
+- `--allowedTools` es OBLIGATORIO en `claude-code-action@v1`. Sin él, todas las tools son denegadas por defecto.
+- Archivos `/tmp/` NO son accesibles por la action. Inyectar contexto inline en el prompt.
+- `allowed_bots: "claude"` necesario en R3 para aceptar PRs creadas por R2.
 
 ### Frontend
 - `activity_type` ENUM en DB usa 5 tipos de entrenamiento: `intervals`, `endurance`, `recovery`, `tempo`, `rest` (migración 003). No confundir con modalidad (outdoor/indoor).
