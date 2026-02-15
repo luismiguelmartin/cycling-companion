@@ -35,7 +35,10 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 20 --allowedTools Bash(git *),Bash(pnpm lint),Bash(pnpm typecheck),Bash(pnpm test),Bash(gh pr create *)"
+          claude_args: |
+            --model claude-sonnet-4-5-20250929
+            --max-turns 20
+            --allowedTools "Edit,Write,Bash(git *),Bash(pnpm lint),Bash(pnpm typecheck),Bash(pnpm test),Bash(gh pr create *)"
           prompt: |
             Eres el PR Generator (R2) del proyecto Cycling Companion.
 

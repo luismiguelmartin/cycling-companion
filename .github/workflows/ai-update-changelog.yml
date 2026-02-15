@@ -24,7 +24,10 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 10 --allowedTools Bash(git *),Bash(gh *)"
+          claude_args: |
+            --model claude-sonnet-4-5-20250929
+            --max-turns 10
+            --allowedTools "Edit,Bash(git *)"
           prompt: |
             Eres el Doc Generator (R5) del proyecto Cycling Companion.
 

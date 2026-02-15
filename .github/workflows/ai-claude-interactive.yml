@@ -37,7 +37,10 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 10 --allowedTools Bash(pnpm lint),Bash(pnpm typecheck),Bash(pnpm test)"
+          claude_args: |
+            --model claude-sonnet-4-5-20250929
+            --max-turns 10
+            --allowedTools "Edit,Write,Bash(git *),Bash(pnpm lint),Bash(pnpm typecheck),Bash(pnpm test)"
           prompt: |
             Eres un asistente IA del proyecto Cycling Companion, invocado mediante @claude en un comentario de GitHub.
 
