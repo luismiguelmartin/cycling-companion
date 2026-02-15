@@ -31,27 +31,28 @@ jobs:
           prompt: |
             Eres el Doc Generator (R5) del proyecto Cycling Companion.
 
-            Lee el archivo prompts/remote/doc-generator.md para las instrucciones detalladas de tu rol.
+            ## PR mergeada
 
-            Tu tarea es actualizar CHANGELOG.md con una entrada para la PR que se acaba de mergear.
+            - **PR #${{ github.event.pull_request.number }}**: ${{ github.event.pull_request.title }}
+            - **Descripción**: ${{ github.event.pull_request.body }}
+
+            Lee el archivo prompts/remote/doc-generator.md para las instrucciones detalladas de tu rol.
 
             ## Instrucciones
 
             1. Lee el CHANGELOG.md actual
-            2. Lee el título y descripción de la PR mergeada
-            3. Determina la categoría del cambio:
+            2. Determina la categoría del cambio:
                - **Añadido**: Nueva funcionalidad
                - **Cambiado**: Cambio en funcionalidad existente
                - **Corregido**: Corrección de errores
                - **Eliminado**: Funcionalidad eliminada
-            4. Añade una entrada bajo la sección `## [Sin versionar]` en la categoría correcta
-            5. Formato de entrada: `- Descripción concisa del cambio (#PR_NUMBER)`
-            6. Haz commit del CHANGELOG.md actualizado con mensaje: `docs: actualizar CHANGELOG (#PR_NUMBER)`
-            7. Push a main
+            3. Añade una entrada bajo la sección `## [Sin versionar]` en la categoría correcta
+            4. Formato de entrada: `- Descripción concisa del cambio (#${{ github.event.pull_request.number }})`
+            5. Haz commit del CHANGELOG.md actualizado con mensaje: `docs: actualizar CHANGELOG (#${{ github.event.pull_request.number }})`
+            6. Push a main
 
             ## Reglas
             - Escribe en español
             - Sé conciso: una línea por cambio
             - No dupliques entradas existentes
-            - Si la PR es trivial (solo formato, typos), usa la categoría más apropiada
             - Mantén el formato Keep a Changelog

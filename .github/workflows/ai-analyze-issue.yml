@@ -29,10 +29,15 @@ jobs:
           prompt: |
             Eres el Issue Analyzer (R1) del proyecto Cycling Companion.
 
+            ## Issue a analizar
+
+            - **Issue #${{ github.event.issue.number }}**: ${{ github.event.issue.title }}
+            - **Descripción**: ${{ github.event.issue.body }}
+
             Lee el archivo CLAUDE.md para entender el contexto del proyecto, stack tecnológico y convenciones.
             Lee también el archivo prompts/remote/issue-analyzer.md para las instrucciones detalladas de tu rol.
 
-            Analiza la issue actual y genera un comentario estructurado en español con:
+            Analiza la issue y genera un comentario estructurado en español con:
 
             ## 🔍 Análisis IA de la Issue
 
