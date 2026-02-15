@@ -11,6 +11,7 @@ jobs:
     timeout-minutes: 5
     permissions:
       contents: write
+      id-token: write
 
     steps:
       - name: Checkout main
@@ -23,10 +24,8 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-5-20250929
-          max_turns: 5
-          timeout_minutes: 5
-          direct_prompt: |
+          claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 5"
+          prompt: |
             Eres el Doc Generator (R5) del proyecto Cycling Companion.
 
             Lee el archivo prompts/remote/doc-generator.md para las instrucciones detalladas de tu rol.

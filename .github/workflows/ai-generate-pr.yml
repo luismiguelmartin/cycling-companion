@@ -13,6 +13,7 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+      id-token: write
 
     steps:
       - name: Checkout
@@ -34,10 +35,8 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-5-20250929
-          max_turns: 15
-          timeout_minutes: 15
-          direct_prompt: |
+          claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 15"
+          prompt: |
             Eres el PR Generator (R2) del proyecto Cycling Companion.
 
             Lee el archivo CLAUDE.md para entender el contexto completo del proyecto.
