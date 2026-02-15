@@ -1,6 +1,31 @@
 # Plan de Desarrollo — Fase 3: Backend + IA
 
 > Generado: 2026-02-15 | Metodología: Pipeline AI-first con agentes locales
+> **Actualizado**: 2026-02-15 — Documentación de metodología híbrida (Bloques 0-2 vs Bloque 3+)
+
+---
+
+## ⚠️ Nota Metodológica
+
+**Bloques 0-2 (Infraestructura, Perfil, Actividades):**
+- **Proceso seguido**: Implementación directa desde este plan general → commit
+- **Documentación**: Specs L2 (diseño técnico) generadas **retroactivamente** tras implementación
+- **Rationale**: Contratos de API bien definidos en PRD, schemas Zod compartidos ya existentes, iteración rápida
+
+**Bloque 3+ (Importación + IA):**
+- **Proceso a seguir**: Pipeline completo L1 → L2 → L3 → L4 → L5
+- **Documentación**: Specs L1/L2/L3 generadas **antes** de implementar
+- **Rationale**: Lógica IA más compleja, prompts a diseñar, mayor beneficio de diseño previo
+
+**Justificación del cambio**:
+- Bloques 0-2 eran más predecibles (CRUD estándar)
+- Bloque 3 (IA) requiere más diseño upfront (prompts, parseo archivos, integración Claude API)
+- Aprendizaje del proceso: aplicar pipeline completo donde aporta más valor
+
+**Archivos de specs retroactivas**:
+- `docs/specs/L2-backend-00-infrastructure.md` (Bloque 0)
+- `docs/specs/L2-backend-01-profile.md` (Bloque 1)
+- `docs/specs/L2-backend-02-activities.md` (Bloque 2)
 
 ---
 
