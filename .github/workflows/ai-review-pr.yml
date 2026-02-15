@@ -25,7 +25,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: |
-            --model claude-sonnet-4-5-20250929
+            --model claude-haiku-4-5-20251001
             --max-turns 10
           use_sticky_comment: "true"
           prompt: |
@@ -67,7 +67,7 @@ jobs:
             - Si la PR es de un bot o auto-generada, sé más breve.
 
             ---
-            > 🤖 Review generado por R3 (PR Reviewer) — `claude-sonnet-4-5-20250929`
+            > 🤖 Review generado por R3 (PR Reviewer) — `claude-haiku-4-5-20251001`
 
       - name: Add ai-reviewed label
         if: success()

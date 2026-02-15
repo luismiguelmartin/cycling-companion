@@ -23,7 +23,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: |
-            --model claude-sonnet-4-5-20250929
+            --model claude-haiku-4-5-20251001
             --max-turns 10
           use_sticky_comment: "true"
           prompt: |
@@ -60,4 +60,4 @@ jobs:
             Esfuerzo estimado (S/M/L) y justificación.
 
             ---
-            > 🤖 Análisis generado por R1 (Issue Analyzer) — `claude-sonnet-4-5-20250929`
+            > 🤖 Análisis generado por R1 (Issue Analyzer) — `claude-haiku-4-5-20251001`
