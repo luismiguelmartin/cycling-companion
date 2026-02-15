@@ -38,6 +38,7 @@ jobs:
           claude_args: |
             --model claude-sonnet-4-5-20250929
             --max-turns 15
+            --allowedTools "Edit,Write,Read,Glob,Grep,Bash"
           prompt: |
             Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}
 
