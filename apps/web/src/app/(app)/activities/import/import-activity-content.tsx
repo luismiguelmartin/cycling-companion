@@ -14,8 +14,8 @@ import {
   Heart,
   TrendingUp,
 } from "lucide-react";
-import { createBrowserClient } from "@supabase/ssr";
 import { activityCreateSchema } from "shared";
+import { apiClientPost, apiClientUpload } from "@/lib/api/client";
 import { ImportModeToggle } from "./import-mode-toggle";
 import { FileDropZone, type FileInfo } from "@/components/file-drop-zone";
 import { SelectField } from "@/components/select-field";
@@ -62,36 +62,39 @@ export function ImportActivityContent() {
     setIsSaving(true);
 
     try {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      );
+      if (mode === "file" && file) {
+        // Upload file via API
+        const formData = new FormData();
+        formData.append("file", file.raw);
+        if (form.name) formData.append("name", form.name);
+        if (form.type) formData.append("type", form.type);
+        if (form.rpe > 0) formData.append("rpe", String(form.rpe));
+        if (form.notes) formData.append("notes", form.notes);
 
-      const payload = {
-        name: form.name,
-        date: form.date,
-        type: form.type,
-        duration_seconds: durationToSeconds(form.duration_h, form.duration_m, form.duration_s),
-        distance_km: form.distance ? parseFloat(form.distance) : null,
-        avg_power_watts: form.avgPower ? parseInt(form.avgPower) : null,
-        avg_hr_bpm: form.avgHR ? parseInt(form.avgHR) : null,
-        max_hr_bpm: form.maxHR ? parseInt(form.maxHR) : null,
-        avg_cadence_rpm: form.avgCadence ? parseInt(form.avgCadence) : null,
-        rpe: form.rpe > 0 ? form.rpe : null,
-        notes: form.notes || null,
-      };
+        await apiClientUpload("/activities/upload", formData);
+      } else {
+        // Manual mode — create activity via API
+        const payload = {
+          name: form.name,
+          date: form.date,
+          type: form.type,
+          duration_seconds: durationToSeconds(form.duration_h, form.duration_m, form.duration_s),
+          distance_km: form.distance ? parseFloat(form.distance) : null,
+          avg_power_watts: form.avgPower ? parseInt(form.avgPower) : null,
+          avg_hr_bpm: form.avgHR ? parseInt(form.avgHR) : null,
+          max_hr_bpm: form.maxHR ? parseInt(form.maxHR) : null,
+          avg_cadence_rpm: form.avgCadence ? parseInt(form.avgCadence) : null,
+          rpe: form.rpe > 0 ? form.rpe : null,
+          notes: form.notes || null,
+        };
 
-      const result = activityCreateSchema.safeParse(payload);
-      if (!result.success) {
-        setIsSaving(false);
-        return;
-      }
+        const result = activityCreateSchema.safeParse(payload);
+        if (!result.success) {
+          setIsSaving(false);
+          return;
+        }
 
-      const { error } = await supabase.from("activities").insert(result.data);
-
-      if (error) {
-        setIsSaving(false);
-        return;
+        await apiClientPost("/activities", result.data);
       }
 
       setSaved(true);

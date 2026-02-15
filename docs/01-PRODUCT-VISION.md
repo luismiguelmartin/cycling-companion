@@ -211,7 +211,7 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 
 > Última actualización: 2026-02-15
 
-### Pantallas implementadas (Fase 1 completada)
+### Frontend (Fase 2 completada ✅)
 
 | Pantalla | Estado | Notas |
 |----------|--------|-------|
@@ -224,16 +224,31 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 | Planificación semanal | ✅ Implementada (Fase 2) | Vista semanal, sugerencias IA, recomendaciones |
 | Insights / Comparar | ✅ Implementada (Fase 2) | Comparativas, radar, análisis tendencias |
 
+### Backend API (Fase 3 — Bloques 0-7 completados ✅)
+
+| Bloque | Endpoints | Estado |
+|--------|-----------|--------|
+| 0 — Infraestructura | `/health`, plugins (auth, cors, errors, env) | ✅ |
+| 1 — Perfil | `GET/PATCH /api/v1/profile` | ✅ |
+| 2 — Actividades | `GET/POST/PATCH/DELETE /api/v1/activities`, `GET /activities/:id/metrics` | ✅ |
+| 3 — Insights | `GET /api/v1/insights`, `GET /api/v1/insights/overload-check` | ✅ |
+| 4 — Training Rules | Cálculos CTL/ATL/TSB, alertas, zonas en `packages/shared` | ✅ |
+| 5 — IA (Claude API) | `POST /api/v1/ai/analyze-activity`, `POST /ai/weekly-plan`, `POST /ai/weekly-summary`, `GET /ai/coach-tip` | ✅ |
+| 6 — Weekly Plan | `GET/PATCH/DELETE /api/v1/plan` | ✅ |
+| 7 — Import | `POST /api/v1/activities/upload` (.fit/.gpx) | ✅ |
+
 ### Artefactos de diseño y especificación
 
 - **Design System**: `docs/DESIGN-SYSTEM.md` — guía completa con tokens, componentes, paleta y guía de conversión JSX→Next.js
 - **Mockups JSX**: `docs/design/` — fuente de verdad visual (excluidos de git)
-- **Especificaciones**: 22 archivos en `docs/specs/` (L1 funcional, L2 técnico, L3 plan de issues) para las 8 pantallas
-- **Schemas compartidos**: `packages/shared/src/` — validaciones Zod y constantes de negocio
+- **Especificaciones**: 22 archivos L1/L2/L3 (frontend) + 8 archivos L2-backend (API) en `docs/specs/`
+- **Schemas compartidos**: `packages/shared/src/` — 5 schemas Zod + 7 módulos de constantes + utils de training
 
 ### Infraestructura
 
 - Monorepo Turborepo + pnpm operativo
-- CI/CD: GitHub Actions (lint, typecheck, format, build)
-- Base de datos: Supabase con 4 tablas + RLS + 2 migraciones aplicadas
+- CI/CD: GitHub Actions separados (frontend + backend)
+- Base de datos: Supabase con 5 tablas + RLS + 4 migraciones aplicadas
 - Auth: Google OAuth via Supabase Auth
+- Deploy: Vercel (frontend) + Render (API) + Supabase (DB)
+- Tests: 27 archivos, 278 tests (71 web + 77 shared + 130 API)

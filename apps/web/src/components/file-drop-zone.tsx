@@ -7,6 +7,7 @@ export interface FileInfo {
   name: string;
   size: number;
   ext: string;
+  raw: File;
 }
 
 interface FileDropZoneProps {
@@ -18,7 +19,7 @@ interface FileDropZoneProps {
 function extractFileInfo(f: File): FileInfo | null {
   const ext = f.name.split(".").pop()?.toLowerCase();
   if (ext && ["fit", "gpx"].includes(ext)) {
-    return { name: f.name, size: f.size, ext };
+    return { name: f.name, size: f.size, ext, raw: f };
   }
   return null;
 }

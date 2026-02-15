@@ -1,36 +1,38 @@
-import { createClient } from "@/lib/supabase/server";
+import { apiGet, getServerToken } from "@/lib/api/server";
+import type { PlanDay } from "shared";
 import { PlanContent } from "./plan-content";
 
+interface PlanResponse {
+  data: {
+    id: string;
+    week_start: string;
+    plan_data: PlanDay[];
+    ai_rationale: string | null;
+  };
+}
+
 export default async function PlanPage() {
-  const supabase = await createClient();
+  const token = await getServerToken();
+  if (!token) return null;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Calcular inicio de semana (lunes)
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() + diffToMonday);
+  weekStart.setHours(0, 0, 0, 0);
+  const weekStartStr = weekStart.toISOString().split("T")[0];
 
-  // Intentar cargar plan semanal de Supabase
-  let planDays = null;
+  let planDays: PlanDay[] | null = null;
 
-  if (user) {
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    // getDay: 0=Sunday, ajustar a lunes=0
-    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-    const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() + diffToMonday);
-    weekStart.setHours(0, 0, 0, 0);
-    const weekStartStr = weekStart.toISOString().split("T")[0];
-
-    const { data: plan } = await supabase
-      .from("weekly_plans")
-      .select("days")
-      .eq("user_id", user.id)
-      .eq("week_start", weekStartStr)
-      .single();
-
-    if (plan?.days) {
-      planDays = plan.days;
+  try {
+    const res = await apiGet<PlanResponse>(`/plan?week_start=${weekStartStr}`, token);
+    if (res.data?.plan_data) {
+      planDays = res.data.plan_data;
     }
+  } catch {
+    // No plan found — will show empty state
   }
 
   return <PlanContent serverPlanDays={planDays} />;
