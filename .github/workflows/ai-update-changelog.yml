@@ -27,7 +27,7 @@ jobs:
           claude_args: |
             --model claude-sonnet-4-5-20250929
             --max-turns 10
-            --allowedTools "Edit,Bash(git *)"
+            --allowedTools "Read,Edit,Bash(git *)"
           prompt: |
             Eres el Doc Generator (R5) del proyecto Cycling Companion.
 
