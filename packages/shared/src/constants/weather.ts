@@ -7,3 +7,5 @@ export const WEATHER_TYPES = {
 } as const;
 
 export type WeatherTypeKey = keyof typeof WEATHER_TYPES;
+
+export type WeatherType = (typeof WEATHER_TYPES)[WeatherTypeKey];
