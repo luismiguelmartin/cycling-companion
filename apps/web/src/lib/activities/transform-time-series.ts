@@ -3,20 +3,28 @@ interface ActivityMetricRow {
   power_watts: number | null;
   hr_bpm: number | null;
   cadence_rpm: number | null;
+  speed_kmh: number | null;
 }
 
 interface ChartDataPoint {
-  min: number;
+  km: number;
   power: number;
   hr: number;
   cadence: number;
 }
 
 export function transformTimeSeries(metrics: ActivityMetricRow[]): ChartDataPoint[] {
-  return metrics.map((m) => ({
-    min: Math.round(m.timestamp_seconds / 60),
-    power: m.power_watts ?? 0,
-    hr: m.hr_bpm ?? 0,
-    cadence: m.cadence_rpm ?? 0,
-  }));
+  let cumulativeKm = 0;
+  return metrics.map((m, i) => {
+    if (i > 0 && m.speed_kmh) {
+      const dtHours = (m.timestamp_seconds - metrics[i - 1].timestamp_seconds) / 3600;
+      cumulativeKm += m.speed_kmh * dtHours;
+    }
+    return {
+      km: Math.round(cumulativeKm * 10) / 10,
+      power: m.power_watts ?? 0,
+      hr: m.hr_bpm ?? 0,
+      cadence: m.cadence_rpm ?? 0,
+    };
+  });
 }

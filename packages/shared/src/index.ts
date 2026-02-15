@@ -59,6 +59,7 @@ export {
   calculateATL,
   calculateTrainingLoad,
   calculateWeeklyTSS,
+  calculateNP,
   classifyActivityZone,
   type TrainingActivityInput,
   type TrainingLoad,

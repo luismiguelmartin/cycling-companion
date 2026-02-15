@@ -33,6 +33,7 @@ interface MetricRow {
   power_watts: number | null;
   hr_bpm: number | null;
   cadence_rpm: number | null;
+  speed_kmh: number | null;
 }
 
 export default async function ActivityDetailPage({ params }: PageProps) {
@@ -122,7 +123,7 @@ export default async function ActivityDetailPage({ params }: PageProps) {
       <DetailHeader name={activity.name} type={activity.type} dateFormatted={dateFormatted} />
       <MetricsGrid metrics={metrics} />
       <ActivityChart data={timeSeries} />
-      <AIAnalysisCard analysis={analysis} />
+      <AIAnalysisCard analysis={analysis} activityId={activity.id} />
     </div>
   );
 }

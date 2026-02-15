@@ -14,28 +14,31 @@ const mockAnalysis = {
 
 describe("AIAnalysisCard", () => {
   it('renderiza el badge "ANÁLISIS IA"', () => {
-    render(<AIAnalysisCard analysis={mockAnalysis} />);
+    render(<AIAnalysisCard analysis={mockAnalysis} activityId="act-1" />);
     expect(screen.getByText("Análisis IA")).toBeInTheDocument();
   });
 
   it("renderiza el texto de análisis", () => {
-    render(<AIAnalysisCard analysis={mockAnalysis} />);
+    render(<AIAnalysisCard analysis={mockAnalysis} activityId="act-1" />);
     expect(screen.getByText(mockAnalysis.summary)).toBeInTheDocument();
     expect(screen.getByText(mockAnalysis.recommendation)).toBeInTheDocument();
   });
 
   it("renderiza los tips", () => {
-    render(<AIAnalysisCard analysis={mockAnalysis} />);
+    render(<AIAnalysisCard analysis={mockAnalysis} activityId="act-1" />);
     expect(screen.getByText("Electrolitos +500ml")).toBeInTheDocument();
     expect(screen.getByText("60g carbs 2h")).toBeInTheDocument();
     expect(screen.getByText("Mín 8h sueño")).toBeInTheDocument();
   });
 
-  it("renderiza el estado vacío cuando analysis es null", () => {
-    render(<AIAnalysisCard analysis={null} />);
+  it("renderiza el estado vacío con botón cuando analysis es null", () => {
+    render(<AIAnalysisCard analysis={null} activityId="act-1" />);
     expect(
-      screen.getByText("El análisis IA se generará automáticamente cuando esté disponible."),
+      screen.getByText(
+        "Genera un análisis inteligente de esta actividad con recomendaciones personalizadas.",
+      ),
     ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Generar análisis/ })).toBeInTheDocument();
   });
 
   it("no renderiza tips si no están definidos", () => {
@@ -44,7 +47,7 @@ describe("AIAnalysisCard", () => {
       recommendation: "Recomendación",
       tips: {},
     };
-    render(<AIAnalysisCard analysis={analysisWithoutTips} />);
+    render(<AIAnalysisCard analysis={analysisWithoutTips} activityId="act-1" />);
     expect(screen.queryByText("Electrolitos")).not.toBeInTheDocument();
   });
 });

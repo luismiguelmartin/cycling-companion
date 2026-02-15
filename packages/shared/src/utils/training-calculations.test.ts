@@ -6,6 +6,7 @@ import {
   calculateATL,
   calculateTrainingLoad,
   calculateWeeklyTSS,
+  calculateNP,
   classifyActivityZone,
 } from "./training-calculations";
 import type { TrainingActivityInput } from "./training-calculations";
@@ -187,6 +188,40 @@ describe("training-calculations", () => {
         { date: "2026-02-10", duration_seconds: 3600, avg_power_watts: 200, tss: 80 },
       ];
       expect(calculateWeeklyTSS(activities, "2026-02-09")).toBe(80);
+    });
+  });
+
+  describe("calculateNP", () => {
+    it("retorna 0 para array vacío", () => {
+      expect(calculateNP([])).toBe(0);
+    });
+
+    it("potencia constante → NP ≈ avg power", () => {
+      // 60 muestras a 1s de 200W constantes
+      const samples = Array(60).fill(200);
+      expect(calculateNP(samples)).toBe(200);
+    });
+
+    it("potencia variable → NP > avg power", () => {
+      // Bloques de 30s a 100W y 30s a 300W para que el rolling avg capture variabilidad
+      const samples: number[] = [];
+      for (let i = 0; i < 120; i++) {
+        samples.push(i < 30 || (i >= 60 && i < 90) ? 100 : 300);
+      }
+      const np = calculateNP(samples);
+      const avg = samples.reduce((a, b) => a + b, 0) / samples.length;
+      expect(np).toBeGreaterThan(avg);
+    });
+
+    it("menos de 30 muestras → devuelve media simple", () => {
+      const samples = [100, 200, 300];
+      expect(calculateNP(samples)).toBe(200);
+    });
+
+    it("respeta sampleIntervalSeconds para ajustar ventana", () => {
+      // Con intervalo de 5s, ventana = 30/5 = 6 muestras
+      const samples = Array(20).fill(250);
+      expect(calculateNP(samples, 5)).toBe(250);
     });
   });
 

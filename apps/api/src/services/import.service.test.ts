@@ -31,7 +31,13 @@ vi.mock("@xmldom/xmldom", () => ({
   })),
 }));
 
-const { parseFitBuffer, parseGpxString, processUpload } = await import("./import.service.js");
+// Mock ai.service (fire-and-forget in processUpload)
+vi.mock("./ai/ai.service.js", () => ({
+  analyzeActivity: vi.fn().mockResolvedValue({}),
+}));
+
+const { parseFitBuffer, parseGpxString, processUpload, extractFromExtensions } =
+  await import("./import.service.js");
 
 const mockFitData = {
   sessions: [
@@ -124,6 +130,30 @@ describe("import.service", () => {
     vi.clearAllMocks();
   });
 
+  describe("extractFromExtensions", () => {
+    it("extrae valor top-level", () => {
+      expect(extractFromExtensions({ power: 200 }, "power")).toBe(200);
+    });
+
+    it("extrae valor de gpxtpx:TrackPointExtension con prefijo", () => {
+      const ext = { "gpxtpx:TrackPointExtension": { "gpxtpx:hr": 136 } };
+      expect(extractFromExtensions(ext, "hr")).toBe(136);
+    });
+
+    it("extrae valor de gpxtpx:TrackPointExtension sin prefijo", () => {
+      const ext = { "gpxtpx:TrackPointExtension": { hr: 140 } };
+      expect(extractFromExtensions(ext, "hr")).toBe(140);
+    });
+
+    it("retorna null si no encuentra el key", () => {
+      expect(extractFromExtensions({ power: 200 }, "hr")).toBeNull();
+    });
+
+    it("busca múltiples keys en orden", () => {
+      expect(extractFromExtensions({ heartRate: 150 }, "hr", "heartRate")).toBe(150);
+    });
+  });
+
   describe("parseFitBuffer", () => {
     it("extrae datos de sesión y métricas de un .fit válido", async () => {
       mockParseAsync.mockResolvedValue(mockFitData);
@@ -134,6 +164,7 @@ describe("import.service", () => {
       expect(result.durationSeconds).toBe(3600);
       expect(result.distanceKm).toBe(45.2);
       expect(result.avgPowerWatts).toBe(205);
+      expect(result.normalizedPowerWatts).toBe(202); // 3 muestras < 30 → avg simple
       expect(result.avgHrBpm).toBe(148);
       expect(result.maxHrBpm).toBe(178);
       expect(result.avgCadenceRpm).toBe(88);
@@ -192,12 +223,13 @@ describe("import.service", () => {
 
       expect(result.name).toBe("Ruta Sierra Norte");
       expect(result.date).toBe("2026-02-15");
-      expect(result.durationSeconds).toBe(3600);
+      expect(result.durationSeconds).toBe(3500); // movingDuration, no totalDuration
       expect(result.distanceKm).toBe(45.2);
       expect(result.avgPowerWatts).toBe(205);
       expect(result.avgHrBpm).toBe(144);
       expect(result.maxHrBpm).toBe(148);
       expect(result.avgCadenceRpm).toBe(88);
+      expect(result.normalizedPowerWatts).toBe(205); // 2 muestras < 30 → avg simple
       expect(result.metrics).toHaveLength(2);
       expect(result.metrics[0].timestampSeconds).toBe(0);
       expect(result.metrics[1].timestampSeconds).toBe(1);
@@ -210,12 +242,53 @@ describe("import.service", () => {
     });
 
     it("lanza error si no hay tracks", () => {
-      mockParseGPXWithCustomParser.mockReturnValue([
-        { ...mockGpxParsed, tracks: [] },
-        null,
-      ]);
+      mockParseGPXWithCustomParser.mockReturnValue([{ ...mockGpxParsed, tracks: [] }, null]);
 
       expect(() => parseGpxString("<empty-gpx>")).toThrow(AppError);
+    });
+
+    it("extrae HR y cadencia de extensiones Garmin namespaced", () => {
+      const garminGpx = {
+        ...mockGpxParsed,
+        tracks: [
+          {
+            ...mockGpxParsed.tracks[0],
+            points: [
+              {
+                latitude: 40.4,
+                longitude: -3.7,
+                elevation: 650,
+                time: new Date("2026-02-15T09:00:00Z"),
+                extensions: {
+                  power: 200,
+                  "gpxtpx:TrackPointExtension": { "gpxtpx:hr": 136, "gpxtpx:cad": 86 },
+                },
+              },
+              {
+                latitude: 40.41,
+                longitude: -3.71,
+                elevation: 660,
+                time: new Date("2026-02-15T09:00:01Z"),
+                extensions: {
+                  power: 210,
+                  "gpxtpx:TrackPointExtension": { "gpxtpx:hr": 148, "gpxtpx:cad": 90 },
+                },
+              },
+            ],
+          },
+        ],
+      };
+      mockParseGPXWithCustomParser.mockReturnValue([garminGpx, null]);
+
+      const result = parseGpxString("<gpx>garmin</gpx>");
+
+      expect(result.avgHrBpm).toBe(142);
+      expect(result.maxHrBpm).toBe(148);
+      expect(result.avgCadenceRpm).toBe(88);
+      expect(result.metrics[0].hrBpm).toBe(136);
+      expect(result.metrics[0].cadenceRpm).toBe(86);
+      expect(result.metrics[1].hrBpm).toBe(148);
+      expect(result.metrics[1].cadenceRpm).toBe(90);
     });
 
     it("maneja puntos sin extensions", () => {
@@ -325,11 +398,7 @@ describe("import.service", () => {
         return chain;
       });
 
-      const result = await processUpload(
-        "user-123",
-        Buffer.from("<gpx>data</gpx>"),
-        "ride.gpx",
-      );
+      const result = await processUpload("user-123", Buffer.from("<gpx>data</gpx>"), "ride.gpx");
 
       expect(result.activityId).toBe("act-new");
       expect(result.metricsCount).toBe(2);
@@ -349,9 +418,9 @@ describe("import.service", () => {
     });
 
     it("lanza error con formato no soportado", async () => {
-      await expect(
-        processUpload("user-123", Buffer.from("data"), "ride.csv"),
-      ).rejects.toThrow(AppError);
+      await expect(processUpload("user-123", Buffer.from("data"), "ride.csv")).rejects.toThrow(
+        AppError,
+      );
 
       await expect(
         processUpload("user-123", Buffer.from("data"), "ride.csv"),
@@ -364,9 +433,9 @@ describe("import.service", () => {
         records: [],
       });
 
-      await expect(
-        processUpload("user-123", Buffer.from("data"), "empty.fit"),
-      ).rejects.toThrow(AppError);
+      await expect(processUpload("user-123", Buffer.from("data"), "empty.fit")).rejects.toThrow(
+        AppError,
+      );
     });
   });
 });

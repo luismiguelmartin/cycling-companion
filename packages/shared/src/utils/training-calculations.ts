@@ -149,6 +149,37 @@ export function calculateWeeklyTSS(
 }
 
 /**
+ * Normalized Power (NP): media de potencia ponderada por la variabilidad.
+ * Algoritmo estándar de Coggan:
+ * 1. Rolling average de 30 segundos de potencia
+ * 2. Elevar cada valor a la 4ª potencia
+ * 3. Media de los valores elevados
+ * 4. Raíz 4ª del resultado
+ */
+export function calculateNP(powerSamples: number[], sampleIntervalSeconds: number = 1): number {
+  if (powerSamples.length === 0) return 0;
+
+  const windowSize = Math.max(1, Math.round(30 / sampleIntervalSeconds));
+  if (powerSamples.length < windowSize) {
+    const sum = powerSamples.reduce((a, b) => a + b, 0);
+    return Math.round(sum / powerSamples.length);
+  }
+
+  // 1. Rolling average de 30s
+  const rolling: number[] = [];
+  let windowSum = 0;
+  for (let i = 0; i < powerSamples.length; i++) {
+    windowSum += powerSamples[i];
+    if (i >= windowSize) windowSum -= powerSamples[i - windowSize];
+    if (i >= windowSize - 1) rolling.push(windowSum / windowSize);
+  }
+
+  // 2-4. Elevar a la 4ª, media, raíz 4ª
+  const fourthPowerAvg = rolling.reduce((sum, v) => sum + v ** 4, 0) / rolling.length;
+  return Math.round(fourthPowerAvg ** 0.25);
+}
+
+/**
  * Clasifica la zona dominante de una actividad según potencia media vs FTP.
  * Usa POWER_ZONES de constants/zones.ts.
  */

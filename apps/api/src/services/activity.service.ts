@@ -95,13 +95,16 @@ export async function createActivity(
   userId: string,
   data: ActivityCreateInput,
   userFtp?: number | null,
+  normalizedPowerWatts?: number | null,
 ): Promise<Activity> {
   const parsedData = activityCreateSchema.parse(data);
 
   let tss: number | null = null;
 
-  if (parsedData.avg_power_watts && userFtp) {
-    const intensityFactor = parsedData.avg_power_watts / userFtp;
+  // Preferir NP sobre avg power para TSS (más preciso)
+  const powerForTSS = normalizedPowerWatts ?? parsedData.avg_power_watts;
+  if (powerForTSS && userFtp) {
+    const intensityFactor = powerForTSS / userFtp;
     const durationHours = parsedData.duration_seconds / 3600;
     tss = Math.round(intensityFactor * intensityFactor * durationHours * 100);
   }

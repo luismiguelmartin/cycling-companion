@@ -13,7 +13,7 @@ import {
 
 interface ActivityChartProps {
   data: Array<{
-    min: number;
+    km: number;
     power: number;
     hr: number;
     cadence: number;
@@ -83,11 +83,11 @@ export function ActivityChart({ data }: ActivityChartProps) {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" vertical={false} />
             <XAxis
-              dataKey="min"
+              dataKey="km"
               tick={{ fontSize: 10, fill: "var(--text-muted)" }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={(v: number) => `${v}'`}
+              tickFormatter={(v: number) => `${v} km`}
             />
             <YAxis
               tick={{ fontSize: 10, fill: "var(--text-muted)" }}

@@ -90,9 +90,7 @@ export default async function activityRoutes(fastify: FastifyInstance) {
     // Extraer overrides de los campos multipart
     const fields = data.fields;
     const name = (fields.name as { value?: string } | undefined)?.value;
-    const type = (fields.type as { value?: string } | undefined)?.value as
-      | ActivityType
-      | undefined;
+    const type = (fields.type as { value?: string } | undefined)?.value as ActivityType | undefined;
     const rpeStr = (fields.rpe as { value?: string } | undefined)?.value;
     const notes = (fields.notes as { value?: string } | undefined)?.value;
 

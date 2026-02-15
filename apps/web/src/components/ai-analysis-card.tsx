@@ -1,4 +1,8 @@
-import { Zap, Droplets, Sun, Moon } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Zap, Droplets, Sun, Moon, Loader2 } from "lucide-react";
+import { apiClientPost } from "@/lib/api/client";
 
 interface AIAnalysis {
   summary: string;
@@ -12,9 +16,45 @@ interface AIAnalysis {
 
 interface AIAnalysisCardProps {
   analysis: AIAnalysis | null;
+  activityId: string;
 }
 
-export function AIAnalysisCard({ analysis }: AIAnalysisCardProps) {
+interface AnalyzeResponse {
+  data: {
+    summary: string;
+    recommendation: string;
+    tips?: {
+      hydration?: string;
+      nutrition?: string;
+      sleep?: string;
+    };
+  };
+}
+
+export function AIAnalysisCard({ analysis: initialAnalysis, activityId }: AIAnalysisCardProps) {
+  const [analysis, setAnalysis] = useState<AIAnalysis | null>(initialAnalysis);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleGenerate() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiClientPost<AnalyzeResponse>("/ai/analyze-activity", {
+        activity_id: activityId,
+      });
+      setAnalysis({
+        summary: res.data.summary,
+        recommendation: res.data.recommendation,
+        tips: res.data.tips ?? {},
+      });
+    } catch {
+      setError("No se pudo generar el análisis. Inténtalo más tarde.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="rounded-[14px] border border-[var(--ai-border)] bg-[var(--ai-bg)] p-3.5 md:p-5">
       {/* Badge */}
@@ -64,9 +104,30 @@ export function AIAnalysisCard({ analysis }: AIAnalysisCardProps) {
           )}
         </>
       ) : (
-        <p className="text-[13px] text-[var(--text-muted)]">
-          El análisis IA se generará automáticamente cuando esté disponible.
-        </p>
+        <div className="space-y-3">
+          <p className="text-[13px] text-[var(--text-muted)]">
+            Genera un análisis inteligente de esta actividad con recomendaciones personalizadas.
+          </p>
+          {error && <p className="text-[12px] text-red-500">{error}</p>}
+          <button
+            onClick={handleGenerate}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-[13px] font-medium text-white transition-opacity disabled:opacity-60"
+            style={{ background: "linear-gradient(135deg, #f97316, #ea580c)" }}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Analizando...
+              </>
+            ) : (
+              <>
+                <Zap className="h-3.5 w-3.5" />
+                Generar análisis
+              </>
+            )}
+          </button>
+        </div>
       )}
     </div>
   );

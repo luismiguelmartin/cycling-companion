@@ -18,11 +18,11 @@
     "@fastify/multipart": "^9.4.0",
     "@supabase/supabase-js": "^2.95.3",
     "@we-gold/gpxjs": "^1.1.0",
-    "@xmldom/xmldom": "^0.8.11",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.0",
     "fastify-plugin": "^5.1.0",
     "fit-file-parser": "^2.3.3",
+    "linkedom": "^0.18.12",
     "shared": "workspace:*",
     "zod": "^3.24.1"
   },

@@ -1,10 +1,11 @@
 import FitParser from "fit-file-parser";
 import { parseGPXWithCustomParser } from "@we-gold/gpxjs";
-import { DOMParser } from "@xmldom/xmldom";
-import type { ActivityType } from "shared";
+import { DOMParser } from "linkedom";
+import { calculateNP, type ActivityType } from "shared";
 import { supabaseAdmin } from "./supabase.js";
 import { createActivity } from "./activity.service.js";
 import { getProfile } from "./profile.service.js";
+import { analyzeActivity } from "./ai/ai.service.js";
 import { AppError } from "../plugins/error-handler.js";
 
 /** Datos extraídos del parseo de un archivo .fit o .gpx */
@@ -14,6 +15,7 @@ export interface ParsedActivityData {
   durationSeconds: number;
   distanceKm: number | null;
   avgPowerWatts: number | null;
+  normalizedPowerWatts: number | null;
   avgHrBpm: number | null;
   maxHrBpm: number | null;
   avgCadenceRpm: number | null;
@@ -26,6 +28,46 @@ export interface ParsedMetric {
   hrBpm: number | null;
   cadenceRpm: number | null;
   speedKmh: number | null;
+}
+
+/**
+ * Busca un valor numérico en extensiones GPX, soportando múltiples formatos:
+ * - Top-level: ext[key]
+ * - Garmin TrackPointExtension: ext["gpxtpx:TrackPointExtension"]["gpxtpx:key"]
+ */
+export function extractFromExtensions(
+  ext: Record<string, unknown>,
+  ...keys: string[]
+): number | null {
+  for (const key of keys) {
+    if (ext[key] != null) return Number(ext[key]);
+    const tpe = ext["gpxtpx:TrackPointExtension"];
+    if (tpe && typeof tpe === "object") {
+      const tpeObj = tpe as Record<string, unknown>;
+      if (tpeObj[key] != null) return Number(tpeObj[key]);
+      if (tpeObj[`gpxtpx:${key}`] != null) return Number(tpeObj[`gpxtpx:${key}`]);
+    }
+  }
+  return null;
+}
+
+/**
+ * Calcula NP a partir de un array de métricas parseadas.
+ */
+function computeNP(metrics: ParsedMetric[]): number | null {
+  const powerSamples = metrics.filter((m) => m.powerWatts != null).map((m) => m.powerWatts!);
+  if (powerSamples.length === 0) return null;
+  const sampleInterval =
+    metrics.length >= 2
+      ? Math.max(
+          1,
+          Math.round(
+            (metrics[metrics.length - 1].timestampSeconds - metrics[0].timestampSeconds) /
+              metrics.length,
+          ),
+        )
+      : 1;
+  return calculateNP(powerSamples, sampleInterval);
 }
 
 /**
@@ -53,9 +95,7 @@ export async function parseFitBuffer(buffer: Buffer): Promise<ParsedActivityData
   const durationSeconds = Math.round(session.total_timer_time ?? session.total_elapsed_time ?? 0);
 
   // Distancia: total_distance viene en km si lengthUnit='km'
-  const distanceKm = session.total_distance
-    ? Math.round(session.total_distance * 100) / 100
-    : null;
+  const distanceKm = session.total_distance ? Math.round(session.total_distance * 100) / 100 : null;
 
   const avgPowerWatts = session.avg_power ? Math.round(session.avg_power) : null;
   const avgHrBpm = session.avg_heart_rate ? Math.round(session.avg_heart_rate) : null;
@@ -86,6 +126,7 @@ export async function parseFitBuffer(buffer: Buffer): Promise<ParsedActivityData
     durationSeconds,
     distanceKm,
     avgPowerWatts,
+    normalizedPowerWatts: computeNP(metrics),
     avgHrBpm,
     maxHrBpm,
     avgCadenceRpm,
@@ -115,7 +156,7 @@ export function parseGpxString(xmlString: string): ParsedActivityData {
 
   const startTime = track.points[0].time ?? new Date();
   const date = new Date(startTime).toISOString().slice(0, 10);
-  const durationSeconds = Math.round(track.duration.totalDuration);
+  const durationSeconds = Math.round(track.duration.movingDuration || track.duration.totalDuration);
   const distanceKm = track.distance.total
     ? Math.round((track.distance.total / 1000) * 100) / 100
     : null;
@@ -135,10 +176,10 @@ export function parseGpxString(xmlString: string): ParsedActivityData {
 
   for (const point of track.points) {
     const ext = point.extensions;
-    const power = ext?.power != null ? Number(ext.power) : null;
-    const hr = ext?.heartRate != null ? Number(ext.heartRate) : null;
-    const cadence = ext?.cadence != null ? Number(ext.cadence) : null;
-    const speed = ext?.speed != null ? Number(ext.speed) : null;
+    const power = ext ? extractFromExtensions(ext, "power", "watts") : null;
+    const hr = ext ? extractFromExtensions(ext, "hr", "heartRate", "heart_rate") : null;
+    const cadence = ext ? extractFromExtensions(ext, "cad", "cadence") : null;
+    const speed = ext ? extractFromExtensions(ext, "speed") : null;
 
     if (power != null && !isNaN(power)) {
       totalPower += power;
@@ -172,6 +213,7 @@ export function parseGpxString(xmlString: string): ParsedActivityData {
     durationSeconds,
     distanceKm,
     avgPowerWatts: powerCount > 0 ? Math.round(totalPower / powerCount) : null,
+    normalizedPowerWatts: computeNP(metrics),
     avgHrBpm: hrCount > 0 ? Math.round(totalHr / hrCount) : null,
     maxHrBpm: maxHr > 0 ? Math.round(maxHr) : null,
     avgCadenceRpm: cadenceCount > 0 ? Math.round(totalCadence / cadenceCount) : null,
@@ -227,6 +269,7 @@ export async function processUpload(
       notes: overrides?.notes ?? null,
     },
     profile.ftp,
+    parsed.normalizedPowerWatts,
   );
 
   // Insertar métricas en batch (si hay)
@@ -248,16 +291,17 @@ export async function processUpload(
       const { error } = await supabaseAdmin.from("activity_metrics").insert(batch);
 
       if (error) {
-        throw new AppError(
-          `Error al guardar métricas: ${error.message}`,
-          500,
-          "DATABASE_ERROR",
-        );
+        throw new AppError(`Error al guardar métricas: ${error.message}`, 500, "DATABASE_ERROR");
       }
     }
 
     metricsCount = metricsRows.length;
   }
+
+  // Fire-and-forget: trigger AI analysis sin bloquear la respuesta
+  analyzeActivity(userId, activity.id).catch(() => {
+    /* silenciar errores de IA */
+  });
 
   return { activityId: activity.id, metricsCount };
 }
