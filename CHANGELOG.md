@@ -20,3 +20,4 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 - Fase 4: Sistema de 16 labels para pipeline AI-first
 - Fase 4: Handler interactivo @claude en issues y PRs
 - Fase 4: CHANGELOG automático en merge de PRs
+- Constante `RPE_DESCRIPTIONS` con descripciones en español para RPE 1-10 (#13)
