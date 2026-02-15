@@ -18,14 +18,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Save issue context
-        run: |
-          echo '${{ github.event.issue.number }}' > /tmp/issue-number.txt
-          echo '${{ github.event.issue.title }}' > /tmp/issue-title.txt
-          cat <<'ISSUE_BODY_EOF' > /tmp/issue-body.txt
-          ${{ github.event.issue.body }}
-          ISSUE_BODY_EOF
-
       - name: Analyze issue with Claude
         uses: anthropics/claude-code-action@v1
         with:
@@ -35,10 +27,9 @@ jobs:
             --max-turns 5
           use_sticky_comment: "true"
           prompt: |
-            Lee /tmp/issue-number.txt, /tmp/issue-title.txt y /tmp/issue-body.txt.
-            Lee CLAUDE.md para contexto.
+            Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}
 
-            Genera un comentario breve en español:
+            Lee CLAUDE.md para contexto. Genera un comentario breve en español:
             ## Analisis IA
             - **Complejidad**: Baja/Media/Alta
             - **Archivos**: lista de archivos a modificar

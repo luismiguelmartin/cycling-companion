@@ -20,11 +20,6 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Save PR context
-        run: |
-          echo '${{ github.event.pull_request.number }}' > /tmp/pr-number.txt
-          echo '${{ github.event.pull_request.title }}' > /tmp/pr-title.txt
-
       - name: Update CHANGELOG with Claude
         uses: anthropics/claude-code-action@v1
         with:
@@ -33,8 +28,9 @@ jobs:
             --model claude-haiku-4-5-20251001
             --max-turns 5
           prompt: |
-            Lee /tmp/pr-number.txt y /tmp/pr-title.txt.
-            Lee CHANGELOG.md. Añade una linea bajo "### Añadido" (o Cambiado/Corregido segun corresponda) en la seccion "[Sin versionar]".
-            Formato: - Descripcion concisa (#NUMERO_PR)
-            Haz commit con mensaje: docs: actualizar CHANGELOG (#NUMERO_PR)
-            Push a main. No dupliques entradas existentes.
+            PR #${{ github.event.pull_request.number }} mergeada: ${{ github.event.pull_request.title }}
+
+            Lee CHANGELOG.md. Añade una linea bajo la categoria correcta (Añadido/Cambiado/Corregido) en "[Sin versionar]".
+            Formato: - Descripcion concisa (#${{ github.event.pull_request.number }})
+            Commit: docs: actualizar CHANGELOG (#${{ github.event.pull_request.number }})
+            Push a main. No dupliques entradas.

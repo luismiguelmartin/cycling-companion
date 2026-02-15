@@ -31,14 +31,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Save issue context
-        run: |
-          echo '${{ github.event.issue.number }}' > /tmp/issue-number.txt
-          echo '${{ github.event.issue.title }}' > /tmp/issue-title.txt
-          cat <<'ISSUE_BODY_EOF' > /tmp/issue-body.txt
-          ${{ github.event.issue.body }}
-          ISSUE_BODY_EOF
-
       - name: Generate PR with Claude
         uses: anthropics/claude-code-action@v1
         with:
@@ -47,10 +39,9 @@ jobs:
             --model claude-sonnet-4-5-20250929
             --max-turns 15
           prompt: |
-            Lee /tmp/issue-number.txt, /tmp/issue-title.txt y /tmp/issue-body.txt para la issue.
-            Lee CLAUDE.md para convenciones.
+            Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}
 
-            Implementa el cambio. Dependencias ya instaladas.
-            Valida: pnpm lint, pnpm typecheck, pnpm test --filter=shared (solo si tocas shared).
-            Crea PR: branch ai/issue-NUMERO-slug, titulo con feat:/fix:, body con Closes #NUMERO, label ai-generated.
-            No sobre-ingenierices. Si es compleja, comenta en la issue.
+            Lee CLAUDE.md para convenciones. Implementa el cambio.
+            Dependencias ya instaladas. Valida con pnpm lint, pnpm typecheck, pnpm test --filter=shared.
+            Crea PR: branch ai/issue-${{ github.event.issue.number }}-slug, titulo con feat:/fix:, body con Closes #${{ github.event.issue.number }}, label ai-generated.
+            No sobre-ingenierices.
