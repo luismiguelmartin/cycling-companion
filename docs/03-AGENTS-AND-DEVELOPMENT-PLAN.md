@@ -372,7 +372,7 @@ jobs:
 
 ## 3. Resumen de agentes
 
-| ID  | Nombre         | Tipo   | Trigger                | Fase     | Estado (2026-02-15) |
+| ID  | Nombre         | Tipo   | Trigger                | Fase     | Estado (2026-02-16) |
 | --- | -------------- | ------ | ---------------------- | -------- | ------------------- |
 | L1  | UX Interpreter | Local  | Manual                 | Fase 1   | ✅ Usado (8 pantallas) |
 | L2  | Architect      | Local  | Manual                 | Fase 1-3 | ✅ Usado (8 pantallas + 8 bloques backend) |
@@ -390,13 +390,13 @@ jobs:
 
 El desarrollo se organiza en **4 fases** distribuidas en **7 semanas**, diseñado para ganar confianza y experiencia de forma progresiva.
 
-### Estado actual (2026-02-15)
+### Estado actual (2026-02-16)
 
 ```
 Fase 1: Cimientos                    ✅ COMPLETADA
 Fase 2: MVP funcional (frontend)     ✅ COMPLETADA
 Fase 3: Backend + IA                 ✅ COMPLETADA (Bloques 0-8 todos completados)
-Fase 4: Agentes remotos + evaluación  🔄 EN PROGRESO (agentes remotos implementados)
+Fase 4: Agentes remotos + evaluación ✅ COMPLETADA (pipeline validado end-to-end)
 ```
 
 ### Filosofía incremental
@@ -484,8 +484,8 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 - ✅ Lista de actividades funcional (filtros, búsqueda, paginación)
 - ✅ Detalle de actividad con gráficas (Recharts)
 - ✅ Importación manual + upload .fit/.gpx
-- ⏳ PR Review automático (R3 pendiente de configuración)
-- ⏳ Issue Analysis automático (R1 pendiente de configuración)
+- ✅ PR Review automático (R3 activo, `ai-review-pr.yml`)
+- ✅ Issue Analysis automático (R1 activo, `ai-analyze-issue.yml`)
 
 #### Semana 4: Planificación y comparativas
 
@@ -550,13 +550,13 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 | 1   | Fix GPX import (Garmin extensions, NP, moving time, km axis)    | L4           | ✅ |
 | 1   | Análisis IA: botón manual + auto-trigger tras import            | L4           | ✅ |
 | 2   | Configurar agente R2 (PR Generator)                             | Manual       | ✅ |
-| 2   | Probar flujo completo: issue → ai-analyze → ai-generate-pr → PR | R1 + R2     | ⏳ Pendiente |
+| 2   | Probar flujo completo: issue → ai-analyze → ai-generate-pr → PR | R1 + R2     | ✅ (Issue #17 → PR #18) |
 | 3   | Configurar agente R5 (Doc Generator)                            | Manual       | ✅ |
-| 3   | Probar: merge → changelog automático                            | R5           | ⏳ Pendiente |
-| 4   | Crear 3-5 issues de features secundarias para probar pipeline   | L3           | ⏳ Pendiente |
-| 4   | Ejecutar pipeline completo en 1-2 features                      | R1 + R2 + R3 | ⏳ Pendiente |
-| 5   | Comparar: PR generada por IA vs PR manual (misma feature)       | Evaluación   | ⏳ Pendiente |
-| 5   | Documentar flujos, ajustar prompts, versionar prompts           | Manual       | ⏳ Pendiente |
+| 3   | Probar: merge → changelog automático                            | R5           | ✅ (CHANGELOG auto-updated) |
+| 4   | Crear 3-5 issues de features secundarias para probar pipeline   | L3           | ✅ (Issues #9-#18) |
+| 4   | Ejecutar pipeline completo en 1-2 features                      | R1 + R2 + R3 | ✅ (Pipeline completo: 28 turns, $0.38) |
+| 5   | Comparar: PR generada por IA vs PR manual (misma feature)       | Evaluación   | ✅ (Mock #12 vs Real #17) |
+| 5   | Documentar flujos, ajustar prompts, versionar prompts           | Manual       | ✅ (remote-agents.md, workflows optimizados) |
 
 **Features secundarias sugeridas para probar el pipeline**:
 
@@ -578,22 +578,35 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 - ✅ Agentes remotos configurados: R1, R2, R3, R5 + @claude interactivo (Fase 4)
 - ✅ 16 labels para pipeline AI-first + label sync automático
 - ✅ CHANGELOG.md con auto-update en merge
-- ⏳ Pipeline AI-first end-to-end: testing con issues reales (Fase 4)
-- ⏳ Comparativa pipeline tradicional vs AI-first (Fase 4)
+- ✅ Pipeline AI-first end-to-end validado: Issue #17 → R1 → R2 (PR #18) → R3 → R5
+- ✅ Costo del pipeline: ~$0.38/issue (Haiku ~$0.04, Sonnet ~$0.30)
 
 ---
 
-### FASE 4 — Evaluación y Documentación (Semana 7)
+### FASE 4 — Agentes Remotos + Evaluación (Semana 7) ✅ COMPLETADA
 
-**Objetivo**: Cerrar el ciclo, medir resultados, documentar aprendizajes y conclusiones.
+**Objetivo**: Implementar agentes remotos, validar pipeline AI-first end-to-end, documentar aprendizajes.
 
-| Día | Tarea                                                             |
-| --- | ----------------------------------------------------------------- |
-| 1   | Recopilar todas las métricas: tiempo, cobertura, bugs, revisiones |
-| 2   | Elaborar tablas comparativas (pipeline tradicional vs AI-first)   |
-| 3   | Documentar limitaciones y riesgos encontrados                     |
-| 4   | Escribir conclusiones y trabajo futuro                            |
-| 5   | Revisión final del repo, README, limpieza                         |
+| Día | Tarea                                                             | Estado |
+| --- | ----------------------------------------------------------------- | ------ |
+| 1   | Implementar 5 workflows GitHub Actions (R1, R2, R3, R5, @claude) | ✅ |
+| 1   | Crear 16 labels + label sync automático + CHANGELOG.md            | ✅ |
+| 2   | Diagnosticar y resolver errores SDK/AJV (billing error enmascarado) | ✅ |
+| 2   | Mock manual del pipeline (Issue #12 → PR #13)                     | ✅ |
+| 3   | Optimizar workflows: Haiku para read-only, Sonnet para write      | ✅ |
+| 3   | Resolver: `/tmp/` access, `--allowedTools`, `allowed_bots`        | ✅ |
+| 4   | Pipeline real end-to-end: Issue #17 → R1 → R2 (PR #18) → R3 → R5 | ✅ |
+| 5   | Documentar resultados, actualizar docs, revisión final             | ✅ |
+
+**Resultados del pipeline real (Issue #17 → PR #18)**:
+
+| Paso | Agente | Turns | Costo  | Resultado |
+|------|--------|-------|--------|-----------|
+| 1    | R1     | 9     | $0.04  | Análisis completado |
+| 2    | R2     | 14    | $0.30  | PR #18 creada, 0 permission denials |
+| 3    | R3     | 1     | $0.01  | Review + label `ai-reviewed` |
+| 4    | R5     | 4     | $0.03  | CHANGELOG actualizado + push a main |
+| **Total** | | **28** | **$0.38** | **Pipeline completo** |
 
 **Métricas a recopilar**:
 
@@ -814,7 +827,7 @@ Para los agentes R1 y R2 que usan Claude, hay dos opciones:
 
 ## 10. Checklist de arranque
 
-> Estado actualizado: 2026-02-15
+> Estado actualizado: 2026-02-16
 
 - [x] Crear proyecto en Supabase (con 4 migraciones aplicadas)
 - [x] Configurar Google OAuth en Google Cloud Console + Supabase (ref: `docs/GOOGLE-OAUTH-SETUP.md`)

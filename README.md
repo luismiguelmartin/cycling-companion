@@ -1,7 +1,7 @@
 # 🚴 Cycling Companion
 
-[![CI Frontend](https://github.com/lm-martin/cycling-companion/actions/workflows/ci-frontend.yml/badge.svg)](https://github.com/lm-martin/cycling-companion/actions/workflows/ci-frontend.yml)
-[![CI Backend](https://github.com/lm-martin/cycling-companion/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/lm-martin/cycling-companion/actions/workflows/ci-backend.yml)
+[![CI Frontend](https://github.com/luismiguelmartin/cycling-companion/actions/workflows/ci-frontend.yml/badge.svg)](https://github.com/luismiguelmartin/cycling-companion/actions/workflows/ci-frontend.yml)
+[![CI Backend](https://github.com/luismiguelmartin/cycling-companion/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/luismiguelmartin/cycling-companion/actions/workflows/ci-backend.yml)
 
 Plataforma web de análisis y planificación de entrenamiento para ciclistas amateur (40+), impulsada por IA.
 
@@ -33,14 +33,14 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 
 ### Estado del Proyecto
 
-**Fase actual**: Fase 3 completada ✅ → Fase 4 — Evaluación y documentación
+**Fase actual**: Fase 4 completada ✅ — Pipeline AI-first validado end-to-end
 
 | Fase       | Descripción                                                   | Estado        |
 | ---------- | ------------------------------------------------------------- | ------------- |
 | **Fase 1** | Cimientos: monorepo, CI, Auth, deploy, schema DB              | ✅ Completada |
 | **Fase 2** | MVP funcional: pantallas frontend, datos mock, specs          | ✅ Completada |
 | **Fase 3** | Core features: API endpoints, integración Claude, import real | ✅ Completada |
-| **Fase 4** | Refinamiento: agentes remotos, evaluación, documentación      | ⏳ Pendiente  |
+| **Fase 4** | Agentes remotos, pipeline AI-first, evaluación                | ✅ Completada |
 
 ### Completado
 
@@ -60,12 +60,10 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 - ✅ **Frontend migrado** de Supabase directo → API backend (Bloque 8)
 - ✅ **Análisis IA** auto-trigger tras importar + botón manual en detalle
 - ✅ **Deploy producción**: Vercel + Render + Supabase
-
-### Próximos Pasos (Fase 4)
-
-- ⏳ Agentes remotos (PR Generator, PR Reviewer, Doc Generator)
-- ⏳ Evaluación: métricas de pipeline AI-first vs desarrollo tradicional
-- ⏳ Documentación final y conclusiones
+- ✅ **5 agentes remotos** (GitHub Actions + `claude-code-action@v1`): R1 Analyzer, R2 PR Generator, R3 Reviewer, R5 Doc Generator, @claude Interactive
+- ✅ **Pipeline AI-first validado end-to-end**: Issue → R1 análisis → R2 genera PR → R3 review → merge → R5 CHANGELOG (~$0.38/pipeline)
+- ✅ **16 labels** para pipeline AI-first + label sync automático
+- ✅ **CHANGELOG automático** en merge de PRs
 
 ---
 
@@ -425,15 +423,18 @@ Este proyecto implementa un pipeline multi-agente para integrar IA en el ciclo d
 | **L3: Planner**        | Diseño → issues incrementales      | Manual  |
 | **L4: Implementer**    | Implementar código con supervisión | Manual  |
 
-### Agentes Remotos (GitHub Actions) — Planificados
+### Agentes Remotos (GitHub Actions + `claude-code-action@v1`) — Activos ✅
 
-| Agente                 | Rol                             | Trigger                |
-| ---------------------- | ------------------------------- | ---------------------- |
-| **R1: Issue Analyzer** | Analizar impacto y complejidad  | Label `ai-analyze`     |
-| **R2: PR Generator**   | Generar PR completa desde issue | Label `ai-generate-pr` |
-| **R3: PR Reviewer**    | Code review automático          | PR abierta             |
-| **R4: CI/CD**          | Lint, test, build               | Push/PR                |
-| **R5: Doc Generator**  | Actualizar CHANGELOG, README    | PR mergeada            |
+| Agente                 | Rol                             | Trigger                | Modelo     | Costo aprox. |
+| ---------------------- | ------------------------------- | ---------------------- | ---------- | ------------ |
+| **R1: Issue Analyzer** | Analizar impacto y complejidad  | Label `ai-analyze`     | Haiku 4.5  | ~$0.04       |
+| **R2: PR Generator**   | Generar PR completa desde issue | Label `ai-generate-pr` | Sonnet 4.5 | ~$0.30       |
+| **R3: PR Reviewer**    | Code review automático          | PR abierta             | Haiku 4.5  | ~$0.01       |
+| **R4: CI/CD**          | Lint, test, build               | Push/PR                | —          | —            |
+| **R5: Doc Generator**  | Actualizar CHANGELOG            | PR mergeada            | Haiku 4.5  | ~$0.03       |
+| **@claude**            | Handler interactivo             | `@claude` en issues/PRs | Sonnet 4  | variable     |
+
+**Pipeline completo validado**: Issue #17 → R1 → R2 (PR #18) → R3 → merge → R5. Total: 28 turns, ~$0.38.
 
 ---
 

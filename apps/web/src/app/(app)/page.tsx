@@ -114,10 +114,9 @@ export default async function DashboardPage() {
   const dailyLoad = calculateDailyLoad(allActivities, currentWeekStart);
 
   // Sobrecarga desde API
-  const overload =
-    overloadRes?.data?.is_overloaded
-      ? { currentLoad: overloadRes.data.currentLoad, avgLoad: overloadRes.data.avgLoad }
-      : null;
+  const overload = overloadRes?.data?.is_overloaded
+    ? { currentLoad: overloadRes.data.currentLoad, avgLoad: overloadRes.data.avgLoad }
+    : null;
 
   // Actividades recientes (máx 4)
   const recentActivities = allActivities.slice(0, 4);
@@ -128,8 +127,9 @@ export default async function DashboardPage() {
   const userName = profile?.display_name ?? "Ciclista";
 
   // Recomendación IA — usar coach tip real o fallback
-  const aiRecommendation = coachTip?.recommendation
-    ?? (allActivities.length > 0
+  const aiRecommendation =
+    coachTip?.recommendation ??
+    (allActivities.length > 0
       ? `Tu semana lleva ${currentKPIs.activityCount} actividad${currentKPIs.activityCount !== 1 ? "es" : ""}. ${
           currentKPIs.avgPower
             ? `Tu potencia media es ${currentKPIs.avgPower}W.`
@@ -137,8 +137,9 @@ export default async function DashboardPage() {
         } ¡Mantén la constancia!`
       : "Sube tu primera actividad para empezar a recibir recomendaciones personalizadas. Cuantos más datos tenga, mejores serán mis consejos.");
 
-  const aiTips = coachTip?.tips
-    ?? (allActivities.length > 0
+  const aiTips =
+    coachTip?.tips ??
+    (allActivities.length > 0
       ? { hydration: "2.5L mínimo", sleep: "7.5h recomendadas", nutrition: "+30g carbohidratos" }
       : undefined);
 

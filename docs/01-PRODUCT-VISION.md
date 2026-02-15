@@ -209,7 +209,7 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 
 ## 10. Estado actual de implementación
 
-> Última actualización: 2026-02-15
+> Última actualización: 2026-02-16
 
 ### Frontend (Fase 2 completada ✅)
 
@@ -238,6 +238,19 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 | 7 — Import | `POST /api/v1/activities/upload` (.fit/.gpx, NP, Garmin extensions) | ✅ |
 | 8 — Frontend Migration | Frontend migrado de Supabase directo → API backend | ✅ |
 
+### Pipeline AI-First — Agentes Remotos (Fase 4 completada ✅)
+
+| Agente | Workflow | Modelo | Estado |
+|--------|----------|--------|--------|
+| R1 Issue Analyzer | `ai-analyze-issue.yml` | Haiku 4.5 | ✅ Activo |
+| R2 PR Generator | `ai-generate-pr.yml` | Sonnet 4.5 | ✅ Activo |
+| R3 PR Reviewer | `ai-review-pr.yml` | Haiku 4.5 | ✅ Activo |
+| R4 CI/CD | `ci-frontend.yml` + `ci-backend.yml` | — | ✅ Activo |
+| R5 Doc Generator | `ai-update-changelog.yml` | Haiku 4.5 | ✅ Activo |
+| @claude Interactive | `ai-claude-interactive.yml` | Sonnet 4 | ✅ Activo |
+
+**Pipeline validado end-to-end**: Issue #17 → R1 (análisis, $0.04) → R2 (PR #18, $0.30) → R3 (review, $0.01) → merge → R5 (CHANGELOG, $0.03). Total: 28 turns, ~$0.38/pipeline.
+
 ### Artefactos de diseño y especificación
 
 - **Design System**: `docs/DESIGN-SYSTEM.md` — guía completa con tokens, componentes, paleta y guía de conversión JSX→Next.js
@@ -248,9 +261,10 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 ### Infraestructura
 
 - Monorepo Turborepo + pnpm operativo
-- CI/CD: GitHub Actions separados (frontend + backend)
+- CI/CD: GitHub Actions separados (frontend + backend) + 5 workflows AI-first
 - Base de datos: Supabase con 5 tablas + RLS + 4 migraciones aplicadas
 - Frontend migrado completamente a API backend (Bloque 8)
 - Auth: Google OAuth via Supabase Auth
 - Deploy: Vercel (frontend) + Render (API) + Supabase (DB)
 - Tests: 29 archivos, 290 tests (72 web + 82 shared + 136 API)
+- Labels: 16 labels para pipeline AI-first (sync automático via `label-sync`)

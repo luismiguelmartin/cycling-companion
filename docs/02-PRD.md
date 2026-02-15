@@ -199,7 +199,7 @@ ai_cache (caché y rate limit de IA)
 
 - **Vercel**: deploy automático en push a `main` y preview en cada PR
 - **Render**: deploy automático en push a `main`
-- **GitHub Actions**: lint, tests, type-check en cada PR + flujos AI-first
+- **GitHub Actions**: lint, tests, type-check en cada PR + 5 agentes AI-first remotos (`claude-code-action@v1`)
 
 ### 3.7 Monorepo vs repos separados
 
@@ -532,7 +532,7 @@ La arquitectura ya soporta datos reales:
 
 ## 9. Estado de especificaciones
 
-> Última actualización: 2026-02-15
+> Última actualización: 2026-02-16
 
 ### Especificaciones frontend (L1/L2/L3 por pantalla)
 
@@ -562,3 +562,15 @@ La arquitectura ya soporta datos reales:
 | 8 — Frontend Migration | `L2-backend-08-frontend-migration.md` | ✅ |
 
 **Convención de nombres**: `L{nivel}-screen-{número_PRD}-{nombre}.md` (frontend), `L2-backend-{bloque}-{nombre}.md` (backend)
+
+### Pipeline AI-First — Agentes remotos (Fase 4 completada ✅)
+
+| Agente | Workflow | Modelo | Trigger | Estado |
+|--------|----------|--------|---------|--------|
+| R1 Issue Analyzer | `ai-analyze-issue.yml` | Haiku 4.5 | Label `ai-analyze` | ✅ |
+| R2 PR Generator | `ai-generate-pr.yml` | Sonnet 4.5 | Label `ai-generate-pr` | ✅ |
+| R3 PR Reviewer | `ai-review-pr.yml` | Haiku 4.5 | PR opened/synchronize | ✅ |
+| R5 Doc Generator | `ai-update-changelog.yml` | Haiku 4.5 | PR merged | ✅ |
+| @claude Interactive | `ai-claude-interactive.yml` | Sonnet 4 | `@claude` en comentarios | ✅ |
+
+Todos implementados con `anthropics/claude-code-action@v1`. Pipeline validado end-to-end: Issue #17 → R1 → R2 (PR #18) → R3 → merge → R5. Costo: ~$0.38/pipeline.
