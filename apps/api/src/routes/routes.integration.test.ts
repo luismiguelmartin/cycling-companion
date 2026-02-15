@@ -525,4 +525,127 @@ describe("API Integration", () => {
       }
     });
   });
+
+  describe("Plan", () => {
+    const mockPlanRow = {
+      id: "plan-123",
+      user_id: "user-123",
+      week_start: "2026-02-10",
+      plan_data: {
+        days: Array.from({ length: 7 }, (_, i) => ({
+          day: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"][i],
+          date: `2026-02-${10 + i}`,
+          type: i === 3 ? "rest" : "endurance",
+          title: i === 3 ? "Descanso" : "Rodaje",
+          intensity: i === 3 ? "—" : "media",
+          duration: i === 3 ? "—" : "1h",
+          description: "Descripción",
+          nutrition: "Nutrición",
+          rest: "Descanso",
+          done: false,
+          actual_power: null,
+        })),
+      },
+      ai_rationale: "Plan adaptado.",
+      created_at: "2026-02-10T08:00:00Z",
+      updated_at: "2026-02-10T08:00:00Z",
+    };
+
+    it("GET /api/v1/plan con week_start devuelve 200 con plan", async () => {
+      mockFromChain({ data: mockPlanRow, error: null });
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/plan?week_start=2026-02-10",
+        headers: authHeaders,
+      });
+      expect(res.statusCode).toBe(200);
+      const body = res.json();
+      expect(body.data).toHaveProperty("days");
+      expect(body.data.days).toHaveLength(7);
+      expect(body.data).toHaveProperty("week_start", "2026-02-10");
+    });
+
+    it("GET /api/v1/plan sin plan devuelve 200 con null", async () => {
+      mockFromChain({ data: null, error: { message: "not found" } });
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/plan?week_start=2026-01-01",
+        headers: authHeaders,
+      });
+      expect(res.statusCode).toBe(200);
+      expect(res.json()).toEqual({ data: null });
+    });
+
+    it("PATCH /api/v1/plan devuelve 200 con plan actualizado", async () => {
+      const updatedRow = {
+        ...mockPlanRow,
+        plan_data: {
+          days: mockPlanRow.plan_data.days.map((d, i) =>
+            i === 0 ? { ...d, done: true, actual_power: 200 } : d,
+          ),
+        },
+      };
+      mockFromChain({ data: updatedRow, error: null });
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/plan",
+        headers: authHeaders,
+        payload: {
+          week_start: "2026-02-10",
+          days: updatedRow.plan_data.days,
+        },
+      });
+      expect(res.statusCode).toBe(200);
+      const body = res.json();
+      expect(body.data.days[0].done).toBe(true);
+      expect(body.data.days[0].actual_power).toBe(200);
+    });
+
+    it("PATCH /api/v1/plan con body inválido devuelve 400", async () => {
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/plan",
+        headers: authHeaders,
+        payload: { week_start: "not-a-date" },
+      });
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("DELETE /api/v1/plan devuelve 204", async () => {
+      const lastEq = vi.fn().mockResolvedValue({ error: null, count: 1 });
+      const firstEq = vi.fn().mockReturnValue({ eq: lastEq });
+      const deleteFn = vi.fn().mockReturnValue({ eq: firstEq });
+      vi.mocked(supabaseAdmin.from).mockReturnValue({
+        delete: deleteFn,
+      } as ReturnType<typeof supabaseAdmin.from>);
+      const res = await app.inject({
+        method: "DELETE",
+        url: "/api/v1/plan?week_start=2026-02-10",
+        headers: authHeaders,
+      });
+      expect(res.statusCode).toBe(204);
+      expect(res.body).toBe("");
+    });
+
+    it("DELETE /api/v1/plan sin week_start devuelve 400", async () => {
+      const res = await app.inject({
+        method: "DELETE",
+        url: "/api/v1/plan",
+        headers: authHeaders,
+      });
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("rutas plan sin auth devuelven 401", async () => {
+      const routes = [
+        { method: "GET" as const, url: "/api/v1/plan?week_start=2026-02-10" },
+        { method: "PATCH" as const, url: "/api/v1/plan" },
+        { method: "DELETE" as const, url: "/api/v1/plan?week_start=2026-02-10" },
+      ];
+      for (const route of routes) {
+        const res = await app.inject({ method: route.method, url: route.url });
+        expect(res.statusCode).toBe(401);
+      }
+    });
+  });
 });
