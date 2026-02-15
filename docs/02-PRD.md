@@ -516,7 +516,7 @@ La arquitectura ya soporta datos reales:
 
 ## 9. Estado de especificaciones
 
-> Última actualización: 2026-02-14
+> Última actualización: 2026-02-15
 
 Todas las pantallas tienen especificaciones completas en `docs/specs/`:
 
@@ -527,8 +527,8 @@ Todas las pantallas tienen especificaciones completas en `docs/specs/`:
 | 02 | Importar Actividad | ✅ | ✅ | ✅ | ✅ |
 | 03 | Lista Actividades | ✅ | ✅ | ✅ | ✅ |
 | 04 | Detalle Actividad | ✅ | ✅ | ✅ | ✅ |
-| 05 | Planificación Semanal | ✅ | ✅ | ✅ | ⏳ |
+| 05 | Planificación Semanal | ✅ | ✅ | ✅ | ✅ (Fase 2) |
 | 06 | Perfil | ✅ | ✅ | — | ✅ |
-| 07 | Insights / Comparar | ✅ | ✅ | ✅ | ⏳ |
+| 07 | Insights / Comparar | ✅ | ✅ | ✅ | ✅ (Fase 2) |
 
 **Convención de nombres**: `L{nivel}-screen-{número_PRD}-{nombre}.md`

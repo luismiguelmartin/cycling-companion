@@ -502,13 +502,15 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 | 5   | Implementar perfil y ajustes                               | L4     |
 | 5   | Alertas de sobrecarga (reglas + banner)                    | L4     |
 
-**Entregables semana 4**: 🔄 EN PROGRESO
+**Entregables semana 4**: ✅ COMPLETADA
 
-- ⏳ Planificación semanal (especificada L1/L2/L3, pendiente implementación)
-- ⏳ Comparativa de semanas / Insights (especificada L1/L2/L3, pendiente implementación)
+- ✅ Planificación semanal (implementada)
+- ✅ Comparativa de semanas / Insights (implementada)
 - ✅ Perfil editable (implementado)
 - ⏳ Alertas de sobrecarga (pendiente)
-- ⏳ **MVP completo**: faltan pantallas 05 (Plan Semanal) y 07 (Insights)
+- ✅ **MVP frontend completado**: todas las pantallas (0-7) implementadas
+
+**Frontend status**: 🎉 Fase 2 completada. Todos los componentes, rutas y pantallas funcionales con datos Supabase y mock data.
 
 **Retrospectiva**: Evaluar calidad de reviews IA vs reviews propias.
 

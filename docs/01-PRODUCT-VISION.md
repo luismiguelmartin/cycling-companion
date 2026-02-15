@@ -209,7 +209,7 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 
 ## 10. Estado actual de implementación
 
-> Última actualización: 2026-02-14
+> Última actualización: 2026-02-15
 
 ### Pantallas implementadas (Fase 1 completada)
 
@@ -221,8 +221,8 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 | Detalle de actividad | ✅ Implementada | Métricas, gráficas, análisis IA |
 | Importar actividad | ✅ Implementada | Formulario manual + upload .fit/.gpx |
 | Perfil y ajustes | ✅ Implementada | Datos personales, zonas, objetivo |
-| Planificación semanal | ⏳ Especificada (L1/L2/L3) | Pendiente implementación (Fase 2) |
-| Insights / Comparar | ⏳ Especificada (L1/L2/L3) | Pendiente implementación (Fase 2) |
+| Planificación semanal | ✅ Implementada (Fase 2) | Vista semanal, sugerencias IA, recomendaciones |
+| Insights / Comparar | ✅ Implementada (Fase 2) | Comparativas, radar, análisis tendencias |
 
 ### Artefactos de diseño y especificación
 

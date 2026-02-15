@@ -166,7 +166,7 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 
 ## Estado de Implementación
 
-### Pantallas implementadas (frontend)
+### Pantallas implementadas (frontend) — Fase 2 Completada ✅
 | Ruta | Pantalla | Datos |
 |------|----------|-------|
 | `/auth/login` | Login (Google OAuth) | Supabase Auth |
@@ -175,15 +175,15 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 | `/activities` | Lista de actividades (filtros, búsqueda) | Supabase |
 | `/activities/[id]` | Detalle de actividad (métricas, chart) | Supabase |
 | `/activities/import` | Importar actividad (manual/archivo) | Solo UI |
-| `/plan` | Planificación semanal (7 días, tips) | Mock data |
-| `/insights` | Insights (comparativas, radar, análisis) | Supabase (cálculos client) |
+| `/plan` | Planificación semanal (7 días, tips) | Implementada (Fase 2) |
+| `/insights` | Insights (comparativas, radar, análisis) | Implementada (Fase 2) |
 | `/profile` | Perfil (datos, zonas, ajustes) | Supabase |
 
-### Pendiente
-- **API Fastify**: Solo tiene `/health`. Faltan endpoints CRUD y de IA.
+### Próximos Pasos — Fase 3: Backend + IA
+- **API Fastify**: Solo tiene `/health`. Implementar endpoints CRUD y de IA.
 - **Integración Claude API**: Entrenador virtual (análisis actividades, generación planes).
-- **Importación real**: Pantalla Import es solo UI, sin conexión a backend.
-- **weekly_plans real**: Plan usa mock data embebido; falta consultar tabla real.
+- **Importación real**: Conectar pantalla Import con API backend.
+- **weekly_plans real**: Migración SQL; Plan consume datos reales de Supabase.
 
 ### Métricas
 - **Componentes**: 32 en `apps/web/src/components/`
