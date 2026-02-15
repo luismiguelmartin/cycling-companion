@@ -11,9 +11,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.74.0",
+    "@fastify/cors": "^11.2.0",
+    "@fastify/multipart": "^9.4.0",
     "@supabase/supabase-js": "^2.95.3",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.0",
+    "fastify-plugin": "^5.1.0",
     "shared": "workspace:*",
     "zod": "^3.24.1"
   },
