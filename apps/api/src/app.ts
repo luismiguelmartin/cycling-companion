@@ -5,6 +5,7 @@ import authPlugin from "./plugins/auth.js";
 import healthRoutes from "./routes/health.js";
 import profileRoutes from "./routes/profile.js";
 import activityRoutes from "./routes/activities.js";
+import insightsRoutes from "./routes/insights.js";
 
 /**
  * Factory function to build and configure the Fastify application.
@@ -31,6 +32,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       await scope.register(authPlugin);
       await scope.register(profileRoutes);
       await scope.register(activityRoutes);
+      await scope.register(insightsRoutes);
     },
     { prefix: "/api/v1" },
   );
