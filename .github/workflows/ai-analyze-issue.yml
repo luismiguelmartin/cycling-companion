@@ -36,6 +36,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           path_to_claude_code_executable: ${{ env.CLAUDE_PATH }}
+          show_full_output: true
           claude_args: |
             --model claude-haiku-4-5-20251001
             --max-turns 10
