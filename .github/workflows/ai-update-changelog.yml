@@ -32,7 +32,7 @@ jobs:
           claude_args: |
             --model claude-haiku-4-5-20251001
             --max-turns 10
-            --allowedTools "Read,Edit,Bash"
+            --allowedTools "Read,Edit,Bash(*)"
           prompt: |
             Eres el Doc Generator (R5) del proyecto Cycling Companion.
 
