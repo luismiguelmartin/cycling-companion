@@ -3,6 +3,8 @@ import corsPlugin from "./plugins/cors.js";
 import { errorHandler } from "./plugins/error-handler.js";
 import authPlugin from "./plugins/auth.js";
 import healthRoutes from "./routes/health.js";
+import profileRoutes from "./routes/profile.js";
+import activityRoutes from "./routes/activities.js";
 
 /**
  * Factory function to build and configure the Fastify application.
@@ -26,14 +28,9 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   // 4. Register protected routes with /api/v1 prefix
   await fastify.register(
     async function protectedRoutes(scope) {
-      // Register auth plugin inside this scope so it only applies to protected routes
       await scope.register(authPlugin);
-
-      // Future protected routes will be registered here:
-      // await scope.register(profileRoutes);
-      // await scope.register(activityRoutes);
-      // await scope.register(weeklyPlanRoutes);
-      // await scope.register(insightsRoutes);
+      await scope.register(profileRoutes);
+      await scope.register(activityRoutes);
     },
     { prefix: "/api/v1" },
   );
