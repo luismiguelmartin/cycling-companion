@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyError, FastifyReply, FastifyRequest } from "fastify";
+import fp from "fastify-plugin";
 import { ZodError } from "zod";
 
 /**
@@ -34,8 +35,13 @@ export async function errorHandler(fastify: FastifyInstance) {
       request: FastifyRequest,
       reply: FastifyReply,
     ) => {
-      // 1. Handle Zod validation errors
-      if (error instanceof ZodError) {
+      // 1. Handle Zod validation errors (duck-type check for ESM compatibility)
+      const isZodError =
+        error instanceof ZodError ||
+        error.name === "ZodError" ||
+        ("issues" in error && Array.isArray((error as ZodError).issues));
+      if (isZodError) {
+        const zodError = error as ZodError;
         const response: ErrorResponse = {
           error: "Validation failed",
           code: "VALIDATION_ERROR",
@@ -43,7 +49,7 @@ export async function errorHandler(fastify: FastifyInstance) {
 
         // Include validation details only in development
         if (process.env.NODE_ENV !== "production") {
-          response.details = error.issues;
+          response.details = zodError.issues;
         }
 
         return reply.status(400).send(response);
