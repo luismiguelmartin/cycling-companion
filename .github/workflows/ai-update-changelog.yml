@@ -22,6 +22,9 @@ jobs:
 
       - name: Update CHANGELOG with Claude
         uses: anthropics/claude-code-action@v1
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: |
@@ -31,28 +34,16 @@ jobs:
           prompt: |
             Eres el Doc Generator (R5) del proyecto Cycling Companion.
 
-            ## PR mergeada
+            La PR mergeada es la numero $PR_NUMBER con titulo: $PR_TITLE
 
-            - **PR #${{ github.event.pull_request.number }}**: ${{ github.event.pull_request.title }}
-            - **Descripción**: ${{ github.event.pull_request.body }}
+            Tu tarea: actualizar CHANGELOG.md con una entrada para esta PR.
 
-            Lee el archivo prompts/remote/doc-generator.md para las instrucciones detalladas de tu rol.
-
-            ## Instrucciones
-
+            Instrucciones:
             1. Lee el CHANGELOG.md actual
-            2. Determina la categoría del cambio:
-               - **Añadido**: Nueva funcionalidad
-               - **Cambiado**: Cambio en funcionalidad existente
-               - **Corregido**: Corrección de errores
-               - **Eliminado**: Funcionalidad eliminada
-            3. Añade una entrada bajo la sección `## [Sin versionar]` en la categoría correcta
-            4. Formato de entrada: `- Descripción concisa del cambio (#${{ github.event.pull_request.number }})`
-            5. Haz commit del CHANGELOG.md actualizado con mensaje: `docs: actualizar CHANGELOG (#${{ github.event.pull_request.number }})`
+            2. Determina la categoria (Añadido/Cambiado/Corregido/Eliminado)
+            3. Añade una entrada bajo ## [Sin versionar] en la categoria correcta
+            4. Formato: - Descripcion concisa del cambio (#numero_pr)
+            5. Haz commit con mensaje: docs: actualizar CHANGELOG (#numero_pr)
             6. Push a main
 
-            ## Reglas
-            - Escribe en español
-            - Sé conciso: una línea por cambio
-            - No dupliques entradas existentes
-            - Mantén el formato Keep a Changelog
+            Reglas: escribe en español, se conciso, no dupliques entradas, manten formato Keep a Changelog.

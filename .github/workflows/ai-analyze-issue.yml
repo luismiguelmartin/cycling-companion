@@ -18,8 +18,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Save issue body to file
+        run: |
+          cat <<'ISSUE_EOF' > /tmp/issue-body.txt
+          ${{ github.event.issue.body }}
+          ISSUE_EOF
+
       - name: Analyze issue with Claude
         uses: anthropics/claude-code-action@v1
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: |
@@ -29,35 +38,33 @@ jobs:
           prompt: |
             Eres el Issue Analyzer (R1) del proyecto Cycling Companion.
 
-            ## Issue a analizar
+            Issue numero $ISSUE_NUMBER: $ISSUE_TITLE
+            Lee /tmp/issue-body.txt para ver la descripcion completa.
 
-            - **Issue #${{ github.event.issue.number }}**: ${{ github.event.issue.title }}
-            - **Descripción**: ${{ github.event.issue.body }}
-
-            Lee el archivo CLAUDE.md para entender el contexto del proyecto, stack tecnológico y convenciones.
-            Lee también el archivo prompts/remote/issue-analyzer.md para las instrucciones detalladas de tu rol.
+            Lee el archivo CLAUDE.md para entender el contexto del proyecto.
+            Lee tambien prompts/remote/issue-analyzer.md para instrucciones de tu rol.
 
             Analiza la issue y genera un comentario estructurado en español con:
 
-            ## 🔍 Análisis IA de la Issue
+            ## Analisis IA de la Issue
 
             ### Complejidad
-            Evalúa: Baja / Media / Alta — con justificación breve.
+            Evalua: Baja / Media / Alta con justificacion breve.
 
             ### Archivos Afectados
-            Lista los archivos/directorios que probablemente se modificarán. Usa el codebase real para ser preciso.
+            Lista los archivos/directorios que se modificaran. Usa el codebase real.
 
             ### Riesgos
-            Identifica riesgos técnicos, de regresión o de seguridad.
+            Identifica riesgos tecnicos, de regresion o de seguridad.
 
             ### Tests Necesarios
-            Qué tests unitarios o de integración se deberían añadir.
+            Que tests unitarios o de integracion se deberian añadir.
 
             ### Approach Sugerido
             Pasos concretos para implementar la issue.
 
-            ### Estimación
-            Esfuerzo estimado (S/M/L) y justificación.
+            ### Estimacion
+            Esfuerzo estimado (S/M/L) y justificacion.
 
             ---
-            > 🤖 Análisis generado por R1 (Issue Analyzer) — `claude-haiku-4-5-20251001`
+            > Analisis generado por R1 (Issue Analyzer) - claude-haiku-4-5-20251001
