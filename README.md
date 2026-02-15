@@ -49,21 +49,21 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 - ✅ Onboarding wizard (4 pasos)
 - ✅ **9 pantallas frontend implementadas** (todas las rutas del MVP)
 - ✅ 32 componentes reutilizables
-- ✅ 16 archivos de test (103 tests)
-- ✅ 4 schemas Zod compartidos + 7 módulos de constantes
-- ✅ 3 migraciones SQL (schema, onboarding, activity types)
+- ✅ **27 archivos de test (278 tests)**: 71 web + 77 shared + 130 API
+- ✅ 5 schemas Zod compartidos + 7 módulos de constantes + utils de training
+- ✅ 4 migraciones SQL (schema, onboarding, activity types, ai_cache)
 - ✅ Design system documentado (dark/light theme)
-- ✅ 22 especificaciones L1/L2/L3 para 8 pantallas
-- ✅ **Pantalla Planificación Semanal** (Fase 2)
-- ✅ **Pantalla Insights / Comparar** (Fase 2)
+- ✅ 22 especificaciones L1/L2/L3 (frontend) + 8 specs L2-backend (API)
+- ✅ **API Fastify completa**: 15+ endpoints (CRUD + IA + upload)
+- ✅ **4 endpoints IA** con Claude API (cache, fallback, rate limit)
+- ✅ **Importación real** de archivos .fit/.gpx
+- ✅ **Deploy producción**: Vercel + Render + Supabase
 
-### Próximos Pasos (Fase 3)
+### Próximos Pasos (Fase 3 — Bloque 8)
 
-- ⏳ API Fastify: endpoints CRUD y de IA
-- ⏳ Integración Claude API: entrenador virtual (análisis actividades, generación planes)
-- ⏳ Importación real de actividades (pantalla UI lista, sin conexión a backend)
-- ⏳ Plan semanal real (actualmente usa mock data; falta tabla `weekly_plans`)
-- ⏳ Deploy a producción (Vercel + Render + Supabase)
+- ⏳ Migrar frontend de Supabase directo → API backend
+- ⏳ Conectar pantallas con endpoints reales (Dashboard, Plan, Insights, Import)
+- ⏳ Agentes remotos (PR Generator, PR Reviewer, Doc Generator)
 
 ---
 
@@ -194,19 +194,24 @@ cycling-companion/
 │   └── api/                        # Fastify 5 Backend
 │       └── src/
 │           ├── index.ts            # Punto de entrada
-│           └── routes/             # Endpoints (planificados)
+│           ├── app.ts              # Setup Fastify (plugins, routes)
+│           ├── plugins/            # Auth, CORS, error-handler, env
+│           ├── routes/             # profile, activities, insights, ai, plan
+│           └── services/           # Lógica de negocio + AI service
 │
 ├── packages/
 │   └── shared/                     # Types y validaciones compartidas
 │       └── src/
-│           ├── schemas/            # 4 schemas Zod (user, activity, plan, insights)
-│           └── constants/          # 7 módulos (goals, zones, types, rpe, filters)
+│           ├── schemas/            # 5 schemas Zod (user, activity, plan, insights, ai-response)
+│           ├── constants/          # 7 módulos (goals, zones, types, rpe, filters)
+│           └── utils/              # Training calculations, training rules
 │
 ├── supabase/
-│   ├── migrations/                 # 3 migraciones SQL
+│   ├── migrations/                 # 4 migraciones SQL
 │   │   ├── 001_initial_schema.sql
 │   │   ├── 002_alter_users_for_onboarding.sql
-│   │   └── 003_align_activity_type_enum.sql
+│   │   ├── 003_align_activity_type_enum.sql
+│   │   └── 004_ai_cache.sql
 │   ├── seed.sql                    # Seed genérico (placeholder <USER_ID>)
 │   └── seed_personalized.sql       # Seed con datos de ejemplo
 │
@@ -226,7 +231,7 @@ cycling-companion/
 └── README.md
 ```
 
-### Modelo de Datos (3 migraciones SQL)
+### Modelo de Datos (4 migraciones SQL)
 
 **users** — Perfil: edad, peso, FTP, FC máx/reposo, objetivo (performance/health/weight_loss/recovery)
 
@@ -236,38 +241,46 @@ cycling-companion/
 
 **activity_metrics** — Series temporales: potencia, FC, cadencia, velocidad por segundo
 
-### Endpoints API (Planificados)
+**ai_cache** — Caché y rate limit de IA: cache_key, endpoint, response (JSONB), expires_at
+
+### Endpoints API (Implementados ✅)
 
 ```
+/health                               Health check
 /api/v1/
-├── /auth              Gestionado por Supabase
-├── /activities        CRUD de actividades
-├── /activities/:id    Detalle + métricas + análisis IA
-├── /plan              Plan semanal (GET, POST para regenerar)
-├── /insights          Comparativas y tendencias
-├── /profile           Perfil del usuario
+├── /profile           GET, PATCH     Perfil del usuario
+├── /activities         GET, POST      Lista y crear actividades
+├── /activities/:id     GET, PATCH, DELETE   Detalle, actualizar, eliminar
+├── /activities/:id/metrics  GET       Series temporales
+├── /activities/upload  POST           Upload .fit/.gpx (multipart)
+├── /insights           GET            Comparativas y tendencias
+├── /insights/overload-check  GET      Alerta de sobrecarga
+├── /plan               GET, PATCH, DELETE   Plan semanal
 └── /ai
-    ├── /analyze-activity   Análisis post-sesión
-    ├── /weekly-plan        Generación de plan semanal
-    └── /weekly-summary     Resumen comparativo
+    ├── /analyze-activity   POST       Análisis post-sesión (Claude API)
+    ├── /weekly-plan        POST       Generación de plan semanal
+    ├── /weekly-summary     POST       Resumen comparativo
+    └── /coach-tip          GET        Recomendación diaria
 ```
 
-> **Nota**: Actualmente solo `/health` está implementado. Los endpoints listados son el diseño objetivo para Fase 3.
-
-### Flujo de Recomendaciones IA (Diseño)
+### Flujo de Recomendaciones IA (Implementado)
 
 ```
-1. Recopilar contexto (perfil + últimas N actividades + plan actual)
+1. Rate limit check (max 20 llamadas/usuario/día via ai_cache)
    ↓
-2. Aplicar reglas/heurísticas (TSS semanal, tendencias, objetivo)
+2. Cache check (buscar respuesta no expirada en ai_cache)
    ↓
-3. Construir prompt estructurado con contexto
+3. Recopilar contexto (perfil + últimas N actividades + métricas CTL/ATL/TSB)
    ↓
-4. Llamar a Claude API
+4. Aplicar reglas/heurísticas (training rules en packages/shared)
    ↓
-5. Parsear respuesta (JSON estructurado)
+5. Construir prompt versionado (prompts.ts)
    ↓
-6. Presentar al usuario con explicación clara
+6. Llamar a Claude API (claude-sonnet-4-5-20250929)
+   ↓
+7. Parsear + validar con schema Zod → si falla: fallback heurístico
+   ↓
+8. Persistir en cache + tabla destino → retornar al usuario
 ```
 
 ### Convenciones de Desarrollo

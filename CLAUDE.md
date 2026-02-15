@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Propuesta de valor**: Entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables.
 
-**Fase actual**: Fase 2 — MVP funcional (frontend completo, backend/IA pendientes)
+**Fase actual**: Fase 3 — Backend + IA (Bloques 0-7 completados, Bloque 8 en curso)
 
 ---
 
@@ -25,7 +25,7 @@ cycling-companion/
 ├── packages/
 │   └── shared/       → Types compartidos, validaciones Zod, constantes
 ├── supabase/
-│   ├── migrations/   → Scripts SQL incrementales (001, 002, 003)
+│   ├── migrations/   → Scripts SQL incrementales (001, 002, 003, 004)
 │   └── seed*.sql     → Datos de prueba
 └── docs/
     ├── specs/        → Especificaciones L1 (UX), L2 (técnico), L3 (issues)
@@ -135,6 +135,57 @@ PORT=3001
 
 ---
 
+## Cambios de Schema en Supabase — Workflow de Migraciones
+
+Cuando una feature requiere **modificar la estructura de la BD** (nuevo campo, tabla, índice, etc.):
+
+### Paso a paso
+
+1. **Crear la migración SQL**
+   ```bash
+   # Nombre: NNN_feature-description.sql (ej: 005_add_weather_to_activities.sql)
+   # Ubicación: supabase/migrations/
+   # Contenido: SQL puro, comentado, reversible si es posible
+   ```
+
+2. **Probar localmente**
+   ```bash
+   supabase link --project-ref <PROJECT_REF>
+   supabase migration up
+   # Verificar cambios en la BD local
+   ```
+
+3. **Documentar cambios en el código**
+   - Si se añade campo: actualizar schema Zod en `packages/shared`
+   - Si se modifica tabla: revisar RLS policies en la migración
+   - Si afecta API: documentar endpoint o agregar novo si aplica
+
+4. **Incluir en la PR**
+   - Migración SQL en `supabase/migrations/`
+   - Código backend/frontend que consume el cambio
+   - Tests que validen el nuevo schema
+   - En la descripción de PR: mención clara "Migración DB: NNN"
+
+5. **Checklist de PR**
+   ```markdown
+   - [ ] Migración SQL testeada localmente
+   - [ ] Schema Zod actualizado en `packages/shared` si aplica
+   - [ ] RLS policies revisadas en la migración
+   - [ ] Tests de integración incluidos
+   - [ ] Documentación de cambios en endpoint si aplica
+   ```
+
+### Nota: Automatización futura (Fase 4)
+
+En fases posteriores, se planea automatizar migraciones via GitHub Actions:
+- Agente **R6 — Migration Manager**: detectar `.sql` nuevos, aplicar en CI, validar cambios
+- Requerirá: `SUPABASE_ACCESS_TOKEN` en GitHub Secrets
+- Beneficio: migraciones applicadas automáticamente antes de PR merge
+
+Por ahora, el proceso manual + documentado es suficiente para mantener integridad.
+
+---
+
 ## Pipeline AI-First
 
 El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo en `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md`.
@@ -201,27 +252,47 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 | `/insights` | Insights (comparativas, radar, análisis) | Implementada (Fase 2) |
 | `/profile` | Perfil (datos, zonas, ajustes) | Supabase |
 
-### Próximos Pasos — Fase 3: Backend + IA
-- **API Fastify**: Solo tiene `/health`. Implementar endpoints CRUD y de IA.
-- **Integración Claude API**: Entrenador virtual (análisis actividades, generación planes).
-- **Importación real**: Conectar pantalla Import con API backend.
-- **weekly_plans real**: Migración SQL; Plan consume datos reales de Supabase.
+### Backend API — Fase 3 Bloques 0-7 Completados ✅
+
+| Bloque | Endpoints |
+|--------|-----------|
+| 0 — Infra | `/health`, plugins (auth, cors, errors, env, supabase, anthropic) |
+| 1 — Perfil | `GET/PATCH /api/v1/profile` |
+| 2 — Actividades | `GET/POST/PATCH/DELETE /api/v1/activities`, `GET /activities/:id/metrics` |
+| 3 — Insights | `GET /api/v1/insights`, `GET /insights/overload-check` |
+| 4 — Training Rules | `calculateTrainingLoad`, `evaluateTrainingAlerts` en shared |
+| 5 — IA | `POST /ai/analyze-activity`, `POST /ai/weekly-plan`, `POST /ai/weekly-summary`, `GET /ai/coach-tip` |
+| 6 — Plan | `GET/PATCH/DELETE /api/v1/plan` |
+| 7 — Import | `POST /api/v1/activities/upload` (.fit/.gpx multipart) |
+
+### Próximos Pasos — Bloque 8: Frontend Migration
+- Migrar frontend de Supabase directo → API backend
+- Conectar Dashboard, Plan, Insights, Import con endpoints reales
 
 ### Métricas
 - **Componentes**: 32 en `apps/web/src/components/`
-- **Tests**: 16 archivos (103 tests) — componentes, utils, schemas
-- **Migraciones SQL**: 3 (001 schema inicial, 002 onboarding, 003 activity_type enum)
-- **Schemas Zod compartidos**: 4 (user-profile, activity, weekly-plan, insights)
-- **Constantes compartidas**: 7 módulos
+- **Tests**: 27 archivos (278 tests) — 71 web + 77 shared + 130 API
+- **Migraciones SQL**: 4 (001 schema, 002 onboarding, 003 activity_type, 004 ai_cache)
+- **Schemas Zod compartidos**: 5 (user-profile, activity, weekly-plan, insights, ai-response)
+- **Constantes compartidas**: 7 módulos + 2 utils (training-calculations, training-rules)
 
 ---
 
 ## Gotchas conocidos
 
+### Frontend
 - `activity_type` ENUM en DB usa 5 tipos de entrenamiento: `intervals`, `endurance`, `recovery`, `tempo`, `rest` (migración 003). No confundir con modalidad (outdoor/indoor).
 - Los mockups JSX en `docs/design/` están excluidos de git. Usar `docs/DESIGN-SYSTEM.md` como fuente de verdad documentada.
 - Padding de páginas está centralizado en `app-shell.tsx` (`p-4 md:p-8`), no ponerlo en páginas individuales.
 - Para pasar iconos de Server→Client Components, usar `ReactNode` (JSX pre-renderizado), no `LucideIcon` (función).
+
+### Backend
+- FitParser mock en tests debe ser una clase, no arrow function: `class MockFitParser { parseAsync = mockFn }`
+- `@fastify/multipart` retorna 406 (no 400) cuando Content-Type no es multipart.
+- Multipart fields en Fastify se acceden via `data.fields.name.value`.
+- Batch insert de métricas en chunks de 1000 para evitar límites de DB.
+- Auth en API: JWT via `supabase.auth.getUser(token)` en plugin `auth.ts` con `fastify-plugin`.
+- `ActivityCreateInput` (z.input) para parámetros que aceptan defaults de Zod (ej: `type` con default "endurance").
 
 ---
 

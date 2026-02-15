@@ -11,7 +11,7 @@ import { OnboardingField } from "@/components/onboarding-field";
 import { GoalCard } from "@/components/goal-card";
 import { ZoneTable } from "@/components/zone-table";
 import { ProfileHeader } from "./profile-header";
-import { createClient } from "@/lib/supabase/client";
+import { apiClientPatch } from "@/lib/api/client";
 
 interface ProfileContentProps {
   profile: {
@@ -84,10 +84,8 @@ export function ProfileContent({ profile }: ProfileContentProps) {
       return;
     }
 
-    const supabase = createClient();
-    const { error } = await supabase
-      .from("users")
-      .update({
+    try {
+      await apiClientPatch("/profile", {
         display_name: parsed.data.display_name,
         age: parsed.data.age,
         weight_kg: parsed.data.weight_kg,
@@ -95,14 +93,11 @@ export function ProfileContent({ profile }: ProfileContentProps) {
         max_hr: parsed.data.max_hr ?? null,
         rest_hr: parsed.data.rest_hr ?? null,
         goal: parsed.data.goal,
-      })
-      .eq("id", profile.id);
-
-    if (error) {
-      setErrors({ _form: "Error al guardar. Inténtalo de nuevo." });
-    } else {
+      });
       setOriginalData({ ...formData });
       router.refresh();
+    } catch {
+      setErrors({ _form: "Error al guardar. Inténtalo de nuevo." });
     }
 
     setIsSaving(false);

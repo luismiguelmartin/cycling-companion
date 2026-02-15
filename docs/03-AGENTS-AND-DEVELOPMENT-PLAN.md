@@ -372,16 +372,16 @@ jobs:
 
 ## 3. Resumen de agentes
 
-| ID  | Nombre         | Tipo   | Trigger                | Fase     | Estado (2026-02-14) |
+| ID  | Nombre         | Tipo   | Trigger                | Fase     | Estado (2026-02-15) |
 | --- | -------------- | ------ | ---------------------- | -------- | ------------------- |
 | L1  | UX Interpreter | Local  | Manual                 | Fase 1   | ✅ Usado (8 pantallas) |
-| L2  | Architect      | Local  | Manual                 | Fase 1   | ✅ Usado (8 pantallas) |
+| L2  | Architect      | Local  | Manual                 | Fase 1-3 | ✅ Usado (8 pantallas + 8 bloques backend) |
 | L3  | Planner        | Local  | Manual                 | Fase 1-2 | ✅ Usado (6 pantallas) |
-| L4  | Implementer    | Local  | Manual                 | Fase 1   | ✅ Usado (6 pantallas implementadas) |
+| L4  | Implementer    | Local  | Manual                 | Fase 1-3 | ✅ Usado (8 pantallas + 8 bloques backend) |
 | R1  | Issue Analyzer | Remoto | Label `ai-analyze`     | Fase 2   | ⏳ Pendiente |
 | R2  | PR Generator   | Remoto | Label `ai-generate-pr` | Fase 3   | ⏳ Pendiente |
 | R3  | PR Reviewer    | Remoto | PR abierta             | Fase 2   | ⏳ Pendiente |
-| R4  | CI/CD          | Remoto | Push/PR                | Fase 1   | ✅ Activo (ci.yml) |
+| R4  | CI/CD          | Remoto | Push/PR                | Fase 1   | ✅ Activo (ci-frontend.yml + ci-backend.yml) |
 | R5  | Doc Generator  | Remoto | PR mergeada            | Fase 3   | ⏳ Pendiente |
 
 ---
@@ -390,12 +390,12 @@ jobs:
 
 El desarrollo se organiza en **4 fases** distribuidas en **7 semanas**, diseñado para ganar confianza y experiencia de forma progresiva.
 
-### Estado actual (2026-02-14)
+### Estado actual (2026-02-15)
 
 ```
 Fase 1: Cimientos                    ✅ COMPLETADA
-Fase 2: MVP funcional                🔄 EN PROGRESO (pantallas 05 y 07 pendientes)
-Fase 3: Pipeline AI-first            ⏳ PENDIENTE
+Fase 2: MVP funcional (frontend)     ✅ COMPLETADA
+Fase 3: Backend + IA                 🔄 EN PROGRESO (Bloques 0-7 completados, Bloque 8 pendiente)
 Fase 4: Pulido y evaluación          ⏳ PENDIENTE
 ```
 
@@ -507,7 +507,7 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 - ✅ Planificación semanal (implementada)
 - ✅ Comparativa de semanas / Insights (implementada)
 - ✅ Perfil editable (implementado)
-- ⏳ Alertas de sobrecarga (pendiente)
+- ✅ Alertas de sobrecarga (implementado en backend: `insights/overload-check` + reglas en shared)
 - ✅ **MVP frontend completado**: todas las pantallas (0-7) implementadas
 
 **Frontend status**: 🎉 Fase 2 completada. Todos los componentes, rutas y pantallas funcionales con datos Supabase y mock data.
@@ -516,21 +516,44 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 
 ---
 
-### FASE 3 — Pipeline AI-First Completo (Semanas 5-6)
+### FASE 3 — Backend + IA + Pipeline AI-First (Semanas 5-6)
 
-**Objetivo**: Activar todos los agentes remotos. Generar features nuevas vía PRs automáticas. Esta es la fase central del proyecto.
+**Objetivo**: Implementar backend completo, integrar Claude API, migrar frontend a API. Activar agentes remotos.
 
-#### Semana 5: Agentes remotos completos
+#### Semana 5: Backend API completo (Bloques 0-7) ✅ COMPLETADA
+
+| Bloque | Tarea | Estado |
+| ------ | ----- | ------ |
+| 0 | Infraestructura: env, cors, auth, error-handler, supabase, anthropic | ✅ |
+| 1 | Profile: GET/PATCH /api/v1/profile | ✅ |
+| 2 | Activities: CRUD /api/v1/activities + metrics | ✅ |
+| 3 | Insights: GET /api/v1/insights + overload-check | ✅ |
+| 4 | Training Rules: calculateTrainingLoad, evaluateTrainingAlerts en shared | ✅ |
+| 5 | IA (Claude API): 4 endpoints /api/v1/ai/* con cache, fallback, rate limit | ✅ |
+| 6 | Weekly Plan: GET/PATCH/DELETE /api/v1/plan | ✅ |
+| 7 | Import: POST /api/v1/activities/upload (.fit/.gpx) | ✅ |
+
+**Entregables semana 5**: ✅ COMPLETADOS
+- ✅ API Fastify con 15+ endpoints funcionales
+- ✅ 4 endpoints IA con Claude API, caché, fallback y rate limiting
+- ✅ Importación real de archivos .fit/.gpx
+- ✅ 130 tests API + 77 tests shared (207 total backend)
+- ✅ 4 migraciones SQL aplicadas
+- ✅ 8 specs L2-backend generadas
+- ✅ Deploy en producción (Render)
+
+#### Semana 6: Frontend migration + Agentes remotos
 
 | Día | Tarea                                                           | Agente       |
 | --- | --------------------------------------------------------------- | ------------ |
-| 1   | Configurar agente R2 (PR Generator)                             | Manual       |
-| 1   | Probar flujo completo: issue → ai-analyze → ai-generate-pr → PR | R1 + R2      |
-| 2   | Configurar agente R5 (Doc Generator)                            | Manual       |
-| 2   | Probar: merge → changelog automático                            | R5           |
-| 3   | Crear 3-5 issues de features secundarias para probar pipeline   | L3           |
-| 3   | Ejecutar pipeline completo en 1-2 features                      | R1 + R2 + R3 |
-| 4   | Comparar: PR generada por IA vs PR manual (misma feature)       | Evaluación   |
+| 1   | Bloque 8: Migrar frontend de Supabase directo → API backend     | L4           |
+| 2   | Configurar agente R2 (PR Generator)                             | Manual       |
+| 2   | Probar flujo completo: issue → ai-analyze → ai-generate-pr → PR | R1 + R2      |
+| 3   | Configurar agente R5 (Doc Generator)                            | Manual       |
+| 3   | Probar: merge → changelog automático                            | R5           |
+| 4   | Crear 3-5 issues de features secundarias para probar pipeline   | L3           |
+| 4   | Ejecutar pipeline completo en 1-2 features                      | R1 + R2 + R3 |
+| 5   | Comparar: PR generada por IA vs PR manual (misma feature)       | Evaluación   |
 | 5   | Documentar flujos, ajustar prompts, versionar prompts           | Manual       |
 
 **Features secundarias sugeridas para probar el pipeline**:
@@ -541,21 +564,15 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 4. Dark mode toggle
 5. Estadísticas de "mejor semana" en el dashboard
 
-#### Semana 6: Iteración y refinamiento
-
-| Día | Tarea                                                 | Agente            |
-| --- | ----------------------------------------------------- | ----------------- |
-| 1-2 | Ejecutar 2-3 features más vía pipeline completo       | Pipeline completo |
-| 3   | Refinar prompts basándose en calidad de PRs generadas | Manual            |
-| 4   | Implementar modo "IA desactivada" para comparativa    | Manual            |
-| 5   | Recopilar métricas de todo el proceso                 | Manual            |
-
 **Entregables fase 3**:
 
-- Pipeline AI-first funcionando end-to-end
-- 5-8 features añadidas vía PRs automáticas
-- Comparativa pipeline tradicional vs AI-first
-- Prompts versionados y documentados
+- ✅ Backend API completo con 15+ endpoints
+- ✅ 4 endpoints IA con Claude API (cache + fallback + rate limit)
+- ✅ Importación real .fit/.gpx
+- ✅ 278 tests (27 archivos): 71 web + 77 shared + 130 API
+- ⏳ Frontend migrado a API backend (Bloque 8)
+- ⏳ Pipeline AI-first end-to-end
+- ⏳ Comparativa pipeline tradicional vs AI-first
 
 ---
 
@@ -790,16 +807,16 @@ Para los agentes R1 y R2 que usan Claude, hay dos opciones:
 
 ## 10. Checklist de arranque
 
-> Estado actualizado: 2026-02-14
+> Estado actualizado: 2026-02-15
 
-- [x] Crear proyecto en Supabase (con 2 migraciones aplicadas)
+- [x] Crear proyecto en Supabase (con 4 migraciones aplicadas)
 - [x] Configurar Google OAuth en Google Cloud Console + Supabase (ref: `docs/GOOGLE-OAUTH-SETUP.md`)
 - [x] Crear repo en GitHub
 - [x] Cuenta en Vercel conectada al repo
-- [ ] Cuenta en Render conectada al repo
-- [ ] API key de Anthropic (para agentes remotos y entrenador IA)
+- [x] Cuenta en Render conectada al repo (deploy producción activo)
+- [x] API key de Anthropic (para agentes remotos y entrenador IA)
 - [x] Preparar mockups JSX en `docs/design/` y documentar en `docs/DESIGN-SYSTEM.md`
 - [x] Crear archivo `CLAUDE.md` con convenciones del proyecto
 - [x] Tener este documento y el PRD accesibles en `/docs/`
 - [x] Configurar ESLint 9 + Prettier + Turborepo
-- [x] CI pipeline básico (GitHub Actions: lint, typecheck, format, build)
+- [x] CI pipeline (GitHub Actions: ci-frontend.yml + ci-backend.yml)

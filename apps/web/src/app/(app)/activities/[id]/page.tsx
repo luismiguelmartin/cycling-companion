@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Activity, Clock, Zap, Heart, TrendingUp } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { apiGet, getServerToken } from "@/lib/api/server";
 import { formatDuration } from "@/lib/dashboard/calculations";
 import { formatActivityDate } from "@/lib/activities/format-date";
 import { transformTimeSeries } from "@/lib/activities/transform-time-series";
@@ -14,29 +14,49 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+interface ActivityData {
+  id: string;
+  name: string;
+  date: string;
+  type: string;
+  distance_km: number | null;
+  duration_seconds: number;
+  avg_power_watts: number | null;
+  avg_hr_bpm: number | null;
+  avg_cadence_rpm: number | null;
+  tss: number | null;
+  ai_analysis: Record<string, unknown> | null;
+}
+
+interface MetricRow {
+  timestamp_seconds: number;
+  power_watts: number | null;
+  hr_bpm: number | null;
+  cadence_rpm: number | null;
+}
+
 export default async function ActivityDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const supabase = await createClient();
+  const token = await getServerToken();
+  if (!token) return null;
 
-  const { data: activity } = await supabase
-    .from("activities")
-    .select(
-      "id, name, date, type, distance_km, duration_seconds, avg_power_watts, avg_hr_bpm, avg_cadence_rpm, tss, ai_analysis",
-    )
-    .eq("id", id)
-    .single();
-
-  if (!activity) {
+  let activity: ActivityData;
+  try {
+    const res = await apiGet<{ data: ActivityData }>(`/activities/${id}`, token);
+    activity = res.data;
+  } catch {
     notFound();
   }
 
-  const { data: metricsRows } = await supabase
-    .from("activity_metrics")
-    .select("timestamp_seconds, power_watts, hr_bpm, cadence_rpm")
-    .eq("activity_id", id)
-    .order("timestamp_seconds", { ascending: true });
+  let metricsRows: MetricRow[] = [];
+  try {
+    const metricsRes = await apiGet<{ data: MetricRow[] }>(`/activities/${id}/metrics`, token);
+    metricsRows = metricsRes.data;
+  } catch {
+    // No metrics available
+  }
 
-  const timeSeries = transformTimeSeries(metricsRows ?? []);
+  const timeSeries = transformTimeSeries(metricsRows);
   const dateFormatted = formatActivityDate(activity.date);
 
   const metrics: MetricItem[] = [
@@ -81,7 +101,7 @@ export default async function ActivityDetailPage({ params }: PageProps) {
   // Validate ai_analysis structure
   let analysis = null;
   if (activity.ai_analysis && typeof activity.ai_analysis === "object") {
-    const raw = activity.ai_analysis as Record<string, unknown>;
+    const raw = activity.ai_analysis;
     if (typeof raw.summary === "string" && typeof raw.recommendation === "string") {
       const tips = (raw.tips as Record<string, unknown>) ?? {};
       analysis = {

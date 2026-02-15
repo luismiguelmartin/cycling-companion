@@ -78,7 +78,7 @@ El producto se desarrolla como caso de uso real de un pipeline AI-first integrad
 
 #### Modelo de datos (según migraciones aplicadas)
 
-> Ref: `supabase/migrations/001_initial_schema.sql` + `002_alter_users_for_onboarding.sql`
+> Ref: `supabase/migrations/001_initial_schema.sql` + `002_alter_users_for_onboarding.sql` + `003_align_activity_type_enum.sql` + `004_ai_cache.sql`
 
 ```
 users
@@ -135,6 +135,18 @@ activity_metrics (series temporales)
 ├── hr_bpm (INTEGER, nullable, CHECK 0-220)
 ├── cadence_rpm (INTEGER, nullable, CHECK ≥ 0)
 └── speed_kmh (DECIMAL(5,2), nullable, CHECK ≥ 0)
+
+ai_cache (caché y rate limit de IA)
+├── id (UUID, PK, auto-generated)
+├── user_id (UUID, NOT NULL, FK → users, ON DELETE CASCADE)
+├── cache_key (TEXT, NOT NULL)          ← 'coach_tip_2026-02-15', 'analyze_activity_{id}'
+├── endpoint (TEXT, NOT NULL)           ← 'analyze-activity' | 'weekly-plan' | 'weekly-summary' | 'coach-tip'
+├── response (JSONB, NOT NULL)
+├── model (TEXT, nullable)
+├── prompt_version (TEXT, nullable)
+├── created_at (TIMESTAMPTZ, NOT NULL)
+├── expires_at (TIMESTAMPTZ, NOT NULL)
+└── UNIQUE(user_id, cache_key)
 ```
 
 **Decisiones de diseño aplicadas (migrations 002 + 003)**:
@@ -148,7 +160,7 @@ activity_metrics (series temporales)
 | Componente                  | Tecnología                                                                 |
 | --------------------------- | -------------------------------------------------------------------------- |
 | **LLM principal**           | Claude (vía API de Anthropic)                                              |
-| **Capa de prompts**         | Prompts versionados en el repo (directorio `/prompts/`, se crearán en fase 2-3) |
+| **Capa de prompts**         | Prompts versionados en código (`apps/api/src/services/ai/prompts.ts`) |
 | **Contexto**                | Datos del usuario + actividades recientes + plan actual (RAG simplificado) |
 | **Reglas de entrenamiento** | Heurísticas en código (umbrales de TSS, zonas, progresión)                 |
 | **Guardrails**              | La IA recomienda, nunca decide. Siempre muestra razonamiento.              |
@@ -518,7 +530,7 @@ La arquitectura ya soporta datos reales:
 
 > Última actualización: 2026-02-15
 
-Todas las pantallas tienen especificaciones completas en `docs/specs/`:
+### Especificaciones frontend (L1/L2/L3 por pantalla)
 
 | Screen | Pantalla | L1 (UX) | L2 (Técnico) | L3 (Issues) | Implementada |
 |--------|----------|:-------:|:------------:|:-----------:|:------------:|
@@ -531,4 +543,17 @@ Todas las pantallas tienen especificaciones completas en `docs/specs/`:
 | 06 | Perfil | ✅ | ✅ | — | ✅ |
 | 07 | Insights / Comparar | ✅ | ✅ | ✅ | ✅ (Fase 2) |
 
-**Convención de nombres**: `L{nivel}-screen-{número_PRD}-{nombre}.md`
+### Especificaciones backend (L2 por bloque)
+
+| Bloque | Spec | Implementado |
+|--------|------|:------------:|
+| 0 — Infraestructura | `L2-backend-00-infrastructure.md` | ✅ |
+| 1 — Perfil | `L2-backend-01-profile.md` | ✅ |
+| 2 — Actividades | `L2-backend-02-activities.md` | ✅ |
+| 3 — Insights | `L2-backend-03-insights.md` | ✅ |
+| 4 — Training Rules | `L2-backend-04-training-rules.md` | ✅ |
+| 5 — IA (Claude API) | `L2-backend-05-ai-endpoints.md` | ✅ |
+| 6 — Weekly Plan | `L2-backend-06-weekly-plan.md` | ✅ |
+| 7 — Import | `L2-backend-07-import.md` | ✅ |
+
+**Convención de nombres**: `L{nivel}-screen-{número_PRD}-{nombre}.md` (frontend), `L2-backend-{bloque}-{nombre}.md` (backend)

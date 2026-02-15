@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Activity, Clock, Zap, Heart, ChevronRight } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { apiGet, getServerToken } from "@/lib/api/server";
 import { KPICard } from "@/components/kpi-card";
 import { AICoachCard } from "@/components/ai-coach-card";
 import { OverloadAlert } from "@/components/overload-alert";
@@ -12,39 +12,85 @@ import {
   calculateTrends,
   calculateWeeklyTrend,
   calculateDailyLoad,
-  detectOverload,
   formatDuration,
   getWeekNumber,
   getWeekStart,
   getGreeting,
 } from "@/lib/dashboard/calculations";
 
+interface ProfileData {
+  data: {
+    display_name: string;
+    ftp: number | null;
+    max_hr: number | null;
+    goal: string;
+  };
+}
+
+interface ActivityRow {
+  id: string;
+  name: string;
+  date: string;
+  type: string;
+  duration_seconds: number;
+  distance_km: number | null;
+  avg_power_watts: number | null;
+  avg_hr_bpm: number | null;
+  tss: number | null;
+}
+
+interface ActivitiesResponse {
+  data: ActivityRow[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+}
+
+interface OverloadResponse {
+  data: {
+    currentLoad: number;
+    avgLoad: number;
+    percentage: number;
+    is_overloaded: boolean;
+    alert_level: "none" | "warning" | "critical";
+  };
+}
+
+interface CoachTipResponse {
+  data: {
+    recommendation: string;
+    tips?: {
+      hydration?: string;
+      sleep?: string;
+      nutrition?: string;
+    };
+  };
+}
+
 export default async function DashboardPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Obtener perfil del usuario
-  const { data: profile } = await supabase
-    .from("users")
-    .select("display_name, ftp, max_hr, goal")
-    .eq("id", user!.id)
-    .single();
+  const token = await getServerToken();
+  if (!token) return null;
 
   // Obtener actividades de las últimas 4 semanas
   const fourWeeksAgo = new Date();
   fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+  const dateFrom = fourWeeksAgo.toISOString().split("T")[0];
 
-  const { data: activities } = await supabase
-    .from("activities")
-    .select("id, name, date, type, duration_seconds, distance_km, avg_power_watts, avg_hr_bpm, tss")
-    .eq("user_id", user!.id)
-    .gte("date", fourWeeksAgo.toISOString().split("T")[0])
-    .order("date", { ascending: false });
+  const [profileRes, activitiesRes, overloadRes] = await Promise.all([
+    apiGet<ProfileData>("/profile", token),
+    apiGet<ActivitiesResponse>(`/activities?date_from=${dateFrom}&limit=100`, token),
+    apiGet<OverloadResponse>("/insights/overload-check", token).catch(() => null),
+  ]);
 
-  const allActivities = activities ?? [];
+  // Coach tip — llamada independiente que puede fallar sin romper la página
+  let coachTip: CoachTipResponse["data"] | null = null;
+  try {
+    const tipRes = await apiGet<CoachTipResponse>("/ai/coach-tip", token);
+    coachTip = tipRes.data;
+  } catch {
+    // Si la IA no está disponible, usamos placeholder
+  }
+
+  const profile = profileRes.data;
+  const allActivities = activitiesRes.data;
 
   // Calcular rangos de semana
   const now = new Date();
@@ -67,8 +113,11 @@ export default async function DashboardPage() {
   const weeklyTrend = calculateWeeklyTrend(allActivities);
   const dailyLoad = calculateDailyLoad(allActivities, currentWeekStart);
 
-  // Sobrecarga
-  const overload = detectOverload(allActivities);
+  // Sobrecarga desde API
+  const overload =
+    overloadRes?.data?.is_overloaded
+      ? { currentLoad: overloadRes.data.currentLoad, avgLoad: overloadRes.data.avgLoad }
+      : null;
 
   // Actividades recientes (máx 4)
   const recentActivities = allActivities.slice(0, 4);
@@ -78,15 +127,20 @@ export default async function DashboardPage() {
   const greeting = getGreeting();
   const userName = profile?.display_name ?? "Ciclista";
 
-  // Recomendación IA placeholder
-  const aiRecommendation =
-    allActivities.length > 0
+  // Recomendación IA — usar coach tip real o fallback
+  const aiRecommendation = coachTip?.recommendation
+    ?? (allActivities.length > 0
       ? `Tu semana lleva ${currentKPIs.activityCount} actividad${currentKPIs.activityCount !== 1 ? "es" : ""}. ${
           currentKPIs.avgPower
             ? `Tu potencia media es ${currentKPIs.avgPower}W.`
             : "Sigue registrando para obtener mejores insights."
         } ¡Mantén la constancia!`
-      : "Sube tu primera actividad para empezar a recibir recomendaciones personalizadas. Cuantos más datos tenga, mejores serán mis consejos. 🚴‍♂️";
+      : "Sube tu primera actividad para empezar a recibir recomendaciones personalizadas. Cuantos más datos tenga, mejores serán mis consejos.");
+
+  const aiTips = coachTip?.tips
+    ?? (allActivities.length > 0
+      ? { hydration: "2.5L mínimo", sleep: "7.5h recomendadas", nutrition: "+30g carbohidratos" }
+      : undefined);
 
   return (
     <div>
@@ -154,18 +208,7 @@ export default async function DashboardPage() {
 
       {/* AI Coach Card */}
       <div className="mb-6">
-        <AICoachCard
-          recommendation={aiRecommendation}
-          tips={
-            allActivities.length > 0
-              ? {
-                  hydration: "2.5L mínimo",
-                  sleep: "7.5h recomendadas",
-                  nutrition: "+30g carbohidratos",
-                }
-              : undefined
-          }
-        />
+        <AICoachCard recommendation={aiRecommendation} tips={aiTips} />
       </div>
 
       {/* Recent Activities */}
