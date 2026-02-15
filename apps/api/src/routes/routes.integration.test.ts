@@ -18,6 +18,15 @@ vi.mock("../services/supabase.js", () => ({
   },
 }));
 
+const mockClaudeCreate = vi.fn();
+vi.mock("../services/anthropic.js", () => ({
+  anthropic: {
+    messages: {
+      create: (...args: unknown[]) => mockClaudeCreate(...args),
+    },
+  },
+}));
+
 const { buildApp } = await import("../app.js");
 const { supabaseAdmin } = await import("../services/supabase.js");
 
@@ -318,6 +327,202 @@ describe("API Integration", () => {
         url: "/api/v1/insights?period_a_start=2026-02-01&period_a_end=2026-02-07&period_b_start=2026-02-08&period_b_end=2026-02-15",
       });
       expect(res.statusCode).toBe(401);
+    });
+  });
+
+  describe("AI", () => {
+    const validAnalysis = {
+      summary: "Buena sesión.",
+      recommendation: "Recuperación mañana.",
+      tips: { hydration: "Bebe agua." },
+    };
+
+    const validCoachTip = {
+      recommendation: "Hoy intervalos.",
+      tips: { hydration: "2L mínimo." },
+    };
+
+    const validWeeklySummary = {
+      summary: "Semana productiva.",
+      recommendation: "Mantén el ritmo.",
+    };
+
+    const validWeeklyPlan = {
+      days: Array.from({ length: 7 }, (_, i) => ({
+        day: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"][i],
+        date: `2026-02-${16 + i}`,
+        type: i === 3 ? "rest" : "endurance",
+        title: i === 3 ? "Descanso" : "Rodaje",
+        intensity: i === 3 ? "—" : "media",
+        duration: i === 3 ? "—" : "1h",
+        description: "Descripción",
+        nutrition: "Nutrición",
+        rest: "Descanso",
+      })),
+      rationale: "Plan adaptado.",
+    };
+
+    /**
+     * Creates self-referencing mock chains for supabase.from() that handle all
+     * AI service internal calls without infinite recursion.
+     */
+    function setupAIMocks(claudeResponse: unknown) {
+      mockClaudeCreate.mockResolvedValue({
+        content: [{ type: "text", text: JSON.stringify(claudeResponse) }],
+      });
+
+      function buildChain(defaultResult: {
+        data: unknown;
+        error: unknown;
+        count?: number | null;
+      }): ReturnType<typeof supabaseAdmin.from> {
+        const chain: Record<string, unknown> = {};
+        const selfMethods = [
+          "eq",
+          "gte",
+          "gt",
+          "lte",
+          "or",
+          "order",
+          "insert",
+          "update",
+          "upsert",
+          "delete",
+        ];
+        for (const m of selfMethods) {
+          chain[m] = vi.fn().mockReturnValue(chain);
+        }
+        chain["single"] = vi.fn().mockResolvedValue(defaultResult);
+        chain["range"] = vi.fn().mockResolvedValue(defaultResult);
+        chain["select"] = vi
+          .fn()
+          .mockImplementation((_cols?: string, opts?: { count?: string; head?: boolean }) => {
+            if (opts?.count === "exact" && opts?.head) {
+              // Rate limit check — self-ref chain that resolves with count: 0
+              const rateChain: Record<string, unknown> = {};
+              for (const m of selfMethods) {
+                rateChain[m] = vi.fn().mockReturnValue(rateChain);
+              }
+              rateChain["then"] = (
+                resolve: (v: unknown) => unknown,
+                reject: (e: unknown) => unknown,
+              ) => Promise.resolve({ count: 0, error: null }).then(resolve, reject);
+              return rateChain;
+            }
+            return chain;
+          });
+        chain["then"] = (resolve: (v: unknown) => unknown, reject: (e: unknown) => unknown) =>
+          Promise.resolve(defaultResult).then(resolve, reject);
+        return chain as ReturnType<typeof supabaseAdmin.from>;
+      }
+
+      vi.mocked(supabaseAdmin.from).mockImplementation((table: string) => {
+        if (table === "users") {
+          return buildChain({ data: mockProfile, error: null });
+        }
+        if (table === "activities") {
+          return buildChain({ data: [mockActivity], error: null, count: 1 });
+        }
+        if (table === "ai_cache") {
+          return buildChain({ data: null, error: { message: "not found" } });
+        }
+        return buildChain({ data: null, error: null });
+      });
+    }
+
+    it("POST /api/v1/ai/analyze-activity devuelve 200 con análisis", async () => {
+      setupAIMocks(validAnalysis);
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/ai/analyze-activity",
+        headers: authHeaders,
+        payload: { activity_id: "act-123" },
+      });
+      expect(res.statusCode).toBe(200);
+      const body = res.json();
+      expect(body.data).toHaveProperty("summary");
+      expect(body.data).toHaveProperty("recommendation");
+      expect(body.data).toHaveProperty("tips");
+    });
+
+    it("POST /api/v1/ai/analyze-activity sin activity_id devuelve 400", async () => {
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/ai/analyze-activity",
+        headers: authHeaders,
+        payload: {},
+      });
+      expect(res.statusCode).toBe(400);
+      expect(res.json()).toMatchObject({ code: "BAD_REQUEST" });
+    });
+
+    it("POST /api/v1/ai/weekly-plan devuelve 200 con 7 días", async () => {
+      setupAIMocks(validWeeklyPlan);
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/ai/weekly-plan",
+        headers: authHeaders,
+        payload: {},
+      });
+      expect(res.statusCode).toBe(200);
+      const body = res.json();
+      expect(body.data).toHaveProperty("days");
+      expect(body.data.days).toHaveLength(7);
+      expect(body.data).toHaveProperty("rationale");
+    });
+
+    it("POST /api/v1/ai/weekly-summary devuelve 200 con resumen", async () => {
+      setupAIMocks(validWeeklySummary);
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/ai/weekly-summary",
+        headers: authHeaders,
+        payload: {
+          period_a_start: "2026-02-01",
+          period_a_end: "2026-02-07",
+          period_b_start: "2026-02-08",
+          period_b_end: "2026-02-15",
+        },
+      });
+      expect(res.statusCode).toBe(200);
+      const body = res.json();
+      expect(body.data).toHaveProperty("summary");
+      expect(body.data).toHaveProperty("recommendation");
+    });
+
+    it("POST /api/v1/ai/weekly-summary sin periodos devuelve 400", async () => {
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/ai/weekly-summary",
+        headers: authHeaders,
+        payload: {},
+      });
+      expect(res.statusCode).toBe(400);
+      expect(res.json()).toMatchObject({ code: "BAD_REQUEST" });
+    });
+
+    it("GET /api/v1/ai/coach-tip devuelve 200 con tip", async () => {
+      setupAIMocks(validCoachTip);
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/ai/coach-tip",
+        headers: authHeaders,
+      });
+      expect(res.statusCode).toBe(200);
+      const body = res.json();
+      expect(body.data).toHaveProperty("recommendation");
+    });
+
+    it("rutas IA sin auth devuelven 401", async () => {
+      const routes = [
+        { method: "POST" as const, url: "/api/v1/ai/analyze-activity" },
+        { method: "POST" as const, url: "/api/v1/ai/weekly-plan" },
+        { method: "GET" as const, url: "/api/v1/ai/coach-tip" },
+      ];
+      for (const route of routes) {
+        const res = await app.inject({ method: route.method, url: route.url });
+        expect(res.statusCode).toBe(401);
+      }
     });
   });
 });
