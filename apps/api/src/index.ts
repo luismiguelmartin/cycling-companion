@@ -1,18 +1,12 @@
 import "dotenv/config";
-import Fastify from "fastify";
+import { buildApp } from "./app.js";
+import { env } from "./config/env.js";
 
-const port = Number(process.env.PORT) || 3001;
+const app = await buildApp({ logger: true });
 
-const app = Fastify({ logger: true });
-
-app.get("/health", async () => {
-  return { status: "ok" };
-});
-
-app.listen({ port, host: "0.0.0.0" }, (err, address) => {
-  if (err) {
-    app.log.error(err);
-    process.exit(1);
-  }
-  app.log.info(`Server listening at ${address}`);
-});
+try {
+  await app.listen({ port: env.PORT, host: "0.0.0.0" });
+} catch (err) {
+  app.log.error(err);
+  process.exit(1);
+}

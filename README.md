@@ -1,5 +1,8 @@
 # 🚴 Cycling Companion
 
+[![CI Frontend](https://github.com/lm-martin/cycling-companion/actions/workflows/ci-frontend.yml/badge.svg)](https://github.com/lm-martin/cycling-companion/actions/workflows/ci-frontend.yml)
+[![CI Backend](https://github.com/lm-martin/cycling-companion/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/lm-martin/cycling-companion/actions/workflows/ci-backend.yml)
+
 Plataforma web de análisis y planificación de entrenamiento para ciclistas amateur (40+), impulsada por IA.
 
 **Cycling Companion** es un banco de pruebas para un pipeline AI-first de integración de IA en el ciclo de vida del desarrollo. Proporciona un entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables de entrenamiento, nutrición y descanso.
@@ -32,12 +35,12 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 
 **Fase actual**: Fase 2 completada ✅ → Fase 3 — Backend + IA
 
-| Fase | Descripción | Estado |
-|------|-------------|--------|
-| **Fase 1** | Cimientos: monorepo, CI, Auth, deploy, schema DB | ✅ Completada |
-| **Fase 2** | MVP funcional: pantallas frontend, datos mock, specs | ✅ Completada |
-| **Fase 3** | Core features: API endpoints, integración Claude, import real | ⏳ En curso |
-| **Fase 4** | Refinamiento: agentes remotos, evaluación, documentación | ⬜ Pendiente |
+| Fase       | Descripción                                                   | Estado        |
+| ---------- | ------------------------------------------------------------- | ------------- |
+| **Fase 1** | Cimientos: monorepo, CI, Auth, deploy, schema DB              | ✅ Completada |
+| **Fase 2** | MVP funcional: pantallas frontend, datos mock, specs          | ✅ Completada |
+| **Fase 3** | Core features: API endpoints, integración Claude, import real | ⏳ En curso   |
+| **Fase 4** | Refinamiento: agentes remotos, evaluación, documentación      | ⬜ Pendiente  |
 
 ### Completado
 
@@ -66,17 +69,17 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 
 ## Stack Tecnológico
 
-| Capa | Tecnología |
-|------|------------|
-| **Frontend** | Next.js 16 (App Router), React 19, TypeScript 5.7, Tailwind CSS 3.4 |
-| **Componentes UI** | shadcn/ui, Radix UI, Lucide React (iconos), Recharts (gráficas) |
-| **Backend** | Fastify 5, TypeScript, Zod (validación) |
-| **Base de Datos** | Supabase (PostgreSQL + Auth + Storage + RLS) |
-| **Autenticación** | Supabase Auth con Google OAuth |
-| **IA** | Claude API (Anthropic) para recomendaciones |
-| **Monorepo** | Turborepo + pnpm |
-| **Testing** | Vitest, React Testing Library |
-| **Tipografía** | DM Sans (400/500/600/700) |
+| Capa               | Tecnología                                                          |
+| ------------------ | ------------------------------------------------------------------- |
+| **Frontend**       | Next.js 16 (App Router), React 19, TypeScript 5.7, Tailwind CSS 3.4 |
+| **Componentes UI** | shadcn/ui, Radix UI, Lucide React (iconos), Recharts (gráficas)     |
+| **Backend**        | Fastify 5, TypeScript, Zod (validación)                             |
+| **Base de Datos**  | Supabase (PostgreSQL + Auth + Storage + RLS)                        |
+| **Autenticación**  | Supabase Auth con Google OAuth                                      |
+| **IA**             | Claude API (Anthropic) para recomendaciones                         |
+| **Monorepo**       | Turborepo + pnpm                                                    |
+| **Testing**        | Vitest, React Testing Library                                       |
+| **Tipografía**     | DM Sans (400/500/600/700)                                           |
 
 ### Justificación Tecnológica
 
@@ -284,26 +287,28 @@ cycling-companion/
 
 ### Pantallas Implementadas
 
-| Ruta | Pantalla | Descripción | Fuente de datos |
-|------|----------|-------------|-----------------|
-| `/auth/login` | Login | Autenticación con Google OAuth | Supabase Auth |
-| `/onboarding` | Onboarding | Wizard de 4 pasos: perfil → objetivos → zonas → resumen | Supabase |
-| `/` | Dashboard | KPIs, gráficas de potencia/carga, coach IA, últimas actividades | Supabase + mock |
-| `/activities` | Lista | Tabla paginada con filtros por tipo y búsqueda por nombre | Supabase |
-| `/activities/[id]` | Detalle | Métricas, gráficas temporales (potencia/FC/cadencia), análisis IA | Supabase |
-| `/activities/import` | Importar | Entrada manual o subida de archivo (.fit/.gpx) | Solo UI |
-| `/plan` | Planificación | Grid semanal (7 días), tips nutrición/descanso, barra de carga | Mock data (Fase 3: real) |
-| `/insights` | Insights | Comparativa entre periodos, radar de rendimiento, análisis IA | Supabase + cálculos client |
-| `/profile` | Perfil | Datos personales, zonas potencia/FC, ajustes tema/unidades | Supabase |
+| Ruta                 | Pantalla      | Descripción                                                       | Fuente de datos            |
+| -------------------- | ------------- | ----------------------------------------------------------------- | -------------------------- |
+| `/auth/login`        | Login         | Autenticación con Google OAuth                                    | Supabase Auth              |
+| `/onboarding`        | Onboarding    | Wizard de 4 pasos: perfil → objetivos → zonas → resumen           | Supabase                   |
+| `/`                  | Dashboard     | KPIs, gráficas de potencia/carga, coach IA, últimas actividades   | Supabase + mock            |
+| `/activities`        | Lista         | Tabla paginada con filtros por tipo y búsqueda por nombre         | Supabase                   |
+| `/activities/[id]`   | Detalle       | Métricas, gráficas temporales (potencia/FC/cadencia), análisis IA | Supabase                   |
+| `/activities/import` | Importar      | Entrada manual o subida de archivo (.fit/.gpx)                    | Solo UI                    |
+| `/plan`              | Planificación | Grid semanal (7 días), tips nutrición/descanso, barra de carga    | Mock data (Fase 3: real)   |
+| `/insights`          | Insights      | Comparativa entre periodos, radar de rendimiento, análisis IA     | Supabase + cálculos client |
+| `/profile`           | Perfil        | Datos personales, zonas potencia/FC, ajustes tema/unidades        | Supabase                   |
 
 ### Características Principales
 
 #### F01 — Autenticación y Onboarding
+
 - Login con Google OAuth (sin contraseña)
 - Onboarding de 4 pasos: datos básicos → FTP → FC máx/reposo → objetivo
 - Redirect automático al dashboard tras completar
 
 #### F02 — Dashboard Principal
+
 - 4 KPI Cards: distancia semanal, tiempo, potencia media, FC media
 - Gráfica de tendencia: últimas 4 semanas (potencia + FC)
 - Tarjeta IA: recomendación del día (2-3 frases)
@@ -311,17 +316,20 @@ cycling-companion/
 - Accesos rápidos: última actividad, plan, comparar
 
 #### F03 — Lista de Actividades
+
 - Tabla con ordenamiento por fecha
 - Filtros: rango de fechas, tipo de salida, búsqueda por nombre
 - Columnas: fecha, nombre, tipo, distancia, tiempo, potencia, FC, RPE
 - Botón importar actividad
 
 #### F04 — Importar Actividad
+
 - Modo manual: formulario con datos (nombre, fecha, tipo, duración, distancia, etc.)
 - Modo archivo: upload .fit/.gpx (Fase 3)
 - Opción: generar datos mock automáticos
 
 #### F05 — Detalle de Actividad
+
 - KPI Cards: distancia, tiempo, potencia, FC, cadencia, TSS
 - Gráficas temporales si hay series de datos
 - RPE registrado
@@ -330,6 +338,7 @@ cycling-companion/
 - Checkbox: marcar como "sesión de referencia"
 
 #### F06 — Planificación Semanal ✅ (Fase 2)
+
 - Calendario horizontal (lunes a domingo)
 - 7 días con sugerencias IA: tipo, intensidad, duración
 - Recomendaciones por día: nutrición, hidratación, horas de sueño
@@ -337,6 +346,7 @@ cycling-companion/
 - Botón: recalcular plan
 
 #### F07 — Insights / Comparar ✅ (Fase 2)
+
 - Selección de dos periodos
 - Datos comparativos: tiempo, distancia, potencia, FC, carga
 - Gráficas comparativas lado a lado
@@ -344,6 +354,7 @@ cycling-companion/
 - **Resumen IA**: explicación de cambios y por qué importan
 
 #### F08 — Perfil y Ajustes
+
 - Datos personales: nombre, edad, peso, FTP, FC máx/reposo
 - Zonas de potencia y FC (calculadas o personalizables)
 - Objetivo actual (performance/health/weight_loss/recovery)
@@ -352,7 +363,9 @@ cycling-companion/
 ### Features Transversales
 
 #### Entrenador IA
+
 No es una pantalla, sino una capa que opera en toda la app:
+
 - **En el dashboard**: resumen diario y recomendación
 - **En cada actividad**: análisis post-sesión
 - **En la planificación**: generación y ajuste de plan semanal
@@ -360,6 +373,7 @@ No es una pantalla, sino una capa que opera en toda la app:
 - **Tono**: cercano, motivador, basado en datos
 
 Internamente implementado con:
+
 - LLM (Claude) como capa explicativa
 - Reglas + heurísticas para lógica de entrenamiento
 - Datos del usuario como contexto (RAG simplificado)
@@ -368,16 +382,16 @@ Internamente implementado con:
 
 ## Documentación
 
-| Documento | Descripción |
-|-----------|-------------|
-| [01-PRODUCT-VISION.md](docs/01-PRODUCT-VISION.md) | Visión del producto, propuesta de valor, persona objetivo |
-| [02-PRD.md](docs/02-PRD.md) | PRD completo: modelo de datos, endpoints, flujo IA, specs |
-| [03-AGENTS-AND-DEVELOPMENT-PLAN.md](docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md) | Plan de agentes locales y remotos, timeline de desarrollo |
-| [DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md) | Design system: pantallas, tokens, componentes, conversión JSX→Next.js |
-| [GOOGLE-OAUTH-SETUP.md](docs/GOOGLE-OAUTH-SETUP.md) | Guía de configuración de Google OAuth en Supabase |
-| [SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md) | Guía de configuración de Supabase y base de datos |
-| [CLAUDE.md](CLAUDE.md) | Instrucciones para Claude Code (este repositorio) |
-| `docs/specs/` | 22 especificaciones L1 (UX), L2 (técnico), L3 (issues) para 8 pantallas |
+| Documento                                                                   | Descripción                                                             |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| [01-PRODUCT-VISION.md](docs/01-PRODUCT-VISION.md)                           | Visión del producto, propuesta de valor, persona objetivo               |
+| [02-PRD.md](docs/02-PRD.md)                                                 | PRD completo: modelo de datos, endpoints, flujo IA, specs               |
+| [03-AGENTS-AND-DEVELOPMENT-PLAN.md](docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md) | Plan de agentes locales y remotos, timeline de desarrollo               |
+| [DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md)                                   | Design system: pantallas, tokens, componentes, conversión JSX→Next.js   |
+| [GOOGLE-OAUTH-SETUP.md](docs/GOOGLE-OAUTH-SETUP.md)                         | Guía de configuración de Google OAuth en Supabase                       |
+| [SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md)                                 | Guía de configuración de Supabase y base de datos                       |
+| [CLAUDE.md](CLAUDE.md)                                                      | Instrucciones para Claude Code (este repositorio)                       |
+| `docs/specs/`                                                               | 22 especificaciones L1 (UX), L2 (técnico), L3 (issues) para 8 pantallas |
 
 ---
 
@@ -387,22 +401,22 @@ Este proyecto implementa un pipeline multi-agente para integrar IA en el ciclo d
 
 ### Agentes Locales (Claude Code)
 
-| Agente | Rol | Trigger |
-|--------|-----|---------|
-| **L1: UX Interpreter** | Mockups → especificación funcional | Manual |
-| **L2: Architect** | Especificación → diseño técnico | Manual |
-| **L3: Planner** | Diseño → issues incrementales | Manual |
-| **L4: Implementer** | Implementar código con supervisión | Manual |
+| Agente                 | Rol                                | Trigger |
+| ---------------------- | ---------------------------------- | ------- |
+| **L1: UX Interpreter** | Mockups → especificación funcional | Manual  |
+| **L2: Architect**      | Especificación → diseño técnico    | Manual  |
+| **L3: Planner**        | Diseño → issues incrementales      | Manual  |
+| **L4: Implementer**    | Implementar código con supervisión | Manual  |
 
 ### Agentes Remotos (GitHub Actions) — Planificados
 
-| Agente | Rol | Trigger |
-|--------|-----|---------|
-| **R1: Issue Analyzer** | Analizar impacto y complejidad | Label `ai-analyze` |
-| **R2: PR Generator** | Generar PR completa desde issue | Label `ai-generate-pr` |
-| **R3: PR Reviewer** | Code review automático | PR abierta |
-| **R4: CI/CD** | Lint, test, build | Push/PR |
-| **R5: Doc Generator** | Actualizar CHANGELOG, README | PR mergeada |
+| Agente                 | Rol                             | Trigger                |
+| ---------------------- | ------------------------------- | ---------------------- |
+| **R1: Issue Analyzer** | Analizar impacto y complejidad  | Label `ai-analyze`     |
+| **R2: PR Generator**   | Generar PR completa desde issue | Label `ai-generate-pr` |
+| **R3: PR Reviewer**    | Code review automático          | PR abierta             |
+| **R4: CI/CD**          | Lint, test, build               | Push/PR                |
+| **R5: Doc Generator**  | Actualizar CHANGELOG, README    | PR mergeada            |
 
 ---
 

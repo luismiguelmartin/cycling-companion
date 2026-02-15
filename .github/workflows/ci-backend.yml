@@ -1,0 +1,54 @@
+name: CI Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "packages/shared/**"
+      - "pnpm-lock.yaml"
+      - "package.json"
+      - "turbo.json"
+      - ".github/workflows/ci-backend.yml"
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - "packages/shared/**"
+      - "pnpm-lock.yaml"
+      - "package.json"
+      - "turbo.json"
+      - ".github/workflows/ci-backend.yml"
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint backend
+        run: pnpm --filter api --filter shared lint
+
+      - name: Type check backend
+        run: pnpm --filter api --filter shared typecheck
+
+      - name: Format check backend
+        run: pnpm --filter api --filter shared format:check
+
+      - name: Test backend
+        run: pnpm --filter api --filter shared test
+
+      - name: Build backend
+        run: pnpm --filter api build

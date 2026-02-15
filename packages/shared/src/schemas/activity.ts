@@ -48,3 +48,4 @@ export const activityCreateSchema = activitySchema
   });
 
 export type ActivityCreate = z.infer<typeof activityCreateSchema>;
+export type ActivityCreateInput = z.input<typeof activityCreateSchema>;

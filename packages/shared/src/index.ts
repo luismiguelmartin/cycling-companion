@@ -15,6 +15,7 @@ export {
   type ActivityType,
   type Activity,
   type ActivityCreate,
+  type ActivityCreateInput,
 } from "./schemas/activity";
 
 // Constants
