@@ -648,4 +648,75 @@ describe("API Integration", () => {
       }
     });
   });
+
+  describe("Upload", () => {
+    function buildMultipart(
+      fileName: string,
+      fileContent: Buffer,
+      fields?: Record<string, string>,
+    ): { body: Buffer; contentType: string } {
+      const boundary = "----FormBoundary" + Date.now();
+      const parts: Buffer[] = [];
+
+      // File part
+      parts.push(
+        Buffer.from(
+          `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${fileName}"\r\nContent-Type: application/octet-stream\r\n\r\n`,
+        ),
+      );
+      parts.push(fileContent);
+      parts.push(Buffer.from("\r\n"));
+
+      // Field parts
+      if (fields) {
+        for (const [key, value] of Object.entries(fields)) {
+          parts.push(
+            Buffer.from(
+              `--${boundary}\r\nContent-Disposition: form-data; name="${key}"\r\n\r\n${value}\r\n`,
+            ),
+          );
+        }
+      }
+
+      parts.push(Buffer.from(`--${boundary}--\r\n`));
+
+      return {
+        body: Buffer.concat(parts),
+        contentType: `multipart/form-data; boundary=${boundary}`,
+      };
+    }
+
+    it("POST /api/v1/activities/upload sin multipart content-type devuelve error", async () => {
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/activities/upload",
+        headers: authHeaders,
+        payload: {},
+      });
+      // Sin content-type multipart, el plugin @fastify/multipart rechaza la petición
+      expect([400, 406]).toContain(res.statusCode);
+    });
+
+    it("POST /api/v1/activities/upload con formato no soportado devuelve 400", async () => {
+      const { body, contentType } = buildMultipart("data.csv", Buffer.from("csv,data"));
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/activities/upload",
+        headers: { ...authHeaders, "content-type": contentType },
+        body,
+      });
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("POST /api/v1/activities/upload sin auth devuelve 401", async () => {
+      const { body, contentType } = buildMultipart("ride.fit", Buffer.from("fake-fit"));
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/activities/upload",
+        headers: { "content-type": contentType },
+        body,
+      });
+      expect(res.statusCode).toBe(401);
+    });
+  });
 });

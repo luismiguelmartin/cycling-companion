@@ -1,4 +1,5 @@
 import Fastify, { FastifyInstance, FastifyServerOptions } from "fastify";
+import multipart from "@fastify/multipart";
 import corsPlugin from "./plugins/cors.js";
 import { errorHandler } from "./plugins/error-handler.js";
 import authPlugin from "./plugins/auth.js";
@@ -22,13 +23,16 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   // 1. Register CORS plugin
   await fastify.register(corsPlugin);
 
-  // 2. Register error handler plugin
+  // 2. Register multipart plugin (file uploads, max 10MB)
+  await fastify.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } });
+
+  // 3. Register error handler plugin
   await fastify.register(errorHandler);
 
-  // 3. Register health routes (no prefix, public route)
+  // 4. Register health routes (no prefix, public route)
   await fastify.register(healthRoutes);
 
-  // 4. Register protected routes with /api/v1 prefix
+  // 5. Register protected routes with /api/v1 prefix
   await fastify.register(
     async function protectedRoutes(scope) {
       await scope.register(authPlugin);
