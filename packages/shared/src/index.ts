@@ -50,3 +50,28 @@ export {
   type RadarDimension,
   type InsightsAnalysis,
 } from "./schemas/insights";
+
+// Training calculations
+export {
+  calculateIF,
+  calculateTSS,
+  calculateCTL,
+  calculateATL,
+  calculateTrainingLoad,
+  calculateWeeklyTSS,
+  classifyActivityZone,
+  type TrainingActivityInput,
+  type TrainingLoad,
+} from "./utils/training-calculations";
+
+// Training rules
+export {
+  checkOverloadAlert,
+  checkRestAlert,
+  checkDetrainingAlert,
+  checkRampRateAlert,
+  evaluateTrainingAlerts,
+  type AlertLevel,
+  type TrainingAlert,
+  type AlertParams,
+} from "./utils/training-rules";
