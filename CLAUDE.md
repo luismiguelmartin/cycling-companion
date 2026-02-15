@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Propuesta de valor**: Entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables.
 
-**Fase actual**: Fase 4 en progreso — Agentes remotos implementados (R1, R2, R3, R5 + @claude)
+**Fase actual**: Fase 4 completada ✅ — Pipeline AI-first validado end-to-end (Issue #17 → PR #18, ~$0.38)
 
 ---
 
@@ -277,7 +277,7 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 | @claude Interactive | `ai-claude-interactive.yml` | `@claude` en comentarios |
 | Label Sync | `ai-label-sync.yml` | Push `.github/labels.yml` |
 
-- **Modelo**: `claude-sonnet-4-5-20250929` en todos los agentes
+- **Modelos**: Haiku 4.5 (R1, R3, R5 — read-only/ligeros), Sonnet 4.5 (R2 — genera código), Sonnet 4 (@claude — interactivo)
 - **Action**: `anthropics/claude-code-action@v1`
 - **Labels**: 16 en `.github/labels.yml` (AI pipeline + tipo + prioridad + fase)
 - **CHANGELOG**: Auto-actualizado por R5 en cada merge
@@ -293,6 +293,9 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 ---
 
 ## Gotchas conocidos
+
+### General
+- GitHub repo owner es `luismiguelmartin` (no `lm-martin`). Verificar en URLs de badges y links.
 
 ### Frontend
 - `activity_type` ENUM en DB usa 5 tipos de entrenamiento: `intervals`, `endurance`, `recovery`, `tempo`, `rest` (migración 003). No confundir con modalidad (outdoor/indoor).
