@@ -127,13 +127,37 @@ export function ImportActivityContent() {
 
       {/* ─── FILE MODE ─── */}
       {mode === "file" && (
-        <div className="max-w-[640px]">
-          <FileDropZone file={file} onFile={setFile} onClear={() => setFile(null)} />
+        <div className="max-w-[640px] space-y-4">
+          {/* Card principal: archivo + RPE + Notas */}
+          <div
+            className="rounded-[14px] p-4 md:p-6"
+            style={{
+              background: "var(--card-bg)",
+              border: "1px solid var(--card-border)",
+            }}
+          >
+            <FileDropZone file={file} onFile={setFile} onClear={() => setFile(null)} />
+
+            {/* RPE y Notas */}
+            <div className="mt-5 flex flex-col gap-3.5">
+              <RPEInput value={form.rpe} onChange={(v) => upd("rpe", v)} />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[12px] font-medium text-[var(--text-primary)]">Notas</label>
+                <textarea
+                  placeholder="Sensaciones, clima, observaciones..."
+                  value={form.notes}
+                  onChange={(e) => upd("notes", e.target.value)}
+                  rows={3}
+                  className="w-full resize-y rounded-[9px] border border-[var(--input-border)] bg-[var(--input-bg)] px-3.5 py-2.5 font-[family-name:var(--font-dm-sans)] text-[14px] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+            </div>
+          </div>
 
           {/* File preview / parsed data hint */}
           {file && (
             <div
-              className="mt-4 rounded-[14px] p-5"
+              className="rounded-[14px] p-5"
               style={{
                 background: "var(--card-bg)",
                 border: "1px solid var(--card-border)",
@@ -176,7 +200,7 @@ export function ImportActivityContent() {
                   Datos adicionales (opcionales)
                 </h4>
                 <div className="flex flex-col gap-3">
-                  {/* Inline Field for nombre */}
+                  {/* Nombre */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[12px] font-medium text-[var(--text-primary)]">
                       Nombre de la actividad
@@ -201,20 +225,6 @@ export function ImportActivityContent() {
                       { value: "rest", label: "Descanso" },
                     ]}
                   />
-                  <RPEInput value={form.rpe} onChange={(v) => upd("rpe", v)} />
-                  {/* Inline Field for notas */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[12px] font-medium text-[var(--text-primary)]">
-                      Notas
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Sensaciones, clima, observaciones..."
-                      value={form.notes}
-                      onChange={(e) => upd("notes", e.target.value)}
-                      className="w-full rounded-[9px] border border-[var(--input-border)] bg-[var(--input-bg)] px-3.5 py-2.5 text-[14px] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                    />
-                  </div>
                 </div>
               </div>
             </div>

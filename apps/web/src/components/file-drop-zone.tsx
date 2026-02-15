@@ -51,7 +51,7 @@ export function FileDropZone({ file, onFile, onClear }: FileDropZoneProps) {
   if (file) {
     return (
       <div
-        className="flex items-center gap-3.5 rounded-[14px] p-5"
+        className="flex items-center gap-3.5 rounded-[9px] p-5"
         style={{
           background: "var(--success-bg)",
           border: "1px solid var(--success-border)",
@@ -112,7 +112,7 @@ export function FileDropZone({ file, onFile, onClear }: FileDropZoneProps) {
       }}
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}
-      className="cursor-pointer rounded-2xl p-7 text-center transition-all duration-200 md:p-10"
+      className="cursor-pointer rounded-[9px] p-7 text-center transition-all duration-200 md:p-10"
       style={{
         border: dragging ? "2px dashed var(--accent)" : "2px dashed var(--input-border)",
         background: dragging ? "var(--drop-bg)" : "transparent",
