@@ -30,3 +30,4 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 - Manejo de fechas UTC en dashboard y backend (#21)
 - Revisión del menú móvil y mejoras de usabilidad (#23)
 - Manejo de errores en guardado de perfil y propagación de errores backend (#24)
+- Errores de formato Prettier y ampliación de exclusiones en CI (#25)
