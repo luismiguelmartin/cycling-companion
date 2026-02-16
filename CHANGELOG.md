@@ -27,3 +27,4 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 
 - CI workflows para respetar pipeline de dependencias usando turbo run (#19)
 - Posición del botón cerrar en menú móvil (#20)
+- Manejo de fechas UTC en dashboard y backend (#21)
