@@ -118,7 +118,7 @@ describe("API Integration", () => {
     it("GET /health devuelve 200 con status ok", async () => {
       const res = await app.inject({ method: "GET", url: "/health" });
       expect(res.statusCode).toBe(200);
-      expect(res.json()).toEqual({ status: "ok" });
+      expect(res.json()).toEqual({ status: "ok", version: "1.0.0" });
     });
 
     it("GET /health funciona sin token", async () => {
