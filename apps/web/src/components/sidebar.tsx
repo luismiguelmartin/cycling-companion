@@ -40,7 +40,7 @@ export function Sidebar({ userName, userEmail, isMobileOpen, onMobileClose }: Si
   }
 
   const sidebarContent = (
-    <div className="flex h-full w-[220px] flex-col border-r border-[var(--card-border)] bg-[var(--sidebar-bg)] py-6">
+    <div className="flex h-full w-[220px] flex-col border-r border-[var(--card-border)] [background:var(--sidebar-bg)] py-6">
       {/* Logo */}
       <div className="mb-6 flex items-center gap-2 px-5">
         <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-gradient-to-br from-orange-500 to-orange-600">
