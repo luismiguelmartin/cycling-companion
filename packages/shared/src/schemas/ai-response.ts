@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { activityTypeEnum } from "./activity";
+import { activityTypeEnum } from "./activity.js";
 
 /** Análisis post-sesión — usado por AIAnalysisCard */
 export const aiActivityAnalysisSchema = z.object({

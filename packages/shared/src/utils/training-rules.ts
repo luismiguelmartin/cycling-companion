@@ -1,4 +1,4 @@
-import type { TrainingLoad } from "./training-calculations";
+import type { TrainingLoad } from "./training-calculations.js";
 
 export type AlertLevel = "none" | "warning" | "critical";
 

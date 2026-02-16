@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { activityTypeEnum } from "./activity";
+import { activityTypeEnum } from "./activity.js";
 
 const intensityLevelEnum = z.enum(["alta", "media-alta", "media", "baja", "—"]);
 
