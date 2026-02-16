@@ -180,24 +180,60 @@ describe("calculateWeeklyKPIs", () => {
 
 describe("calculateTrends", () => {
   it("calcula tendencia alcista de distancia", () => {
-    const current = { distanceKm: 100, durationSeconds: 3600, avgPower: 200, avgHR: 150, activityCount: 3 };
-    const previous = { distanceKm: 80, durationSeconds: 3000, avgPower: 180, avgHR: 160, activityCount: 2 };
+    const current = {
+      distanceKm: 100,
+      durationSeconds: 3600,
+      avgPower: 200,
+      avgHR: 150,
+      activityCount: 3,
+    };
+    const previous = {
+      distanceKm: 80,
+      durationSeconds: 3000,
+      avgPower: 180,
+      avgHR: 160,
+      activityCount: 2,
+    };
     const trends = calculateTrends(current, previous);
     expect(trends.distance?.direction).toBe("up");
     expect(trends.distance?.percentage).toBe(25);
   });
 
   it("invierte dirección para FC (bajar es positivo)", () => {
-    const current = { distanceKm: 100, durationSeconds: 3600, avgPower: 200, avgHR: 140, activityCount: 3 };
-    const previous = { distanceKm: 100, durationSeconds: 3600, avgPower: 200, avgHR: 160, activityCount: 3 };
+    const current = {
+      distanceKm: 100,
+      durationSeconds: 3600,
+      avgPower: 200,
+      avgHR: 140,
+      activityCount: 3,
+    };
+    const previous = {
+      distanceKm: 100,
+      durationSeconds: 3600,
+      avgPower: 200,
+      avgHR: 160,
+      activityCount: 3,
+    };
     const trends = calculateTrends(current, previous);
     // FC bajó de 160 a 140, eso es positivo → direction = "up"
     expect(trends.hr?.direction).toBe("up");
   });
 
   it("devuelve null si semana anterior es 0", () => {
-    const current = { distanceKm: 100, durationSeconds: 3600, avgPower: 200, avgHR: 150, activityCount: 3 };
-    const previous = { distanceKm: 0, durationSeconds: 0, avgPower: null, avgHR: null, activityCount: 0 };
+    const current = {
+      distanceKm: 100,
+      durationSeconds: 3600,
+      avgPower: 200,
+      avgHR: 150,
+      activityCount: 3,
+    };
+    const previous = {
+      distanceKm: 0,
+      durationSeconds: 0,
+      avgPower: null,
+      avgHR: null,
+      activityCount: 0,
+    };
     const trends = calculateTrends(current, previous);
     expect(trends.distance).toBeNull();
     expect(trends.power).toBeNull();
@@ -207,9 +243,30 @@ describe("calculateTrends", () => {
 describe("calculateWeeklyTrend", () => {
   it("agrupa actividades por semana y calcula promedios", () => {
     const activities = [
-      { date: "2026-02-16", duration_seconds: 3600, distance_km: 30, avg_power_watts: 200, avg_hr_bpm: 150, tss: 80 },
-      { date: "2026-02-17", duration_seconds: 3600, distance_km: 30, avg_power_watts: 180, avg_hr_bpm: 140, tss: 70 },
-      { date: "2026-02-09", duration_seconds: 3600, distance_km: 30, avg_power_watts: 190, avg_hr_bpm: 145, tss: 75 },
+      {
+        date: "2026-02-16",
+        duration_seconds: 3600,
+        distance_km: 30,
+        avg_power_watts: 200,
+        avg_hr_bpm: 150,
+        tss: 80,
+      },
+      {
+        date: "2026-02-17",
+        duration_seconds: 3600,
+        distance_km: 30,
+        avg_power_watts: 180,
+        avg_hr_bpm: 140,
+        tss: 70,
+      },
+      {
+        date: "2026-02-09",
+        duration_seconds: 3600,
+        distance_km: 30,
+        avg_power_watts: 190,
+        avg_hr_bpm: 145,
+        tss: 75,
+      },
     ];
     const result = calculateWeeklyTrend(activities);
     expect(result).toHaveLength(2);
@@ -219,7 +276,14 @@ describe("calculateWeeklyTrend", () => {
 
   it("maneja actividades sin potencia", () => {
     const activities = [
-      { date: "2026-02-16", duration_seconds: 3600, distance_km: 30, avg_power_watts: null, avg_hr_bpm: 150, tss: null },
+      {
+        date: "2026-02-16",
+        duration_seconds: 3600,
+        distance_km: 30,
+        avg_power_watts: null,
+        avg_hr_bpm: 150,
+        tss: null,
+      },
     ];
     const result = calculateWeeklyTrend(activities);
     expect(result[0].power).toBe(0);
@@ -228,8 +292,22 @@ describe("calculateWeeklyTrend", () => {
 
   it("ordena correctamente entre años (semana 52 antes de semana 1)", () => {
     const activities = [
-      { date: "2025-12-28", duration_seconds: 3600, distance_km: 30, avg_power_watts: 200, avg_hr_bpm: 150, tss: 80 },
-      { date: "2026-01-05", duration_seconds: 3600, distance_km: 30, avg_power_watts: 190, avg_hr_bpm: 145, tss: 75 },
+      {
+        date: "2025-12-28",
+        duration_seconds: 3600,
+        distance_km: 30,
+        avg_power_watts: 200,
+        avg_hr_bpm: 150,
+        tss: 80,
+      },
+      {
+        date: "2026-01-05",
+        duration_seconds: 3600,
+        distance_km: 30,
+        avg_power_watts: 190,
+        avg_hr_bpm: 145,
+        tss: 75,
+      },
     ];
     const result = calculateWeeklyTrend(activities);
     expect(result).toHaveLength(2);
@@ -244,8 +322,22 @@ describe("calculateDailyLoad", () => {
 
   it("distribuye TSS por día de la semana", () => {
     const activities = [
-      { date: "2026-02-16", duration_seconds: 3600, distance_km: 30, avg_power_watts: 200, avg_hr_bpm: 150, tss: 80 },
-      { date: "2026-02-18", duration_seconds: 5400, distance_km: 50, avg_power_watts: 180, avg_hr_bpm: 140, tss: 90 },
+      {
+        date: "2026-02-16",
+        duration_seconds: 3600,
+        distance_km: 30,
+        avg_power_watts: 200,
+        avg_hr_bpm: 150,
+        tss: 80,
+      },
+      {
+        date: "2026-02-18",
+        duration_seconds: 5400,
+        distance_km: 50,
+        avg_power_watts: 180,
+        avg_hr_bpm: 140,
+        tss: 90,
+      },
     ];
     const result = calculateDailyLoad(activities, weekStart);
     expect(result[0]).toEqual({ day: "L", load: 80 }); // Lunes
@@ -255,7 +347,14 @@ describe("calculateDailyLoad", () => {
 
   it("ignora actividades fuera de la semana", () => {
     const activities = [
-      { date: "2026-02-15", duration_seconds: 7200, distance_km: 80, avg_power_watts: 190, avg_hr_bpm: 145, tss: 110 },
+      {
+        date: "2026-02-15",
+        duration_seconds: 7200,
+        distance_km: 80,
+        avg_power_watts: 190,
+        avg_hr_bpm: 145,
+        tss: 110,
+      },
     ];
     const result = calculateDailyLoad(activities, weekStart);
     expect(result.every((d) => d.load === 0)).toBe(true);
@@ -263,7 +362,14 @@ describe("calculateDailyLoad", () => {
 
   it("trata tss null como 0", () => {
     const activities = [
-      { date: "2026-02-16", duration_seconds: 3600, distance_km: 30, avg_power_watts: null, avg_hr_bpm: 150, tss: null },
+      {
+        date: "2026-02-16",
+        duration_seconds: 3600,
+        distance_km: 30,
+        avg_power_watts: null,
+        avg_hr_bpm: 150,
+        tss: null,
+      },
     ];
     const result = calculateDailyLoad(activities, weekStart);
     expect(result[0].load).toBe(0);
@@ -271,8 +377,22 @@ describe("calculateDailyLoad", () => {
 
   it("suma TSS de múltiples actividades en el mismo día", () => {
     const activities = [
-      { date: "2026-02-16", duration_seconds: 3600, distance_km: 30, avg_power_watts: 200, avg_hr_bpm: 150, tss: 80 },
-      { date: "2026-02-16", duration_seconds: 1800, distance_km: 15, avg_power_watts: 210, avg_hr_bpm: 155, tss: 40 },
+      {
+        date: "2026-02-16",
+        duration_seconds: 3600,
+        distance_km: 30,
+        avg_power_watts: 200,
+        avg_hr_bpm: 150,
+        tss: 80,
+      },
+      {
+        date: "2026-02-16",
+        duration_seconds: 1800,
+        distance_km: 15,
+        avg_power_watts: 210,
+        avg_hr_bpm: 155,
+        tss: 40,
+      },
     ];
     const result = calculateDailyLoad(activities, weekStart);
     expect(result[0].load).toBe(120);
@@ -280,7 +400,14 @@ describe("calculateDailyLoad", () => {
 
   it("asigna domingo correctamente (índice 6)", () => {
     const activities = [
-      { date: "2026-02-22", duration_seconds: 3600, distance_km: 30, avg_power_watts: 200, avg_hr_bpm: 150, tss: 100 },
+      {
+        date: "2026-02-22",
+        duration_seconds: 3600,
+        distance_km: 30,
+        avg_power_watts: 200,
+        avg_hr_bpm: 150,
+        tss: 100,
+      },
     ];
     const result = calculateDailyLoad(activities, weekStart);
     expect(result[6]).toEqual({ day: "D", load: 100 });
@@ -317,7 +444,14 @@ describe("detectOverload", () => {
   it("devuelve null si carga actual es 0", () => {
     // Solo actividades antiguas, nada esta semana
     const activities = [
-      { date: "2025-01-01", duration_seconds: 3600, distance_km: 30, avg_power_watts: 200, avg_hr_bpm: 150, tss: 80 },
+      {
+        date: "2025-01-01",
+        duration_seconds: 3600,
+        distance_km: 30,
+        avg_power_watts: 200,
+        avg_hr_bpm: 150,
+        tss: 80,
+      },
     ];
     expect(detectOverload(activities)).toBeNull();
   });
