@@ -10,15 +10,15 @@ Agente remoto (GitHub Actions + Claude) que revisa automáticamente las PRs abie
 
 ## Configuración
 
-| Campo | Valor |
-|-------|-------|
-| **Workflow** | `.github/workflows/ai-review-pr.yml` |
-| **Trigger** | `pull_request.opened` / `pull_request.synchronize` |
-| **Modelo** | `claude-sonnet-4-5-20250929` |
-| **Max turns** | 3 |
-| **Timeout** | 5 minutos |
-| **Permisos** | `contents: read`, `pull-requests: write` |
-| **Excluye** | PRs de `dependabot[bot]`, `github-actions[bot]` |
+| Campo         | Valor                                              |
+| ------------- | -------------------------------------------------- |
+| **Workflow**  | `.github/workflows/ai-review-pr.yml`               |
+| **Trigger**   | `pull_request.opened` / `pull_request.synchronize` |
+| **Modelo**    | `claude-sonnet-4-5-20250929`                       |
+| **Max turns** | 3                                                  |
+| **Timeout**   | 5 minutos                                          |
+| **Permisos**  | `contents: read`, `pull-requests: write`           |
+| **Excluye**   | PRs de `dependabot[bot]`, `github-actions[bot]`    |
 
 ## Prompt
 
@@ -34,18 +34,21 @@ El agente recibe el diff de la PR y acceso al repositorio completo para contexto
 ### Criterios de Review
 
 #### Calidad del Código
+
 - TypeScript estricto (no `any`, types correctos)
 - Adherencia a convenciones del proyecto
 - Legibilidad y mantenibilidad
 - Complejidad innecesaria o sobre-ingeniería
 
 #### Seguridad
+
 - RLS policies en cambios de DB
 - Validación de inputs con Zod
 - No exposición de secrets o datos sensibles
 - OWASP top 10 (XSS, SQL injection, etc.)
 
 #### Tests
+
 - Cobertura de los cambios
 - Calidad de los tests (no solo cobertura)
 - Tests faltantes sugeridos

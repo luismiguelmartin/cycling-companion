@@ -10,15 +10,15 @@ Agente remoto (GitHub Actions + Claude) que actualiza automáticamente el CHANGE
 
 ## Configuración
 
-| Campo | Valor |
-|-------|-------|
-| **Workflow** | `.github/workflows/ai-update-changelog.yml` |
-| **Trigger** | `pull_request.closed` (merged = true) |
-| **Modelo** | `claude-sonnet-4-5-20250929` |
-| **Max turns** | 5 |
-| **Timeout** | 5 minutos |
-| **Permisos** | `contents: write` |
-| **Checkout** | `ref: main` (post-merge) |
+| Campo         | Valor                                       |
+| ------------- | ------------------------------------------- |
+| **Workflow**  | `.github/workflows/ai-update-changelog.yml` |
+| **Trigger**   | `pull_request.closed` (merged = true)       |
+| **Modelo**    | `claude-sonnet-4-5-20250929`                |
+| **Max turns** | 5                                           |
+| **Timeout**   | 5 minutos                                   |
+| **Permisos**  | `contents: write`                           |
+| **Checkout**  | `ref: main` (post-merge)                    |
 
 ## Prompt
 
@@ -34,12 +34,12 @@ El agente recibe la PR mergeada (título, descripción, diff) y acceso al CHANGE
 
 ### Categorías (Keep a Changelog)
 
-| Categoría | Uso |
-|-----------|-----|
-| **Añadido** | Nueva funcionalidad |
-| **Cambiado** | Cambio en funcionalidad existente |
-| **Corregido** | Corrección de errores |
-| **Eliminado** | Funcionalidad eliminada |
+| Categoría     | Uso                               |
+| ------------- | --------------------------------- |
+| **Añadido**   | Nueva funcionalidad               |
+| **Cambiado**  | Cambio en funcionalidad existente |
+| **Corregido** | Corrección de errores             |
+| **Eliminado** | Funcionalidad eliminada           |
 
 ### Formato de Entrada
 
@@ -48,6 +48,7 @@ El agente recibe la PR mergeada (título, descripción, diff) y acceso al CHANGE
 ```
 
 Ejemplos:
+
 - `- Añadir campo clima a la actividad (#42)`
 - `- Corregir cálculo de Normalized Power en archivos GPX (#38)`
 - `- Eliminar endpoint deprecated /api/v1/legacy (#45)`

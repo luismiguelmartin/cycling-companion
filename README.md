@@ -300,17 +300,17 @@ cycling-companion/
 
 ### Pantallas Implementadas
 
-| Ruta                 | Pantalla      | Descripción                                                       | Fuente de datos            |
-| -------------------- | ------------- | ----------------------------------------------------------------- | -------------------------- |
-| `/auth/login`        | Login         | Autenticación con Google OAuth                                    | Supabase Auth              |
-| `/onboarding`        | Onboarding    | Wizard de 4 pasos: perfil → objetivos → zonas → resumen           | API backend                |
-| `/`                  | Dashboard     | KPIs, gráficas de potencia/carga, coach IA, últimas actividades   | API backend                |
-| `/activities`        | Lista         | Tabla paginada con filtros por tipo y búsqueda por nombre         | API backend                |
-| `/activities/[id]`   | Detalle       | Métricas, gráficas temporales (potencia/FC/cadencia), análisis IA | API backend                |
-| `/activities/import` | Importar      | Entrada manual o subida de archivo (.fit/.gpx)                    | API backend                |
-| `/plan`              | Planificación | Grid semanal (7 días), tips nutrición/descanso, barra de carga    | API backend                |
-| `/insights`          | Insights      | Comparativa entre periodos, radar de rendimiento, análisis IA     | API backend                |
-| `/profile`           | Perfil        | Datos personales, zonas potencia/FC, ajustes tema/unidades        | API backend                |
+| Ruta                 | Pantalla      | Descripción                                                       | Fuente de datos |
+| -------------------- | ------------- | ----------------------------------------------------------------- | --------------- |
+| `/auth/login`        | Login         | Autenticación con Google OAuth                                    | Supabase Auth   |
+| `/onboarding`        | Onboarding    | Wizard de 4 pasos: perfil → objetivos → zonas → resumen           | API backend     |
+| `/`                  | Dashboard     | KPIs, gráficas de potencia/carga, coach IA, últimas actividades   | API backend     |
+| `/activities`        | Lista         | Tabla paginada con filtros por tipo y búsqueda por nombre         | API backend     |
+| `/activities/[id]`   | Detalle       | Métricas, gráficas temporales (potencia/FC/cadencia), análisis IA | API backend     |
+| `/activities/import` | Importar      | Entrada manual o subida de archivo (.fit/.gpx)                    | API backend     |
+| `/plan`              | Planificación | Grid semanal (7 días), tips nutrición/descanso, barra de carga    | API backend     |
+| `/insights`          | Insights      | Comparativa entre periodos, radar de rendimiento, análisis IA     | API backend     |
+| `/profile`           | Perfil        | Datos personales, zonas potencia/FC, ajustes tema/unidades        | API backend     |
 
 ### Características Principales
 
@@ -397,16 +397,16 @@ Internamente implementado con:
 
 ## Documentación
 
-| Documento                                                                   | Descripción                                                             |
-| --------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| [01-PRODUCT-VISION.md](docs/01-PRODUCT-VISION.md)                           | Visión del producto, propuesta de valor, persona objetivo               |
-| [02-PRD.md](docs/02-PRD.md)                                                 | PRD completo: modelo de datos, endpoints, flujo IA, specs               |
-| [03-AGENTS-AND-DEVELOPMENT-PLAN.md](docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md) | Plan de agentes locales y remotos, timeline de desarrollo               |
-| [DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md)                                   | Design system: pantallas, tokens, componentes, conversión JSX→Next.js   |
-| [GOOGLE-OAUTH-SETUP.md](docs/GOOGLE-OAUTH-SETUP.md)                         | Guía de configuración de Google OAuth en Supabase                       |
-| [SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md)                                 | Guía de configuración de Supabase y base de datos                       |
-| [CLAUDE.md](CLAUDE.md)                                                      | Instrucciones para Claude Code (este repositorio)                       |
-| `docs/specs/`                                                               | 27 especificaciones L1/L2/L3 (8 pantallas + 9 bloques backend) |
+| Documento                                                                   | Descripción                                                           |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [01-PRODUCT-VISION.md](docs/01-PRODUCT-VISION.md)                           | Visión del producto, propuesta de valor, persona objetivo             |
+| [02-PRD.md](docs/02-PRD.md)                                                 | PRD completo: modelo de datos, endpoints, flujo IA, specs             |
+| [03-AGENTS-AND-DEVELOPMENT-PLAN.md](docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md) | Plan de agentes locales y remotos, timeline de desarrollo             |
+| [DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md)                                   | Design system: pantallas, tokens, componentes, conversión JSX→Next.js |
+| [GOOGLE-OAUTH-SETUP.md](docs/GOOGLE-OAUTH-SETUP.md)                         | Guía de configuración de Google OAuth en Supabase                     |
+| [SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md)                                 | Guía de configuración de Supabase y base de datos                     |
+| [CLAUDE.md](CLAUDE.md)                                                      | Instrucciones para Claude Code (este repositorio)                     |
+| `docs/specs/`                                                               | 27 especificaciones L1/L2/L3 (8 pantallas + 9 bloques backend)        |
 
 ---
 
@@ -425,14 +425,14 @@ Este proyecto implementa un pipeline multi-agente para integrar IA en el ciclo d
 
 ### Agentes Remotos (GitHub Actions + `claude-code-action@v1`) — Activos ✅
 
-| Agente                 | Rol                             | Trigger                | Modelo     | Costo aprox. |
-| ---------------------- | ------------------------------- | ---------------------- | ---------- | ------------ |
-| **R1: Issue Analyzer** | Analizar impacto y complejidad  | Label `ai-analyze`     | Haiku 4.5  | ~$0.04       |
-| **R2: PR Generator**   | Generar PR completa desde issue | Label `ai-generate-pr` | Sonnet 4.5 | ~$0.30       |
-| **R3: PR Reviewer**    | Code review automático          | PR abierta             | Haiku 4.5  | ~$0.01       |
-| **R4: CI/CD**          | Lint, test, build               | Push/PR                | —          | —            |
-| **R5: Doc Generator**  | Actualizar CHANGELOG            | PR mergeada            | Haiku 4.5  | ~$0.03       |
-| **@claude**            | Handler interactivo             | `@claude` en issues/PRs | Sonnet 4  | variable     |
+| Agente                 | Rol                             | Trigger                 | Modelo     | Costo aprox. |
+| ---------------------- | ------------------------------- | ----------------------- | ---------- | ------------ |
+| **R1: Issue Analyzer** | Analizar impacto y complejidad  | Label `ai-analyze`      | Haiku 4.5  | ~$0.04       |
+| **R2: PR Generator**   | Generar PR completa desde issue | Label `ai-generate-pr`  | Sonnet 4.5 | ~$0.30       |
+| **R3: PR Reviewer**    | Code review automático          | PR abierta              | Haiku 4.5  | ~$0.01       |
+| **R4: CI/CD**          | Lint, test, build               | Push/PR                 | —          | —            |
+| **R5: Doc Generator**  | Actualizar CHANGELOG            | PR mergeada             | Haiku 4.5  | ~$0.03       |
+| **@claude**            | Handler interactivo             | `@claude` en issues/PRs | Sonnet 4   | variable     |
 
 **Pipeline completo validado**: Issue #17 → R1 → R2 (PR #18) → R3 → merge → R5. Total: 28 turns, ~$0.38.
 
