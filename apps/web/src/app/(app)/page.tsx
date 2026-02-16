@@ -92,17 +92,16 @@ export default async function DashboardPage() {
   const profile = profileRes.data;
   const allActivities = activitiesRes.data;
 
-  // Calcular rangos de semana
+  // Calcular rangos de semana (UTC para consistencia con fechas de actividad)
   const now = new Date();
   const currentWeekStart = getWeekStart(now);
-  const currentWeekEnd = new Date(currentWeekStart);
-  currentWeekEnd.setDate(currentWeekEnd.getDate() + 6);
-  currentWeekEnd.setHours(23, 59, 59, 999);
+  const currentWeekEnd = new Date(currentWeekStart.getTime());
+  currentWeekEnd.setUTCDate(currentWeekEnd.getUTCDate() + 6);
+  currentWeekEnd.setUTCHours(23, 59, 59, 999);
 
-  const previousWeekStart = new Date(currentWeekStart);
-  previousWeekStart.setDate(previousWeekStart.getDate() - 7);
-  const previousWeekEnd = new Date(currentWeekStart);
-  previousWeekEnd.setMilliseconds(-1);
+  const previousWeekStart = new Date(currentWeekStart.getTime());
+  previousWeekStart.setUTCDate(previousWeekStart.getUTCDate() - 7);
+  const previousWeekEnd = new Date(currentWeekStart.getTime() - 1);
 
   // KPIs
   const currentKPIs = calculateWeeklyKPIs(allActivities, currentWeekStart, currentWeekEnd);
