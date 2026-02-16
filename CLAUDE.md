@@ -80,6 +80,7 @@ SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 ANTHROPIC_API_KEY=
 PORT=3001
+FRONTEND_URL=http://localhost:3000  # URL del frontend para CORS
 ```
 
 ---
@@ -138,49 +139,13 @@ PORT=3001
 
 ---
 
-## Cambios de Schema en Supabase — Workflow de Migraciones
+## Migraciones Supabase
 
-Cuando una feature requiere **modificar la estructura de la BD** (nuevo campo, tabla, índice, etc.):
-
-### Paso a paso
-
-1. **Crear la migración SQL**
-   ```bash
-   # Nombre: NNN_feature-description.sql (ej: 005_add_weather_to_activities.sql)
-   # Ubicación: supabase/migrations/
-   # Contenido: SQL puro, comentado, reversible si es posible
-   ```
-
-2. **Probar localmente**
-   ```bash
-   supabase link --project-ref <PROJECT_REF>
-   supabase migration up
-   # Verificar cambios en la BD local
-   ```
-
-3. **Documentar cambios en el código**
-   - Si se añade campo: actualizar schema Zod en `packages/shared`
-   - Si se modifica tabla: revisar RLS policies en la migración
-   - Si afecta API: documentar endpoint o agregar novo si aplica
-
-4. **Incluir en la PR**
-   - Migración SQL en `supabase/migrations/`
-   - Código backend/frontend que consume el cambio
-   - Tests que validen el nuevo schema
-   - En la descripción de PR: mención clara "Migración DB: NNN"
-
-5. **Checklist de PR**
-   ```markdown
-   - [ ] Migración SQL testeada localmente
-   - [ ] Schema Zod actualizado en `packages/shared` si aplica
-   - [ ] RLS policies revisadas en la migración
-   - [ ] Tests de integración incluidos
-   - [ ] Documentación de cambios en endpoint si aplica
-   ```
-
-### Nota sobre automatización
-
-Las migraciones se aplican manualmente. R6 (Migration Manager) fue descartado del scope del MVP.
+- Archivo SQL en `supabase/migrations/NNN_description.sql`
+- Probar: `supabase link --project-ref <REF> && supabase migration up`
+- Actualizar schema Zod en `packages/shared` si se añaden/modifican campos
+- Revisar RLS policies en cada migración
+- Se aplican manualmente (no hay agente automatizado)
 
 ---
 
@@ -201,74 +166,16 @@ Metodología híbrida: pipeline completo (L1→L2→L3→L4) para features compl
 ### Al trabajar en nuevas features:
 1. Revisar el PRD (`docs/02-PRD.md`) para entender el contexto funcional
 2. Consultar `docs/DESIGN-SYSTEM.md` para implementar UI (pantallas, tokens, componentes, guía de conversión JSX→Tailwind)
-3. Los mockups JSX originales están en `docs/design/` (excluidos de git) — usar `docs/DESIGN-SYSTEM.md` como referencia documentada
-4. Mantener consistencia con el tono y estructura del código existente
-5. No sobre-ingeniería: implementar solo lo necesario para la issue actual
-
-### Al crear issues:
-- Usar template estructurado: descripción, criterios de aceptación, archivos afectados
-- Asignar labels apropiados: `priority:*`, `type:*`, `phase:*`
-- Mantener issues pequeñas y enfocadas (1-3 horas de trabajo)
-
-### Al abrir PRs:
-- Incluir screenshots si hay cambios visuales
-- Marcar con label `ai-generated` si fue generada por agente remoto
-- Self-review: revisar diff completo antes de pedir review
 
 ---
 
 ## Estado de Implementación
 
-### Pantallas (frontend) — Todas migradas a API backend ✅
-| Ruta | Pantalla | Datos |
-|------|----------|-------|
-| `/auth/login` | Login (Google OAuth) | Supabase Auth |
-| `/onboarding` | Onboarding wizard (4 pasos) | API backend |
-| `/` | Dashboard (KPIs, gráficas, coach IA) | API backend |
-| `/activities` | Lista de actividades (filtros, búsqueda) | API backend |
-| `/activities/[id]` | Detalle de actividad (métricas, chart km, análisis IA) | API backend |
-| `/activities/import` | Importar actividad (manual + .fit/.gpx) | API backend |
-| `/plan` | Planificación semanal (7 días, tips) | API backend |
-| `/insights` | Insights (comparativas, radar, análisis) | API backend |
-| `/profile` | Perfil (datos, zonas, ajustes) | API backend |
-
-### Backend API — Fase 3 Bloques 0-8 Completados ✅
-
-| Bloque | Endpoints |
-|--------|-----------|
-| 0 — Infra | `/health`, plugins (auth, cors, errors, env, supabase, anthropic) |
-| 1 — Perfil | `GET/PATCH /api/v1/profile` |
-| 2 — Actividades | `GET/POST/PATCH/DELETE /api/v1/activities`, `GET /activities/:id/metrics` |
-| 3 — Insights | `GET /api/v1/insights`, `GET /insights/overload-check` |
-| 4 — Training Rules | `calculateTrainingLoad`, `evaluateTrainingAlerts`, `calculateNP` en shared |
-| 5 — IA | `POST /ai/analyze-activity`, `POST /ai/weekly-plan`, `POST /ai/weekly-summary`, `GET /ai/coach-tip` |
-| 6 — Plan | `GET/PATCH/DELETE /api/v1/plan` |
-| 7 — Import | `POST /api/v1/activities/upload` (.fit/.gpx, NP, Garmin extensions) |
-| 8 — Frontend Migration | Todas las pantallas migradas de Supabase directo → API backend |
-
-### Agentes Remotos — Fase 4 ✅
-
-| Agente | Workflow | Trigger |
-|--------|----------|---------|
-| R1 — Issue Analyzer | `ai-analyze-issue.yml` | Label `ai-analyze` |
-| R2 — PR Generator | `ai-generate-pr.yml` | Label `ai-generate-pr` |
-| R3 — PR Reviewer | `ai-review-pr.yml` | PR opened/synchronize |
-| R5 — Doc Generator | `ai-update-changelog.yml` | PR merged |
-| @claude Interactive | `ai-claude-interactive.yml` | `@claude` en comentarios |
-| Label Sync | `ai-label-sync.yml` | Push `.github/labels.yml` |
-
-- **Modelos**: Haiku 4.5 (R1, R3, R5 — read-only/ligeros), Sonnet 4.5 (R2 — genera código), Sonnet 4 (@claude — interactivo)
-- **Action**: `anthropics/claude-code-action@v1`
-- **Labels**: 16 en `.github/labels.yml` (AI pipeline + tipo + prioridad + fase)
-- **CHANGELOG**: Auto-actualizado por R5 en cada merge
-
-### Métricas
-- **Componentes**: 32 en `apps/web/src/components/`
-- **Tests**: 29 archivos (290 tests) — 72 web + 82 shared + 136 API
-- **Migraciones SQL**: 4 (001 schema, 002 onboarding, 003 activity_type, 004 ai_cache)
-- **Schemas Zod compartidos**: 5 (user-profile, activity, weekly-plan, insights, ai-response)
-- **Constantes compartidas**: 7 módulos + 2 utils (training-calculations, training-rules)
-- **Workflows CI/CD**: 8 (2 CI + 5 AI agents + 1 label sync)
+### Resumen
+- **Frontend**: 9 pantallas (login, onboarding, dashboard, activities, import, plan, insights, profile) — todas migradas a API backend ✅
+- **Backend**: 8 bloques completados (infra, perfil, actividades, insights, training rules, IA, plan, import) — 15+ endpoints bajo `/api/v1`
+- **Agentes remotos**: 5 agentes (R1 analyzer, R2 PR generator, R3 reviewer, R5 changelog, @claude interactive) + label sync
+- **Tests**: ~300 (72 web + 90 shared + 136 API)
 
 ---
 
@@ -287,6 +194,11 @@ Metodología híbrida: pipeline completo (L1→L2→L3→L4) para features compl
 - Los mockups JSX en `docs/design/` están excluidos de git. Usar `docs/DESIGN-SYSTEM.md` como fuente de verdad documentada.
 - Padding de páginas está centralizado en `app-shell.tsx` (`p-4 md:p-8`), no ponerlo en páginas individuales.
 - Para pasar iconos de Server→Client Components, usar `ReactNode` (JSX pre-renderizado), no `LucideIcon` (función).
+
+### Shared Package (Node ESM)
+- `packages/shared` usa `"type": "module"` → **TODOS los imports relativos deben llevar extensión `.js`** (ej: `from "./activity.js"`). Sin ella → `ERR_MODULE_NOT_FOUND` en producción (Node ESM puro).
+- `shared/package.json` apunta a `"main": "./dist/index.js"`. Nunca apuntar a `./src/index.ts` — funciona en dev con tsx pero falla en producción con Node puro.
+- `tsconfig.base.json` usa `moduleResolution: "bundler"` que NO añade `.js` automáticamente al compilar — hay que ponerlas en el source `.ts`.
 
 ### Backend
 - FitParser mock en tests debe ser una clase, no arrow function: `class MockFitParser { parseAsync = mockFn }`
