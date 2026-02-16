@@ -105,11 +105,11 @@ export function Sidebar({ userName, userEmail, isMobileOpen, onMobileClose }: Si
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onMobileClose} />
           {/* Sidebar */}
-          <div className="relative z-10 h-full">
+          <div className="relative z-10 flex h-full w-fit">
             {sidebarContent}
             <button
               onClick={onMobileClose}
-              className="absolute right-4 top-4 rounded-lg p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+              className="absolute right-2 top-4 rounded-lg p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               aria-label="Cerrar menú"
             >
               <X className="h-5 w-5" />
