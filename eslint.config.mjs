@@ -9,7 +9,19 @@ import globals from "globals";
 export default tseslint.config(
   // Global ignores
   {
-    ignores: ["**/node_modules/**", "**/dist/**", "**/.next/**", "**/.turbo/**", "**/coverage/**"],
+    ignores: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.next/**",
+      "**/.turbo/**",
+      "**/coverage/**",
+      "docs/**",
+      "prompts/**",
+      "supabase/**",
+      ".github/**",
+      "**/*.md",
+      "**/*.sql",
+    ],
   },
 
   // Base: ESLint recommended + TypeScript recommended

@@ -4,5 +4,19 @@ dist
 pnpm-lock.yaml
 .turbo
 coverage
+
+# Documentation & markdown
 docs
+*.md
 CLAUDE.md
+README.md
+CHANGELOG.md
+
+# Prompts
+prompts
+
+# Supabase (SQL files)
+supabase
+
+# GitHub workflows & templates
+.github

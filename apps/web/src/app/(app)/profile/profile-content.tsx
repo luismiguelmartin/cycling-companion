@@ -97,8 +97,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
       setOriginalData({ ...formData });
       router.refresh();
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Error al guardar. Inténtalo de nuevo.";
+      const message = err instanceof Error ? err.message : "Error al guardar. Inténtalo de nuevo.";
       if (message.includes("No authenticated session")) {
         setErrors({ _form: "Sesión expirada. Recarga la página e inténtalo de nuevo." });
       } else if (message.includes("API 4")) {
