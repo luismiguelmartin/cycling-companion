@@ -32,3 +32,4 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 - Revisión del menú móvil y mejoras de usabilidad (#23)
 - Manejo de errores en guardado de perfil y propagación de errores backend (#24)
 - Errores de formato Prettier y ampliación de exclusiones en CI (#25)
+- Migración de guardado de perfil a Server Action para evitar errores de red (#27)
