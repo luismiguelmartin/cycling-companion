@@ -202,6 +202,16 @@ describe("calculateTrends", () => {
     expect(trends.distance).toBeNull();
     expect(trends.power).toBeNull();
   });
+
+  it("devuelve null si semana actual es 0 (evita ↓ 100% engañoso)", () => {
+    const current = { distanceKm: 0, durationSeconds: 0, avgPower: null, avgHR: null, activityCount: 0 };
+    const previous = { distanceKm: 80, durationSeconds: 3000, avgPower: 180, avgHR: 160, activityCount: 3 };
+    const trends = calculateTrends(current, previous);
+    expect(trends.distance).toBeNull();
+    expect(trends.duration).toBeNull();
+    expect(trends.power).toBeNull();
+    expect(trends.hr).toBeNull();
+  });
 });
 
 describe("calculateWeeklyTrend", () => {

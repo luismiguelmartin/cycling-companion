@@ -67,7 +67,7 @@ export function calculateTrends(
   previous: WeeklyKPIs,
 ): Record<string, Trend | null> {
   function trend(curr: number | null, prev: number | null, invertPositive = false): Trend | null {
-    if (curr == null || prev == null || prev === 0) return null;
+    if (curr == null || prev == null || curr === 0 || prev === 0) return null;
     const change = ((curr - prev) / prev) * 100;
     const percentage = Math.abs(Math.round(change));
     if (percentage === 0) return null;
