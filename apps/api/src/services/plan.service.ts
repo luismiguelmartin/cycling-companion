@@ -35,10 +35,10 @@ function mapRowToResponse(row: WeeklyPlanRow): WeeklyPlanResponse {
 }
 
 export function getWeekStart(date: Date): string {
-  const d = new Date(date);
-  const dayOfWeek = d.getDay();
-  const diff = d.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-  d.setDate(diff);
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const dayOfWeek = d.getUTCDay();
+  const diff = d.getUTCDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+  d.setUTCDate(diff);
   return d.toISOString().slice(0, 10);
 }
 

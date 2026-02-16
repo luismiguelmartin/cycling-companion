@@ -87,7 +87,9 @@ export function calculateTrends(
 }
 
 /**
- * Agrupa actividades por semana y calcula promedios de potencia y FC
+ * Agrupa actividades por semana y calcula promedios de potencia y FC.
+ * Usa year*100+weekNum como clave para ordenar correctamente entre años
+ * (ej: semana 52 de 2025 antes de semana 1 de 2026).
  */
 export function calculateWeeklyTrend(
   activities: ActivityData[],
@@ -95,11 +97,21 @@ export function calculateWeeklyTrend(
   const weekMap = new Map<number, { powers: number[]; hrs: number[] }>();
 
   for (const activity of activities) {
-    const weekNum = getWeekNumber(new Date(activity.date));
-    if (!weekMap.has(weekNum)) {
-      weekMap.set(weekNum, { powers: [], hrs: [] });
+    const actDate = new Date(activity.date);
+    const weekNum = getWeekNumber(actDate);
+    // Usar año ISO (del jueves de esa semana) para manejar año-frontera
+    const d = new Date(
+      Date.UTC(actDate.getUTCFullYear(), actDate.getUTCMonth(), actDate.getUTCDate()),
+    );
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const isoYear = d.getUTCFullYear();
+    const yearWeekKey = isoYear * 100 + weekNum;
+
+    if (!weekMap.has(yearWeekKey)) {
+      weekMap.set(yearWeekKey, { powers: [], hrs: [] });
     }
-    const entry = weekMap.get(weekNum)!;
+    const entry = weekMap.get(yearWeekKey)!;
     if (activity.avg_power_watts != null) entry.powers.push(activity.avg_power_watts);
     if (activity.avg_hr_bpm != null) entry.hrs.push(activity.avg_hr_bpm);
   }
@@ -143,7 +155,8 @@ export function calculateDailyLoad(
 
 /**
  * Detecta sobrecarga comparando TSS semanal vs media de 4 semanas.
- * Retorna null si no hay sobrecarga (< 1.2x)
+ * Retorna null si no hay sobrecarga (< 1.2x).
+ * Usa UTC para consistencia con fechas de actividad ("YYYY-MM-DD" → UTC midnight).
  */
 export function detectOverload(
   activities: ActivityData[],
@@ -159,10 +172,10 @@ export function detectOverload(
   // TSS por semana de las últimas 4 semanas (excluyendo la actual)
   const weekLoads: number[] = [];
   for (let i = 1; i <= 4; i++) {
-    const weekStart = new Date(currentWeekStart);
-    weekStart.setDate(weekStart.getDate() - 7 * i);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 7);
+    const weekStart = new Date(currentWeekStart.getTime());
+    weekStart.setUTCDate(weekStart.getUTCDate() - 7 * i);
+    const weekEnd = new Date(weekStart.getTime());
+    weekEnd.setUTCDate(weekEnd.getUTCDate() + 7);
 
     const load = activities
       .filter((a) => {
@@ -196,10 +209,12 @@ export function formatDuration(seconds: number): string {
 }
 
 /**
- * Obtiene el número de semana ISO del año
+ * Obtiene el número de semana ISO del año.
+ * Usa getUTC* para extraer componentes de fecha en UTC,
+ * evitando desfases cuando la fecha proviene de new Date("YYYY-MM-DD").
  */
 export function getWeekNumber(date: Date): number {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
   const dayNum = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
@@ -207,14 +222,15 @@ export function getWeekNumber(date: Date): number {
 }
 
 /**
- * Obtiene el lunes de la semana actual
+ * Obtiene el lunes de la semana actual (UTC).
+ * Usa métodos UTC para evitar discrepancias con new Date("YYYY-MM-DD")
+ * que siempre devuelve medianoche UTC.
  */
 export function getWeekStart(date: Date): Date {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  d.setDate(diff);
-  d.setHours(0, 0, 0, 0);
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const day = d.getUTCDay();
+  const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
+  d.setUTCDate(diff);
   return d;
 }
 
