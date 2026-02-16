@@ -39,16 +39,16 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint backend
-        run: pnpm --filter api --filter shared lint
+        run: turbo run lint --filter=api --filter=shared
 
       - name: Type check backend
-        run: pnpm --filter api --filter shared typecheck
+        run: turbo run typecheck --filter=api --filter=shared
 
-      - name: Format check backend
-        run: pnpm --filter api --filter shared format:check
+      - name: Format check
+        run: pnpm format:check
 
       - name: Test backend
-        run: pnpm --filter api --filter shared test
+        run: turbo run test --filter=api --filter=shared
 
       - name: Build backend
-        run: pnpm --filter api build
+        run: turbo run build --filter=api

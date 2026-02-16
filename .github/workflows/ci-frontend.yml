@@ -39,19 +39,19 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint frontend
-        run: pnpm --filter web --filter shared lint
+        run: turbo run lint --filter=web --filter=shared
 
       - name: Type check frontend
-        run: pnpm --filter web --filter shared typecheck
+        run: turbo run typecheck --filter=web --filter=shared
 
-      - name: Format check frontend
-        run: pnpm --filter web --filter shared format:check
+      - name: Format check
+        run: pnpm format:check
 
       - name: Test frontend
-        run: pnpm --filter web --filter shared test
+        run: turbo run test --filter=web --filter=shared
 
       - name: Build frontend
-        run: pnpm --filter web build
+        run: turbo run build --filter=web
         env:
           # Variables de entorno necesarias para el build de Next.js
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}

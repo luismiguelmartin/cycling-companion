@@ -10,15 +10,15 @@ Agente remoto (GitHub Actions + Claude Code) que genera automáticamente una PR 
 
 ## Configuración
 
-| Campo | Valor |
-|-------|-------|
-| **Workflow** | `.github/workflows/ai-generate-pr.yml` |
-| **Trigger** | `issues.labeled` → label `ai-generate-pr` |
-| **Modelo** | `claude-sonnet-4-5-20250929` |
-| **Max turns** | 15 |
-| **Timeout** | 15 minutos |
-| **Permisos** | `contents: write`, `pull-requests: write`, `issues: write` |
-| **Setup previo** | pnpm install + Node 22 (antes de Claude) |
+| Campo            | Valor                                                      |
+| ---------------- | ---------------------------------------------------------- |
+| **Workflow**     | `.github/workflows/ai-generate-pr.yml`                     |
+| **Trigger**      | `issues.labeled` → label `ai-generate-pr`                  |
+| **Modelo**       | `claude-sonnet-4-5-20250929`                               |
+| **Max turns**    | 15                                                         |
+| **Timeout**      | 15 minutos                                                 |
+| **Permisos**     | `contents: write`, `pull-requests: write`, `issues: write` |
+| **Setup previo** | pnpm install + Node 22 (antes de Claude)                   |
 
 ## Prompt
 

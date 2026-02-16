@@ -10,14 +10,14 @@ Agente remoto (GitHub Actions + Claude) que analiza issues etiquetadas con `ai-a
 
 ## Configuración
 
-| Campo | Valor |
-|-------|-------|
-| **Workflow** | `.github/workflows/ai-analyze-issue.yml` |
-| **Trigger** | `issues.labeled` → label `ai-analyze` |
-| **Modelo** | `claude-sonnet-4-5-20250929` |
-| **Max turns** | 3 |
-| **Timeout** | 5 minutos |
-| **Permisos** | `contents: read`, `issues: write` |
+| Campo         | Valor                                    |
+| ------------- | ---------------------------------------- |
+| **Workflow**  | `.github/workflows/ai-analyze-issue.yml` |
+| **Trigger**   | `issues.labeled` → label `ai-analyze`    |
+| **Modelo**    | `claude-sonnet-4-5-20250929`             |
+| **Max turns** | 3                                        |
+| **Timeout**   | 5 minutos                                |
+| **Permisos**  | `contents: read`, `issues: write`        |
 
 ## Prompt
 
