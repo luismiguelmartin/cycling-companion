@@ -180,6 +180,73 @@ describe("API Integration", () => {
       expect(res.statusCode).toBe(200);
       expect(res.json()).toEqual({ data: updated });
     });
+
+    it("PATCH /api/v1/profile con payload completo y nulls devuelve 200", async () => {
+      const fullPayload = {
+        display_name: "Luis Miguel",
+        age: 43,
+        weight_kg: 78,
+        ftp: null,
+        max_hr: null,
+        rest_hr: null,
+        goal: "performance",
+      };
+      const updated = {
+        ...mockProfile,
+        ...fullPayload,
+      };
+      mockFromChain({ data: updated, error: null });
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/profile",
+        headers: authHeaders,
+        payload: fullPayload,
+      });
+      expect(res.statusCode).toBe(200);
+      expect(res.json()).toEqual({ data: updated });
+    });
+
+    it("PATCH /api/v1/profile con body vacío devuelve 400", async () => {
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/profile",
+        headers: authHeaders,
+        payload: {},
+      });
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("PATCH /api/v1/profile con datos inválidos devuelve 400", async () => {
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/profile",
+        headers: authHeaders,
+        payload: { age: -5 },
+      });
+      expect(res.statusCode).toBe(400);
+      expect(res.json()).toMatchObject({ code: "VALIDATION_ERROR" });
+    });
+
+    it("PATCH /api/v1/profile con error de DB devuelve 500", async () => {
+      mockFromChain({ data: null, error: { message: "DB connection failed", code: "PGRST000" } });
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/profile",
+        headers: authHeaders,
+        payload: { display_name: "Test" },
+      });
+      expect(res.statusCode).toBe(500);
+      expect(res.json()).toMatchObject({ code: "DB_ERROR" });
+    });
+
+    it("PATCH /api/v1/profile sin auth devuelve 401", async () => {
+      const res = await app.inject({
+        method: "PATCH",
+        url: "/api/v1/profile",
+        payload: { ftp: 260 },
+      });
+      expect(res.statusCode).toBe(401);
+    });
   });
 
   describe("Activities", () => {

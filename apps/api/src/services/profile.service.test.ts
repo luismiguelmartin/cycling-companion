@@ -77,11 +77,59 @@ describe("ProfileService", () => {
       expect(result).toEqual(updated);
     });
 
-    it("lanza AppError 404 cuando el usuario no existe", async () => {
-      mockSingle.mockResolvedValue({ data: null, error: { message: "Not found" } });
+    it("actualiza perfil con payload completo incluyendo nulls", async () => {
+      const fullPayload = {
+        display_name: "Luis Miguel",
+        age: 43,
+        weight_kg: 78,
+        ftp: null,
+        max_hr: null,
+        rest_hr: null,
+        goal: "performance" as const,
+      };
+      const updated = { ...mockProfile, ...fullPayload };
+      mockSingle.mockResolvedValue({ data: updated, error: null });
+      const result = await updateProfile("user-123", fullPayload);
+      expect(result).toEqual(updated);
+    });
+
+    it("lanza AppError 404 cuando el usuario no existe (PGRST116)", async () => {
+      mockSingle.mockResolvedValue({
+        data: null,
+        error: { message: "Not found", code: "PGRST116" },
+      });
       await expect(updateProfile("user-123", { display_name: "Test" })).rejects.toThrow(AppError);
       await expect(updateProfile("user-123", { display_name: "Test" })).rejects.toMatchObject({
         statusCode: 404,
+        code: "NOT_FOUND",
+      });
+    });
+
+    it("lanza AppError 500 con detalles cuando hay error de DB genérico", async () => {
+      mockSingle.mockResolvedValue({
+        data: null,
+        error: { message: "DB connection failed", code: "PGRST000" },
+      });
+      await expect(updateProfile("user-123", { display_name: "Test" })).rejects.toThrow(AppError);
+      await expect(updateProfile("user-123", { display_name: "Test" })).rejects.toMatchObject({
+        statusCode: 500,
+        code: "DB_ERROR",
+      });
+    });
+
+    it("lanza AppError 404 cuando data es null sin error", async () => {
+      mockSingle.mockResolvedValue({ data: null, error: null });
+      await expect(updateProfile("user-123", { display_name: "Test" })).rejects.toMatchObject({
+        statusCode: 404,
+        code: "NOT_FOUND",
+      });
+    });
+
+    it("lanza AppError 400 cuando no hay campos para actualizar", async () => {
+      await expect(updateProfile("user-123", {})).rejects.toThrow(AppError);
+      await expect(updateProfile("user-123", {})).rejects.toMatchObject({
+        statusCode: 400,
+        code: "BAD_REQUEST",
       });
     });
 

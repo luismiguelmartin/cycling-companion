@@ -20,6 +20,10 @@ export async function updateProfile(
 ): Promise<UserProfile> {
   const parsedData = onboardingSchema.partial().parse(data);
 
+  if (Object.keys(parsedData).length === 0) {
+    throw new AppError("No fields to update", 400, "BAD_REQUEST");
+  }
+
   const { data: updated, error } = await supabaseAdmin
     .from("users")
     .update(parsedData)
@@ -27,7 +31,14 @@ export async function updateProfile(
     .select()
     .single();
 
-  if (error || !updated) {
+  if (error) {
+    if (error.code === "PGRST116") {
+      throw new AppError("Profile not found", 404, "NOT_FOUND");
+    }
+    throw new AppError(`Failed to update profile: ${error.message}`, 500, "DB_ERROR");
+  }
+
+  if (!updated) {
     throw new AppError("Profile not found", 404, "NOT_FOUND");
   }
 
