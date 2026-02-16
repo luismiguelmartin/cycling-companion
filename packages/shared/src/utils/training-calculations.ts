@@ -1,4 +1,4 @@
-import { POWER_ZONES } from "../constants/zones";
+import { POWER_ZONES } from "../constants/zones.js";
 
 /** Entrada mínima de actividad para cálculos de carga */
 export interface TrainingActivityInput {
