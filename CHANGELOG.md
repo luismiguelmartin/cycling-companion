@@ -29,3 +29,4 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 - Posición del botón cerrar en menú móvil (#20)
 - Manejo de fechas UTC en dashboard y backend (#21)
 - Revisión del menú móvil y mejoras de usabilidad (#23)
+- Manejo de errores en guardado de perfil y propagación de errores backend (#24)
