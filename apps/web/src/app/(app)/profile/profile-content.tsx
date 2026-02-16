@@ -11,7 +11,7 @@ import { OnboardingField } from "@/components/onboarding-field";
 import { GoalCard } from "@/components/goal-card";
 import { ZoneTable } from "@/components/zone-table";
 import { ProfileHeader } from "./profile-header";
-import { apiClientPatch } from "@/lib/api/client";
+import { saveProfile } from "./actions";
 
 interface ProfileContentProps {
   profile: {
@@ -84,27 +84,23 @@ export function ProfileContent({ profile }: ProfileContentProps) {
       return;
     }
 
-    try {
-      await apiClientPatch("/profile", {
-        display_name: parsed.data.display_name,
-        age: parsed.data.age,
-        weight_kg: parsed.data.weight_kg,
-        ftp: parsed.data.ftp ?? null,
-        max_hr: parsed.data.max_hr ?? null,
-        rest_hr: parsed.data.rest_hr ?? null,
-        goal: parsed.data.goal,
-      });
+    const result = await saveProfile({
+      display_name: parsed.data.display_name,
+      age: parsed.data.age,
+      weight_kg: parsed.data.weight_kg,
+      ftp: parsed.data.ftp ?? null,
+      max_hr: parsed.data.max_hr ?? null,
+      rest_hr: parsed.data.rest_hr ?? null,
+      goal: parsed.data.goal,
+    });
+
+    if (result.success) {
       setOriginalData({ ...formData });
       router.refresh();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Error al guardar. Inténtalo de nuevo.";
-      if (message.includes("No authenticated session")) {
-        setErrors({ _form: "Sesión expirada. Recarga la página e inténtalo de nuevo." });
-      } else if (message.includes("API 4")) {
-        setErrors({ _form: "Error de validación. Revisa los datos e inténtalo de nuevo." });
-      } else {
-        setErrors({ _form: "Error al guardar. Inténtalo de nuevo." });
-      }
+    } else if (result.code === "NO_SESSION") {
+      setErrors({ _form: "Sesión expirada. Recarga la página e inténtalo de nuevo." });
+    } else {
+      setErrors({ _form: result.error ?? "Error al guardar. Inténtalo de nuevo." });
     }
 
     setIsSaving(false);

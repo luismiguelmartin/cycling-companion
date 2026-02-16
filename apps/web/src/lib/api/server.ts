@@ -31,3 +31,25 @@ export async function apiGet<T>(path: string, token: string): Promise<T> {
 
   return res.json() as Promise<T>;
 }
+
+/**
+ * PATCH al API backend desde Server Components / Server Actions.
+ * Recibe el token JWT de Supabase Auth para autenticación.
+ */
+export async function apiPatch<T>(path: string, token: string, body: unknown): Promise<T> {
+  const res = await fetch(`${API_URL}/api/v1${path}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "Unknown error");
+    throw new Error(`API ${res.status}: ${text}`);
+  }
+
+  return res.json() as Promise<T>;
+}
