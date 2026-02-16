@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: cycling-companion-api
+    rootDir: apps/api
+    runtime: node
+    plan: standard
+    buildCommand: cd ../.. && pnpm install && pnpm build --filter=shared --filter=api
+    startCommand: node dist/index.js
+    envVars:
+      - key: SUPABASE_URL
+        scope: run_and_build
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        scope: run_and_build
+      - key: ANTHROPIC_API_KEY
+        scope: run_and_build
+      - key: PORT
+        value: "3001"
