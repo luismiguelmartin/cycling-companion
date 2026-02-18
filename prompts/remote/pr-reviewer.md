@@ -14,7 +14,7 @@ Agente remoto (GitHub Actions + Claude) que revisa automáticamente las PRs abie
 | ------------- | -------------------------------------------------- |
 | **Workflow**  | `.github/workflows/ai-review-pr.yml`               |
 | **Trigger**   | `pull_request.opened` / `pull_request.synchronize` |
-| **Modelo**    | `claude-sonnet-4-5-20250929`                       |
+| **Modelo**    | `claude-haiku-4-5-20251001`                       |
 | **Max turns** | 3                                                  |
 | **Timeout**   | 5 minutos                                          |
 | **Permisos**  | `contents: read`, `pull-requests: write`           |
@@ -78,7 +78,7 @@ El agente recibe el diff de la PR y acceso al repositorio completo para contexto
 [✅ Aprobado / ⚠️ Aprobado con sugerencias / 🔍 Requiere atención]
 
 ---
-> 🤖 Review generado por R3 (PR Reviewer) — `claude-sonnet-4-5-20250929`
+> 🤖 Review generado por R3 (PR Reviewer) — `claude-haiku-4-5-20251001`
 ```
 
 ### Reglas

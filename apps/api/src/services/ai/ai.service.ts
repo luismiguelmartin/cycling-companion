@@ -34,7 +34,7 @@ import {
   fallbackCoachTip,
 } from "./fallback.js";
 
-const MODEL = "claude-sonnet-4-5-20250929";
+const MODEL = "claude-sonnet-4-6";
 const MAX_DAILY_CALLS = 20;
 
 // ---------------------------------------------------------------------------

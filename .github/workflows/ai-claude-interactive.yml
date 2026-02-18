@@ -44,7 +44,7 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           path_to_claude_code_executable: ${{ env.CLAUDE_PATH }}
           claude_args: |
-            --model claude-sonnet-4-20250514
+            --model claude-sonnet-4-6
             --max-turns 10
             --allowedTools "Read,Glob,Grep,Edit,Write,Bash(git *),Bash(pnpm *),Bash(gh *),Bash(cat *),Bash(ls *)"
           prompt: |
@@ -63,4 +63,4 @@ jobs:
             Si te piden hacer cambios, valida con lint/typecheck/test antes de commitear.
 
             ---
-            > 🤖 Respuesta generada por Claude Interactive — `claude-sonnet-4-20250514`
+            > 🤖 Respuesta generada por Claude Interactive — `claude-sonnet-4-6`

@@ -14,7 +14,7 @@ Agente remoto (GitHub Actions + Claude) que actualiza automáticamente el CHANGE
 | ------------- | ------------------------------------------- |
 | **Workflow**  | `.github/workflows/ai-update-changelog.yml` |
 | **Trigger**   | `pull_request.closed` (merged = true)       |
-| **Modelo**    | `claude-sonnet-4-5-20250929`                |
+| **Modelo**    | `claude-haiku-4-5-20251001`                |
 | **Max turns** | 5                                           |
 | **Timeout**   | 5 minutos                                   |
 | **Permisos**  | `contents: write`                           |
