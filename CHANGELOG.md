@@ -24,6 +24,10 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 - Constante `MAX_RPE` para el valor máximo de RPE (#18)
 - Campo `version` al endpoint `/health` (#26)
 
+### Cambiado
+
+- Actualización de modelos Claude a claude-sonnet-4-6 en workflows y API (#28)
+
 ### Corregido
 
 - CI workflows para respetar pipeline de dependencias usando turbo run (#22)
