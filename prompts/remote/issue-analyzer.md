@@ -14,7 +14,7 @@ Agente remoto (GitHub Actions + Claude) que analiza issues etiquetadas con `ai-a
 | ------------- | ---------------------------------------- |
 | **Workflow**  | `.github/workflows/ai-analyze-issue.yml` |
 | **Trigger**   | `issues.labeled` → label `ai-analyze`    |
-| **Modelo**    | `claude-sonnet-4-5-20250929`             |
+| **Modelo**    | `claude-haiku-4-5-20251001`             |
 | **Max turns** | 3                                        |
 | **Timeout**   | 5 minutos                                |
 | **Permisos**  | `contents: read`, `issues: write`        |
@@ -58,7 +58,7 @@ El agente recibe el contexto de la issue (título, cuerpo, labels, comentarios) 
 [S / M / L] — [justificación]
 
 ---
-> 🤖 Análisis generado por R1 (Issue Analyzer) — `claude-sonnet-4-5-20250929`
+> 🤖 Análisis generado por R1 (Issue Analyzer) — `claude-haiku-4-5-20251001`
 ```
 
 ### Reglas
