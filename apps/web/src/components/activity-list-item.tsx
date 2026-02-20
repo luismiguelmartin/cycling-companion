@@ -77,11 +77,16 @@ export function ActivityListItem({
         </span>
         <span style={{ color: "#ef4444" }}>{avgHR != null ? `${avgHR} bpm` : "—"}</span>
         <div className="hidden lg:block">
-          <div className="flex flex-col items-end gap-0.5">
+          <div className="group relative flex flex-col items-end gap-0.5">
             <RPEIndicator value={rpe} />
             <span className="text-[10px] text-[var(--text-secondary)]">
-              {rpe != null ? `${rpe} — ${RPE_DESCRIPTIONS[rpe]}` : "—"}
+              {rpe != null ? rpe : "—"}
             </span>
+            {rpe != null && (
+              <div className="pointer-events-none absolute bottom-full right-0 mb-1 hidden whitespace-nowrap rounded-md border border-[var(--tooltip-border)] bg-[var(--tooltip-bg)] px-2 py-1 text-[11px] text-[var(--text-primary)] shadow-lg group-hover:block">
+                {RPE_DESCRIPTIONS[rpe]}
+              </div>
+            )}
           </div>
         </div>
         <ChevronRight className="h-3.5 w-3.5 text-[var(--text-muted)]" />
