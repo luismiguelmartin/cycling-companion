@@ -30,6 +30,7 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 ### Cambiado
 
 - Actualización de modelos Claude a claude-sonnet-4-6 en workflows y API (#28)
+- Mover etiqueta descriptiva del RPE a tooltip en lista de actividades (#34)
 
 ### Corregido
 
