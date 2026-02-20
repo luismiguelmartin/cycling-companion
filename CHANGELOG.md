@@ -41,3 +41,4 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 - Manejo de errores en guardado de perfil y propagación de errores backend (#24)
 - Errores de formato Prettier y ampliación de exclusiones en CI (#25)
 - Migración de guardado de perfil a Server Action para evitar errores de red (#27)
+- Mover número RPE al tooltip y eliminar texto redundante (#36)
