@@ -25,6 +25,7 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 - Campo `version` al endpoint `/health` (#26)
 - Diapositivas de presentación para MVP de Cycling Companion (#29)
 - Modo demo con datos mock de febrero 2026 y modal carrusel (#30)
+- Etiqueta descriptiva de RPE en lista de actividades (#32)
 
 ### Cambiado
 
