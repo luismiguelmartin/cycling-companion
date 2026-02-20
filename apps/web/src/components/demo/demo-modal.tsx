@@ -3,12 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { DEMO_SCREENS } from "@/lib/demo/screen-config";
-import {
-  DEMO_ACTIVITIES,
-  DEMO_PLAN_DAYS,
-  DEMO_INSIGHTS,
-  DEMO_PROFILE,
-} from "@/lib/demo/mock-data";
+import { DEMO_ACTIVITIES, DEMO_PLAN_DAYS, DEMO_INSIGHTS, DEMO_PROFILE } from "@/lib/demo/mock-data";
 import { DemoOnboardingStep } from "./demo-onboarding-step";
 import { DemoDashboard } from "./demo-dashboard";
 import { DemoScreenWrapper } from "./demo-screen-wrapper";
@@ -94,10 +89,7 @@ export function DemoModal({ onClose }: DemoModalProps) {
         </div>
 
         {/* Content */}
-        <div
-          className="flex-1 overflow-y-auto overflow-x-hidden"
-          onClick={interceptLinks}
-        >
+        <div className="flex-1 overflow-y-auto overflow-x-hidden" onClick={interceptLinks}>
           <DemoSlide screenId={screen.id} />
         </div>
 
@@ -216,4 +208,3 @@ function DemoSlide({ screenId }: { screenId: string }) {
       return null;
   }
 }
-

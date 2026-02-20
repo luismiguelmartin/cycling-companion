@@ -33,7 +33,9 @@ export function GoalCard({ icon, label, description, active, onClick }: GoalCard
     >
       <div className="flex items-center gap-2">
         {IconComponent ? (
-          <IconComponent className={`h-5 w-5 ${active ? "text-orange-500" : "text-[var(--text-muted)]"}`} />
+          <IconComponent
+            className={`h-5 w-5 ${active ? "text-orange-500" : "text-[var(--text-muted)]"}`}
+          />
         ) : (
           <span className="text-[22px]">{icon}</span>
         )}
