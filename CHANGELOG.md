@@ -23,6 +23,7 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 - Constante `RPE_DESCRIPTIONS` con descripciones en español para RPE 1-10 (#13)
 - Constante `MAX_RPE` para el valor máximo de RPE (#18)
 - Campo `version` al endpoint `/health` (#26)
+- Diapositivas de presentación para MVP de Cycling Companion (#29)
 
 ### Cambiado
 
