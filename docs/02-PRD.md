@@ -573,4 +573,4 @@ La arquitectura ya soporta datos reales:
 | R5 Doc Generator | `ai-update-changelog.yml` | Haiku 4.5 | PR merged | ✅ |
 | @claude Interactive | `ai-claude-interactive.yml` | Sonnet 4 | `@claude` en comentarios | ✅ |
 
-Todos implementados con `anthropics/claude-code-action@v1`. Pipeline validado end-to-end: Issue #31 → R1 → R2 (PR #32) → R3 → merge → R5. Costo: ~$1.00/pipeline.
+Todos implementados con `anthropics/claude-code-action@v1`. Pipeline validado end-to-end: Issue #17 → PR #18 (Sonnet 4.5, 28 turns, ~$0.38) y Issue #31 → PR #32 (Sonnet 4.6, 31 turns, ~$1.00).

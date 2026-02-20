@@ -249,7 +249,7 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 | R5 Doc Generator | `ai-update-changelog.yml` | Haiku 4.5 | ✅ Activo |
 | @claude Interactive | `ai-claude-interactive.yml` | Sonnet 4 | ✅ Activo |
 
-**Pipeline validado end-to-end**: Issue #31 → R1 (análisis, $0.25) → R2 (PR #32, $0.71) → R3 (review, $0.01) → merge → R5 (CHANGELOG, $0.03). Total: 31 turns, ~$1.00/pipeline.
+**Pipeline validado end-to-end**: Issue #17 → R1 → R2 (PR #18) → R3 → merge → R5 (28 turns, ~$0.38). Optimizado con Sonnet 4.6: Issue #31 → PR #32 (31 turns, ~$1.00). Issues #33, #35 validaron que incluir diffs en el issue reduce turns y coste.
 
 ### Artefactos de diseño y especificación
 

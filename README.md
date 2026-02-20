@@ -61,7 +61,7 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 - ✅ **Análisis IA** auto-trigger tras importar + botón manual en detalle
 - ✅ **Deploy producción**: Vercel + Render + Supabase
 - ✅ **5 agentes remotos** (GitHub Actions + `claude-code-action@v1`): R1 Analyzer, R2 PR Generator, R3 Reviewer, R5 Doc Generator, @claude Interactive
-- ✅ **Pipeline AI-first validado end-to-end**: Issue → R1 análisis → R2 genera PR → R3 review → merge → R5 CHANGELOG (~$1.00/feature)
+- ✅ **Pipeline AI-first validado end-to-end**: Issue → R1 análisis → R2 genera PR → R3 review → merge → R5 CHANGELOG (~$0.38–$1.00/feature)
 - ✅ **16 labels** para pipeline AI-first + label sync automático
 - ✅ **CHANGELOG automático** en merge de PRs
 
@@ -428,13 +428,13 @@ Este proyecto implementa un pipeline multi-agente para integrar IA en el ciclo d
 | Agente                 | Rol                             | Trigger                 | Modelo     | Costo aprox. |
 | ---------------------- | ------------------------------- | ----------------------- | ---------- | ------------ |
 | **R1: Issue Analyzer** | Analizar impacto y complejidad  | Label `ai-analyze`      | Haiku 4.5  | ~$0.04       |
-| **R2: PR Generator**   | Generar PR completa desde issue | Label `ai-generate-pr`  | Sonnet 4.6 | ~$0.71       |
+| **R2: PR Generator**   | Generar PR completa desde issue | Label `ai-generate-pr`  | Sonnet 4.6 | ~$0.30–$0.71 |
 | **R3: PR Reviewer**    | Code review automático          | PR abierta              | Haiku 4.5  | ~$0.01       |
 | **R4: CI/CD**          | Lint, test, build               | Push/PR                 | —          | —            |
 | **R5: Doc Generator**  | Actualizar CHANGELOG            | PR mergeada             | Haiku 4.5  | ~$0.03       |
 | **@claude**            | Handler interactivo             | `@claude` en issues/PRs | Sonnet 4   | variable     |
 
-**Pipeline completo validado**: Issue #31 → R1 → R2 (PR #32) → R3 → merge → R5. Total: 31 turns, ~$1.00.
+**Pipeline completo validado**: Issue #17 → PR #18 (28 turns, ~$0.38) · Issue #31 → PR #32 (31 turns, ~$1.00) · Issues #33, #35 (optimizadas con diffs en issue).
 
 ---
 

@@ -578,8 +578,8 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 - ✅ Agentes remotos configurados: R1, R2, R3, R5 + @claude interactivo (Fase 4)
 - ✅ 16 labels para pipeline AI-first + label sync automático
 - ✅ CHANGELOG.md con auto-update en merge
-- ✅ Pipeline AI-first end-to-end validado: Issue #31 → R1 → R2 (PR #32) → R3 → R5
-- ✅ Costo del pipeline: ~$1.00/feature (R1 ~$0.25, R2 ~$0.71, R3 ~$0.01, R5 ~$0.03)
+- ✅ Pipeline AI-first end-to-end validado: Issue #17 → PR #18 (28 turns, ~$0.38) y Issue #31 → PR #32 (31 turns, ~$1.00)
+- ✅ Costo del pipeline: ~$0.38–$1.00/feature según complejidad y modelo
 
 ---
 
@@ -595,10 +595,20 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 | 2   | Mock manual del pipeline (Issue #12 → PR #13)                     | ✅ |
 | 3   | Optimizar workflows: Haiku para read-only, Sonnet para write      | ✅ |
 | 3   | Resolver: `/tmp/` access, `--allowedTools`, `allowed_bots`        | ✅ |
-| 4   | Pipeline real end-to-end: Issue #31 → R1 → R2 (PR #32) → R3 → R5 | ✅ |
+| 4   | Pipeline real end-to-end: Issue #17 → PR #18, Issue #31 → PR #32 | ✅ |
 | 5   | Documentar resultados, actualizar docs, revisión final             | ✅ |
 
-**Resultados del pipeline real (Issue #31 → PR #32)**:
+**Resultados del primer pipeline (Issue #17 → PR #18, Sonnet 4.5)**:
+
+| Paso | Agente | Turns | Costo  | Resultado |
+|------|--------|-------|--------|-----------|
+| 1    | R1     | 9     | $0.04  | Análisis completado |
+| 2    | R2     | 14    | $0.30  | PR #18 creada, 0 permission denials |
+| 3    | R3     | 1     | $0.01  | Review + label `ai-reviewed` |
+| 4    | R5     | 4     | $0.03  | CHANGELOG actualizado + push a main |
+| **Total** | | **28** | **$0.38** | **Pipeline completo** |
+
+**Resultados del pipeline con Sonnet 4.6 (Issue #31 → PR #32)**:
 
 | Paso | Agente | Turns | Costo  | Resultado |
 |------|--------|-------|--------|-----------|

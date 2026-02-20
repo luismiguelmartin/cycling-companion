@@ -195,7 +195,9 @@ Diseño → Especificación → Planificación → Implementación → Review �
 
 ## Diapositiva 13 — Pipeline End-to-End en Acción
 
-**Caso real validado: Issue #31 → PR #32** (mostrar etiqueta RPE en lista de actividades)
+**Casos reales validados**: Issue #17 → PR #18 (Sonnet 4.5, 28 turns, ~$0.38) y Issue #31 → PR #32 (Sonnet 4.6, 31 turns, ~$1.00)
+
+**Ejemplo detallado: Issue #31 → PR #32** (mostrar etiqueta RPE en lista de actividades)
 
 ```
 1. Se crea Issue #31 con descripción del cambio

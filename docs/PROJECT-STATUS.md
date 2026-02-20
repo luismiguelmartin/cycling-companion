@@ -16,7 +16,7 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle en `docs/
 
 **Metodología híbrida**: pipeline completo (L1→L2→L3→L4) para features complejas, implementación directa para CRUD predecible. 33 specs en `docs/specs/`.
 
-**Caso validado (Issue #31 → PR #32)**: R1 analiza → R2 genera código + tests → R3 revisa → CI valida → merge → R5 actualiza CHANGELOG. Total: 31 turns, ~$1.00.
+**Casos validados**: Issue #17 → PR #18 (Sonnet 4.5, 28 turns, ~$0.38) · Issue #31 → PR #32 (Sonnet 4.6, 31 turns, ~$1.00) · Issues #33, #35 (optimizadas con diffs en issue). Pipeline: R1 analiza → R2 genera código + tests → R3 revisa → CI valida → merge → R5 CHANGELOG.
 
 ## Deploy Producción
 
