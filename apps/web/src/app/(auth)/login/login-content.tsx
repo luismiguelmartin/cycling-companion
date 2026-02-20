@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Zap, Play } from "lucide-react";
+import { Zap, Play, BarChart3, CalendarDays, MessageSquareText } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { DemoModal } from "@/components/demo/demo-modal";
 import { LoginButton } from "./login-button";
@@ -48,15 +48,24 @@ export function LoginContent() {
           {/* Feature list (desktop only) */}
           <div className="mt-8 hidden flex-col gap-3 md:flex">
             {[
-              { emoji: "📊", text: "Análisis automático de cada salida: TSS, zonas y tendencias" },
-              { emoji: "🗓️", text: "Plan semanal ajustado a tu FTP, objetivo y disponibilidad" },
-              { emoji: "🧠", text: "Recomendaciones con explicación: qué hacer y por qué" },
+              {
+                icon: <BarChart3 className="h-5 w-5 text-orange-500" />,
+                text: "Análisis automático de cada salida: TSS, zonas y tendencias",
+              },
+              {
+                icon: <CalendarDays className="h-5 w-5 text-orange-500" />,
+                text: "Plan semanal ajustado a tu FTP, objetivo y disponibilidad",
+              },
+              {
+                icon: <MessageSquareText className="h-5 w-5 text-orange-500" />,
+                text: "Recomendaciones con explicación: qué hacer y por qué",
+              },
             ].map((feature) => (
               <div
                 key={feature.text}
                 className="flex items-center gap-3 text-sm text-[var(--text-secondary)]"
               >
-                <span className="text-lg">{feature.emoji}</span>
+                <span className="shrink-0">{feature.icon}</span>
                 {feature.text}
               </div>
             ))}

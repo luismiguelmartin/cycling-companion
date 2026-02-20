@@ -82,14 +82,14 @@ Presentación del proyecto **Cycling Companion**: MVP de una plataforma de entre
 ```
 cycling-companion/
 ├── apps/
-│   ├── web/          → Next.js 16 (9 pantallas, 32 componentes)
+│   ├── web/          → Next.js 16 (10 pantallas, 32 componentes)
 │   └── api/          → Fastify 5 (15+ endpoints, 4 endpoints IA)
 ├── packages/
 │   └── shared/       → Types Zod compartidos frontend ↔ backend
 ├── supabase/
 │   └── migrations/   → 4 migraciones SQL incrementales
 └── docs/
-    └── specs/        → 27+ especificaciones L1/L2/L3
+    └── specs/        → 33 especificaciones L1/L2/L3
 ```
 
 - TypeScript estricto end-to-end (no `any`)
@@ -100,17 +100,18 @@ cycling-companion/
 
 ## Diapositiva 8 — Funcionalidades del MVP
 
-**9 pantallas implementadas:**
+**10 pantallas implementadas:**
 
-1. **Login** — Google OAuth (sin contraseña)
+1. **Login** — Google OAuth (sin contraseña) + modo demo interactivo
 2. **Onboarding** — Wizard 4 pasos: perfil → FTP → FC → objetivo
 3. **Dashboard** — KPIs, gráficas de tendencia, consejo IA del día, alerta sobrecarga
 4. **Lista de actividades** — Tabla paginada con filtros y búsqueda
-5. **Detalle de actividad** — Métricas, gráficas temporales, análisis IA
+5. **Detalle de actividad** — Métricas, gráficas temporales, análisis IA, eliminación con confirmación
 6. **Importar actividad** — Manual o .fit/.gpx con parseo Garmin
 7. **Plan semanal** — Grid 7 días con sugerencias IA + tips nutrición/descanso
 8. **Insights** — Comparativa entre periodos + radar rendimiento + resumen IA
 9. **Perfil** — Datos, zonas potencia/FC, ajustes tema/unidades
+10. **Error de autenticación** — Página de error para flujos OAuth fallidos
 
 ---
 
@@ -169,7 +170,7 @@ Diseño → Especificación → Planificación → Implementación → Review �
 **Metodología híbrida:**
 - Pipeline completo (L1→L2→L3→L4) para features complejas
 - Implementación directa (L4) para CRUD predecible
-- 27+ especificaciones generadas (L1/L2/L3)
+- 33 especificaciones generadas (L1/L2/L3)
 
 ---
 
@@ -179,8 +180,8 @@ Diseño → Especificación → Planificación → Implementación → Review �
 
 | Agente | Trigger | Modelo | Coste |
 |--------|---------|--------|-------|
-| **R1: Issue Analyzer** | Label `ai-analyze` | Haiku 4.5 | ~$0.04 |
-| **R2: PR Generator** | Label `ai-generate-pr` | Sonnet 4.5 | ~$0.30 |
+| **R1: Issue Analyzer** | Label `ai-analyze` | Haiku 4.5 | ~$0.25 |
+| **R2: PR Generator** | Label `ai-generate-pr` | Sonnet 4.6 | ~$0.71 |
 | **R3: PR Reviewer** | PR abierta | Haiku 4.5 | ~$0.01 |
 | **R4: CI/CD** | Push/PR | — | — |
 | **R5: Doc Generator** | PR mergeada | Haiku 4.5 | ~$0.03 |
@@ -194,41 +195,41 @@ Diseño → Especificación → Planificación → Implementación → Review �
 
 ## Diapositiva 13 — Pipeline End-to-End en Acción
 
-**Caso real validado: Issue #17 → PR #18**
+**Caso real validado: Issue #31 → PR #32** (mostrar etiqueta RPE en lista de actividades)
 
 ```
-1. Se crea un Issue con descripción del cambio
+1. Se crea Issue #31 con descripción del cambio
        ↓
-2. R1 (Issue Analyzer) analiza impacto, complejidad, riesgos    [$0.04]
+2. R1 (Issue Analyzer) analiza impacto, archivos, approach      [$0.25, 2 turns]
        ↓
-3. Se añade label `ai-generate-pr`
+3. Humano revisa análisis y añade label `ai-generate-pr`
        ↓
-4. R2 (PR Generator) genera código, tests, documentación        [$0.30]
+4. R2 (PR Generator) genera código + 4 tests + PR #32           [$0.71, 24 turns]
        ↓
-5. R3 (PR Reviewer) revisa calidad, seguridad, tests            [$0.01]
+5. R3 (PR Reviewer) revisa calidad, seguridad, tests            [$0.01, 1 turn]
        ↓
-6. R4 (CI/CD) ejecuta lint + typecheck + tests + build
+6. R4 (CI/CD) ejecuta lint + typecheck + 112 tests              [pass ✅]
        ↓
 7. Humano revisa y mergea
        ↓
-8. R5 (Doc Generator) actualiza CHANGELOG automáticamente       [$0.03]
+8. R5 (Doc Generator) actualiza CHANGELOG automáticamente       [$0.03, 4 turns]
 ```
 
-**Total: 28 turns de IA, ~$0.38 por feature completa**
+**Total: 31 turns de IA, ~$1.00 por feature completa (frontend + tests)**
 
 ---
 
 ## Diapositiva 14 — Coste del Pipeline
 
-**Coste por feature con el pipeline AI-first:**
+**Coste por feature con el pipeline AI-first (Issue #31 → PR #32):**
 
-| Etapa | Agente | Coste |
-|-------|--------|-------|
-| Análisis del issue | R1 (Haiku 4.5) | $0.04 |
-| Generación de PR | R2 (Sonnet 4.5) | $0.30 |
-| Code review automático | R3 (Haiku 4.5) | $0.01 |
-| Documentación (CHANGELOG) | R5 (Haiku 4.5) | $0.03 |
-| **Total por feature** | | **~$0.38** |
+| Etapa | Agente | Turns | Coste |
+|-------|--------|-------|-------|
+| Análisis del issue | R1 (Haiku 4.5) | 2 | $0.25 |
+| Generación de PR | R2 (Sonnet 4.6) | 24 | $0.71 |
+| Code review automático | R3 (Haiku 4.5) | 1 | $0.01 |
+| Documentación (CHANGELOG) | R5 (Haiku 4.5) | 4 | $0.03 |
+| **Total por feature** | | **31** | **~$1.00** |
 
 **Coste de infraestructura del MVP:**
 - Vercel (frontend): $0 (tier gratuito)
@@ -244,14 +245,14 @@ Diseño → Especificación → Planificación → Implementación → Review �
 
 | Métrica | Valor |
 |---------|-------|
-| Pantallas frontend | 9 |
+| Pantallas frontend | 10 |
 | Componentes reutilizables | 32 |
 | Endpoints API | 15+ |
 | Endpoints IA | 4 (análisis, plan, resumen, coach tip) |
-| Tests totales | ~290 (72 web + 82 shared + 136 API) |
+| Tests totales | ~343 (108 web + 90 shared + 145 API) |
 | Migraciones SQL | 4 |
 | Schemas Zod compartidos | 5 |
-| Especificaciones (L1/L2/L3) | 27+ |
+| Especificaciones (L1/L2/L3) | 33 |
 | Agentes remotos activos | 5 |
 | Labels del pipeline | 16 |
 | Fases completadas | 4 de 4 |
@@ -263,7 +264,7 @@ Diseño → Especificación → Planificación → Implementación → Review �
 | Fase | Foco | Entregables clave |
 |------|------|-------------------|
 | **Fase 1** | Cimientos | Monorepo, CI/CD, Auth (Google OAuth), deploy, schema DB, onboarding |
-| **Fase 2** | MVP Frontend | 9 pantallas, 32 componentes, design system, specs L1/L2/L3 |
+| **Fase 2** | MVP Frontend | 10 pantallas, 32 componentes, design system, specs L1/L2/L3 |
 | **Fase 3** | Core Backend | 15+ endpoints API, 4 endpoints IA (Claude), import .fit/.gpx, migración frontend→API |
 | **Fase 4** | Pipeline AI | 5 agentes remotos, 16 labels, CHANGELOG auto, validación end-to-end |
 
@@ -275,7 +276,7 @@ Diseño → Especificación → Planificación → Implementación → Review �
 
 **Un aspecto destacable del pipeline: la IA se auto-supervisa**
 
-- R2 (Sonnet 4.5) **genera** el código de la PR
+- R2 (Sonnet 4.6) **genera** el código de la PR
 - R3 (Haiku 4.5) **revisa** la PR generada por R2
 - R4 (CI/CD) **valida** que el código pasa lint, types y tests
 - El humano tiene la **última palabra** antes del merge
@@ -287,7 +288,7 @@ IA genera → IA revisa → CI valida → Humano decide
 Esto crea un sistema de checks & balances donde:
 - La IA no opera sin supervisión
 - Los errores se detectan en múltiples capas
-- El coste se mantiene bajo (~$0.38/feature)
+- El coste se mantiene bajo (~$1/feature)
 
 ---
 
@@ -329,7 +330,7 @@ Esto crea un sistema de checks & balances donde:
 - IA excelente para generar código a partir de specs bien definidas
 - Code review automático detecta problemas reales
 - Documentación automática (CHANGELOG) ahorra tiempo
-- El coste es despreciable (~$0.38/feature)
+- El coste es despreciable (~$1/feature)
 - La metodología L1→L2→L3→L4 produce specs de alta calidad
 
 **Lo que requiere atención:**
@@ -346,9 +347,9 @@ Esto crea un sistema de checks & balances donde:
 
 2. **El pipeline AI-first es operativo**: desde la creación de un issue hasta el CHANGELOG automático, la IA participa en cada fase
 
-3. **El coste es marginal**: ~$0.38 por feature completa, infraestructura en tier gratuito
+3. **El coste es marginal**: ~$1 por feature completa, infraestructura en tier gratuito
 
-4. **La calidad se mantiene**: 290 tests, TypeScript estricto, RLS, code review automático + humano
+4. **La calidad se mantiene**: 343 tests, TypeScript estricto, RLS, code review automático + humano
 
 5. **Es escalable**: el patrón multi-agente probado a pequeña escala es adaptable a equipos y proyectos mayores
 
@@ -360,7 +361,7 @@ Esto crea un sistema de checks & balances donde:
 
 - El producto: una plataforma funcional de entrenamiento ciclista con IA
 - La innovación: un pipeline AI-first validado end-to-end
-- El resultado: MVP completo en 4 fases, ~$0.38/feature, 290 tests, 0 coste de infraestructura
+- El resultado: MVP completo en 4 fases, ~$1/feature, 343 tests, 0 coste de infraestructura
 
 > *"Desarrollado con un pipeline AI-first de integración de IA en el ciclo de vida del desarrollo."*
 
@@ -381,6 +382,6 @@ Esto crea un sistema de checks & balances donde:
 ### Puntos clave a enfatizar:
 - La app de ciclismo es real y funcional, no un demo
 - El pipeline AI-first es el diferenciador: la IA no solo está en el producto, sino en cómo se construyó
-- El coste de $0.38/feature es un dato impactante para la audiencia
+- El coste de $1/feature es un dato impactante para la audiencia
 - La IA revisa a la IA (R2 genera, R3 revisa) — checks & balances
 - MVP = decisiones conscientes de qué NO incluir, tan importantes como las de qué incluir
