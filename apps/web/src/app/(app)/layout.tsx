@@ -23,8 +23,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect("/onboarding");
   }
 
+  const avatarUrl = (user.user_metadata?.avatar_url as string) ?? null;
+
   return (
-    <AppShell userName={profile.display_name} userEmail={profile.email ?? user.email ?? ""}>
+    <AppShell
+      userName={profile.display_name}
+      userEmail={profile.email ?? user.email ?? ""}
+      userAvatarUrl={avatarUrl}
+    >
       {children}
     </AppShell>
   );

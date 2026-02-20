@@ -1,10 +1,14 @@
 "use client";
 
-import { Zap } from "lucide-react";
+import { useState } from "react";
+import { Zap, Play } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { DemoModal } from "@/components/demo/demo-modal";
 import { LoginButton } from "./login-button";
 
 export function LoginContent() {
+  const [showDemo, setShowDemo] = useState(false);
+
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[image:var(--hero-bg)]">
       {/* Glow effects */}
@@ -29,24 +33,24 @@ export function LoginContent() {
           </div>
 
           {/* Headline */}
-          <h1 className="text-[28px] font-bold leading-[1.2] tracking-[-0.03em] text-[var(--text-primary)] md:text-[40px]">
-            Tu entrenador IA
+          <h1 className="text-[24px] font-bold leading-[1.2] tracking-[-0.03em] text-[var(--text-primary)] min-[400px]:text-[28px] md:text-[40px]">
+            <span className="whitespace-nowrap">Entrena más inteligente,</span>
             <br />
-            <span className="text-orange-500">que entiende tus datos</span>
+            <span className="text-orange-500">no más duro</span>
           </h1>
 
           {/* Subtitle */}
           <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)] opacity-85 md:text-base">
-            Análisis inteligente, planes personalizados y recomendaciones basadas en ciencia para
-            ciclistas que quieren mejorar.
+            Importa tus archivos .fit o .gpx y recibe planes semanales, análisis de carga y consejos
+            personalizados impulsados por IA.
           </p>
 
           {/* Feature list (desktop only) */}
           <div className="mt-8 hidden flex-col gap-3 md:flex">
             {[
-              { emoji: "📊", text: "Análisis inteligente de tus sesiones" },
-              { emoji: "🗓️", text: "Planificación semanal adaptada a ti" },
-              { emoji: "🧠", text: "IA que te explica qué hacer y por qué" },
+              { emoji: "📊", text: "Análisis automático de cada salida: TSS, zonas y tendencias" },
+              { emoji: "🗓️", text: "Plan semanal ajustado a tu FTP, objetivo y disponibilidad" },
+              { emoji: "🧠", text: "Recomendaciones con explicación: qué hacer y por qué" },
             ].map((feature) => (
               <div
                 key={feature.text}
@@ -62,19 +66,31 @@ export function LoginContent() {
         {/* Login card */}
         <div className="w-full rounded-[20px] border border-[var(--card-border)] bg-[var(--card-bg)] p-6 shadow-xl backdrop-blur-sm md:w-[380px] md:p-10">
           <div className="mb-6 text-center">
-            <h2 className="text-xl font-bold text-[var(--text-primary)]">Comienza ahora</h2>
+            <h2 className="text-xl font-bold text-[var(--text-primary)]">Empieza gratis</h2>
             <p className="mt-2 text-sm text-[var(--text-muted)]">
-              Conecta tu cuenta para empezar a entrenar de forma inteligente
+              Inicia sesión con Google y sube tu primera actividad en segundos
             </p>
           </div>
 
           <LoginButton />
+
+          {/* Demo button */}
+          <button
+            onClick={() => setShowDemo(true)}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--input-border)] bg-transparent px-4 py-3 text-[14px] font-medium text-[var(--text-secondary)] transition-all duration-200 hover:border-orange-500/40 hover:bg-orange-500/[0.06] hover:text-orange-500"
+          >
+            <Play className="h-4 w-4" />
+            Explorar demo
+          </button>
 
           <p className="mt-6 text-center text-[11px] leading-[1.5] text-[var(--text-muted)]">
             Al continuar, aceptas nuestros términos de servicio y política de privacidad.
           </p>
         </div>
       </div>
+
+      {/* Demo modal */}
+      {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
     </div>
   );
 }

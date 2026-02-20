@@ -9,6 +9,7 @@ import { MetricsGrid, type MetricItem } from "@/components/metrics-grid";
 import { ActivityChart } from "@/components/charts/activity-chart";
 import { AIAnalysisCard } from "@/components/ai-analysis-card";
 import { DetailHeader } from "./detail-header";
+import { DeleteActivityButton } from "./delete-activity-button";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -120,7 +121,12 @@ export default async function ActivityDetailPage({ params }: PageProps) {
   return (
     <div className="space-y-4 md:space-y-6">
       <BackButton />
-      <DetailHeader name={activity.name} type={activity.type} dateFormatted={dateFormatted} />
+      <DetailHeader
+        name={activity.name}
+        type={activity.type}
+        dateFormatted={dateFormatted}
+        actions={<DeleteActivityButton activityId={activity.id} activityName={activity.name} />}
+      />
       <MetricsGrid metrics={metrics} />
       <ActivityChart data={timeSeries} />
       <AIAnalysisCard analysis={analysis} activityId={activity.id} />

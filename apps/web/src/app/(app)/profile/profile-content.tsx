@@ -247,15 +247,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
               {GOALS.map((g) => (
                 <GoalCard
                   key={g.key}
-                  icon={
-                    g.key === "performance"
-                      ? "🎯"
-                      : g.key === "health"
-                        ? "❤️"
-                        : g.key === "weight_loss"
-                          ? "📉"
-                          : "🛡️"
-                  }
+                  icon={g.icon}
                   label={g.label}
                   description={g.description}
                   active={formData.goal === g.key}

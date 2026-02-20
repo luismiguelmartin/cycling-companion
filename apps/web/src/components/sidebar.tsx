@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Activity, BarChart3, Calendar, TrendingUp, User, X, Zap } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Activity, BarChart3, Calendar, LogOut, TrendingUp, User, X, Zap } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { createClient } from "@/lib/supabase/client";
 import { NAV_ITEMS } from "shared";
 import type { LucideIcon } from "lucide-react";
 
@@ -18,6 +20,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
 interface SidebarProps {
   userName: string;
   userEmail: string;
+  userAvatarUrl: string | null;
   isMobileOpen: boolean;
   onMobileClose: () => void;
 }
@@ -31,8 +34,22 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-export function Sidebar({ userName, userEmail, isMobileOpen, onMobileClose }: SidebarProps) {
+export function Sidebar({
+  userName,
+  userEmail,
+  userAvatarUrl,
+  isMobileOpen,
+  onMobileClose,
+}: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    onMobileClose();
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+  }
 
   function isActive(href: string): boolean {
     if (href === "/") return pathname === "/";
@@ -72,6 +89,13 @@ export function Sidebar({ userName, userEmail, isMobileOpen, onMobileClose }: Si
             </Link>
           );
         })}
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-normal text-[var(--text-secondary)] transition-colors hover:bg-red-500/10 hover:text-red-500"
+        >
+          <LogOut className="h-[18px] w-[18px] text-[var(--text-muted)]" />
+          Cerrar sesión
+        </button>
       </nav>
 
       {/* Bottom section */}
@@ -80,9 +104,20 @@ export function Sidebar({ userName, userEmail, isMobileOpen, onMobileClose }: Si
 
         {/* User info */}
         <div className="flex items-center gap-2.5 rounded-lg px-3 py-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 text-[11px] font-bold text-white">
-            {getInitials(userName)}
-          </div>
+          {userAvatarUrl ? (
+            <Image
+              src={userAvatarUrl}
+              alt={userName}
+              width={32}
+              height={32}
+              className="h-8 w-8 shrink-0 rounded-lg object-cover"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 text-[11px] font-bold text-white">
+              {getInitials(userName)}
+            </div>
+          )}
           <div className="min-w-0">
             <p className="truncate text-[12px] font-medium text-[var(--text-primary)]">
               {userName}
