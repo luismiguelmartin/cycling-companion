@@ -34,7 +34,7 @@ jobs:
           prompt: |
             Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}
 
-            Lee CLAUDE.md para contexto. Genera un comentario breve en español:
+            Lee AGENTS.md para contexto. Genera un comentario breve en español:
             ## Analisis IA
             - **Complejidad**: Baja/Media/Alta
             - **Archivos**: lista de archivos a modificar

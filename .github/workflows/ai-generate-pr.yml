@@ -46,7 +46,7 @@ jobs:
           prompt: |
             Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}
 
-            Lee CLAUDE.md para convenciones. Implementa el cambio.
+            Lee AGENTS.md para convenciones. Implementa el cambio.
             Dependencias ya instaladas. Valida con pnpm lint, pnpm typecheck, pnpm test --filter=shared.
             Crea PR: branch ai/issue-${{ github.event.issue.number }}-slug, titulo con feat:/fix:, body con Closes #${{ github.event.issue.number }}, label ai-generated.
             No sobre-ingenierices.
