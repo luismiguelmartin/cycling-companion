@@ -4,6 +4,10 @@ on:
   issues:
     types: [labeled]
 
+concurrency:
+  group: r2-issue-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
 jobs:
   generate:
     if: github.event.label.name == 'ai-generate-pr'
@@ -37,7 +41,7 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: |
             --model claude-sonnet-4-6
-            --max-turns 15
+            --max-turns 25
             --allowedTools "Edit,Write,Read,Glob,Grep,Bash"
           prompt: |
             Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}
