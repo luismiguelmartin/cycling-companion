@@ -57,13 +57,13 @@ export function DemoScreenWrapper({ activeScreenId, children }: DemoScreenWrappe
         <div className="mt-auto px-3">
           <div className="flex items-center gap-2.5 rounded-lg px-3 py-2">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 text-[11px] font-bold text-white">
-              CG
+              LM
             </div>
             <div className="min-w-0">
               <p className="truncate text-[12px] font-medium text-[var(--text-primary)]">
-                Carlos García
+                Luis Miguel
               </p>
-              <p className="truncate text-[11px] text-[var(--text-muted)]">carlos@demo.app</p>
+              <p className="truncate text-[11px] text-[var(--text-muted)]">luis.miguel@demo.app</p>
             </div>
           </div>
         </div>

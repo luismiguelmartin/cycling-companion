@@ -7,10 +7,11 @@ import { Sidebar } from "@/components/sidebar";
 interface AppShellProps {
   userName: string;
   userEmail: string;
+  userAvatarUrl: string | null;
   children: React.ReactNode;
 }
 
-export function AppShell({ userName, userEmail, children }: AppShellProps) {
+export function AppShell({ userName, userEmail, userAvatarUrl, children }: AppShellProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -18,6 +19,7 @@ export function AppShell({ userName, userEmail, children }: AppShellProps) {
       <Sidebar
         userName={userName}
         userEmail={userEmail}
+        userAvatarUrl={userAvatarUrl}
         isMobileOpen={isMobileMenuOpen}
         onMobileClose={() => setIsMobileMenuOpen(false)}
       />
