@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Activity, ChevronRight } from "lucide-react";
-import { ACTIVITY_TYPES, type ActivityTypeKey } from "shared";
+import { ACTIVITY_TYPES, RPE_DESCRIPTIONS, type ActivityTypeKey } from "shared";
 import { RPEIndicator } from "./rpe-indicator";
 
 interface ActivityListItemProps {
@@ -77,7 +77,12 @@ export function ActivityListItem({
         </span>
         <span style={{ color: "#ef4444" }}>{avgHR != null ? `${avgHR} bpm` : "—"}</span>
         <div className="hidden lg:block">
-          <RPEIndicator value={rpe} />
+          <div className="flex flex-col items-end gap-0.5">
+            <RPEIndicator value={rpe} />
+            <span className="text-[10px] text-[var(--text-secondary)]">
+              {rpe != null ? `${rpe} — ${RPE_DESCRIPTIONS[rpe]}` : "—"}
+            </span>
+          </div>
         </div>
         <ChevronRight className="h-3.5 w-3.5 text-[var(--text-muted)]" />
       </div>
