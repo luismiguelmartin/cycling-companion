@@ -243,13 +243,13 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 | Agente | Workflow | Modelo | Estado |
 |--------|----------|--------|--------|
 | R1 Issue Analyzer | `ai-analyze-issue.yml` | Haiku 4.5 | ✅ Activo |
-| R2 PR Generator | `ai-generate-pr.yml` | Sonnet 4.5 | ✅ Activo |
+| R2 PR Generator | `ai-generate-pr.yml` | Sonnet 4.6 | ✅ Activo |
 | R3 PR Reviewer | `ai-review-pr.yml` | Haiku 4.5 | ✅ Activo |
 | R4 CI/CD | `ci-frontend.yml` + `ci-backend.yml` | — | ✅ Activo |
 | R5 Doc Generator | `ai-update-changelog.yml` | Haiku 4.5 | ✅ Activo |
 | @claude Interactive | `ai-claude-interactive.yml` | Sonnet 4 | ✅ Activo |
 
-**Pipeline validado end-to-end**: Issue #17 → R1 (análisis, $0.04) → R2 (PR #18, $0.30) → R3 (review, $0.01) → merge → R5 (CHANGELOG, $0.03). Total: 28 turns, ~$0.38/pipeline.
+**Pipeline validado end-to-end**: Issue #31 → R1 (análisis, $0.25) → R2 (PR #32, $0.71) → R3 (review, $0.01) → merge → R5 (CHANGELOG, $0.03). Total: 31 turns, ~$1.00/pipeline.
 
 ### Artefactos de diseño y especificación
 

@@ -7,7 +7,7 @@ El producto y el pipeline AI-first están **100% implementados**. Lo que queda e
 - Recopilar métricas de GitHub: timestamps issue→PR, nº de turns, costos por agente
 - Comparar PRs generadas por IA (R2) vs PRs manuales (misma feature)
 - Medir calidad de reviews IA (R3) vs lo que harías tú
-- Datos disponibles: Issues #9-#18, PRs #11-#18, costos del pipeline ($0.38/issue)
+- Datos disponibles: Issues #9-#18 (Fase 3-4), Issues #31-#35 (pipeline optimizado), costos ~$1.00/feature
 
 ## 2. Memoria del TFM — Secciones pendientes
 
@@ -20,7 +20,7 @@ El producto y el pipeline AI-first están **100% implementados**. Lo que queda e
 ## 3. Demo/presentación
 
 - Preparar un flujo en vivo o grabado: crear issue → `ai-analyze` → `ai-generate-pr` → review → merge → CHANGELOG auto
-- Screenshots de cada paso del pipeline (ya disponibles de Issue #17 → PR #18)
+- Screenshots de cada paso del pipeline (disponibles de Issue #17 → PR #18 y Issue #31 → PR #32)
 
 ## 4. Limpieza final del repo
 

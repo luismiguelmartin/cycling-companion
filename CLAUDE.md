@@ -32,7 +32,7 @@ pnpm build                  # Build completo
 pnpm lint                   # ESLint (3 paquetes)
 pnpm typecheck              # TypeScript (3 paquetes)
 pnpm test                   # Vitest (3 paquetes)
-pnpm test --filter=web      # Solo web (108 tests)
+pnpm test --filter=web      # Solo web (112 tests)
 pnpm test --filter=api      # Solo API (145 tests)
 pnpm test --filter=shared   # Solo shared (90 tests)
 pnpm format                 # Prettier --write

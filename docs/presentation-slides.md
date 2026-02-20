@@ -249,7 +249,7 @@ Diseño → Especificación → Planificación → Implementación → Review �
 | Componentes reutilizables | 32 |
 | Endpoints API | 15+ |
 | Endpoints IA | 4 (análisis, plan, resumen, coach tip) |
-| Tests totales | ~343 (108 web + 90 shared + 145 API) |
+| Tests totales | ~347 (112 web + 90 shared + 145 API) |
 | Migraciones SQL | 4 |
 | Schemas Zod compartidos | 5 |
 | Especificaciones (L1/L2/L3) | 33 |
@@ -349,7 +349,7 @@ Esto crea un sistema de checks & balances donde:
 
 3. **El coste es marginal**: ~$1 por feature completa, infraestructura en tier gratuito
 
-4. **La calidad se mantiene**: 343 tests, TypeScript estricto, RLS, code review automático + humano
+4. **La calidad se mantiene**: 347 tests, TypeScript estricto, RLS, code review automático + humano
 
 5. **Es escalable**: el patrón multi-agente probado a pequeña escala es adaptable a equipos y proyectos mayores
 
@@ -361,7 +361,7 @@ Esto crea un sistema de checks & balances donde:
 
 - El producto: una plataforma funcional de entrenamiento ciclista con IA
 - La innovación: un pipeline AI-first validado end-to-end
-- El resultado: MVP completo en 4 fases, ~$1/feature, 343 tests, 0 coste de infraestructura
+- El resultado: MVP completo en 4 fases, ~$1/feature, 347 tests, 0 coste de infraestructura
 
 > *"Desarrollado con un pipeline AI-first de integración de IA en el ciclo de vida del desarrollo."*
 

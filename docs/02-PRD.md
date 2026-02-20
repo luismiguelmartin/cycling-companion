@@ -568,9 +568,9 @@ La arquitectura ya soporta datos reales:
 | Agente | Workflow | Modelo | Trigger | Estado |
 |--------|----------|--------|---------|--------|
 | R1 Issue Analyzer | `ai-analyze-issue.yml` | Haiku 4.5 | Label `ai-analyze` | ✅ |
-| R2 PR Generator | `ai-generate-pr.yml` | Sonnet 4.5 | Label `ai-generate-pr` | ✅ |
+| R2 PR Generator | `ai-generate-pr.yml` | Sonnet 4.6 | Label `ai-generate-pr` | ✅ |
 | R3 PR Reviewer | `ai-review-pr.yml` | Haiku 4.5 | PR opened/synchronize | ✅ |
 | R5 Doc Generator | `ai-update-changelog.yml` | Haiku 4.5 | PR merged | ✅ |
 | @claude Interactive | `ai-claude-interactive.yml` | Sonnet 4 | `@claude` en comentarios | ✅ |
 
-Todos implementados con `anthropics/claude-code-action@v1`. Pipeline validado end-to-end: Issue #17 → R1 → R2 (PR #18) → R3 → merge → R5. Costo: ~$0.38/pipeline.
+Todos implementados con `anthropics/claude-code-action@v1`. Pipeline validado end-to-end: Issue #31 → R1 → R2 (PR #32) → R3 → merge → R5. Costo: ~$1.00/pipeline.

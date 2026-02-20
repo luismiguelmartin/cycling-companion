@@ -550,11 +550,11 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 | 1   | Fix GPX import (Garmin extensions, NP, moving time, km axis)    | L4           | ✅ |
 | 1   | Análisis IA: botón manual + auto-trigger tras import            | L4           | ✅ |
 | 2   | Configurar agente R2 (PR Generator)                             | Manual       | ✅ |
-| 2   | Probar flujo completo: issue → ai-analyze → ai-generate-pr → PR | R1 + R2     | ✅ (Issue #17 → PR #18) |
+| 2   | Probar flujo completo: issue → ai-analyze → ai-generate-pr → PR | R1 + R2     | ✅ (Issue #17 → PR #18, optimizado en #31 → #32) |
 | 3   | Configurar agente R5 (Doc Generator)                            | Manual       | ✅ |
 | 3   | Probar: merge → changelog automático                            | R5           | ✅ (CHANGELOG auto-updated) |
 | 4   | Crear 3-5 issues de features secundarias para probar pipeline   | L3           | ✅ (Issues #9-#18) |
-| 4   | Ejecutar pipeline completo en 1-2 features                      | R1 + R2 + R3 | ✅ (Pipeline completo: 28 turns, $0.38) |
+| 4   | Ejecutar pipeline completo en 1-2 features                      | R1 + R2 + R3 | ✅ (Pipeline validado: Issues #31, #33, #35) |
 | 5   | Comparar: PR generada por IA vs PR manual (misma feature)       | Evaluación   | ✅ (Mock #12 vs Real #17) |
 | 5   | Documentar flujos, ajustar prompts, versionar prompts           | Manual       | ✅ (remote-agents.md, workflows optimizados) |
 
@@ -578,8 +578,8 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 - ✅ Agentes remotos configurados: R1, R2, R3, R5 + @claude interactivo (Fase 4)
 - ✅ 16 labels para pipeline AI-first + label sync automático
 - ✅ CHANGELOG.md con auto-update en merge
-- ✅ Pipeline AI-first end-to-end validado: Issue #17 → R1 → R2 (PR #18) → R3 → R5
-- ✅ Costo del pipeline: ~$0.38/issue (Haiku ~$0.04, Sonnet ~$0.30)
+- ✅ Pipeline AI-first end-to-end validado: Issue #31 → R1 → R2 (PR #32) → R3 → R5
+- ✅ Costo del pipeline: ~$1.00/feature (R1 ~$0.25, R2 ~$0.71, R3 ~$0.01, R5 ~$0.03)
 
 ---
 
@@ -595,18 +595,20 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 | 2   | Mock manual del pipeline (Issue #12 → PR #13)                     | ✅ |
 | 3   | Optimizar workflows: Haiku para read-only, Sonnet para write      | ✅ |
 | 3   | Resolver: `/tmp/` access, `--allowedTools`, `allowed_bots`        | ✅ |
-| 4   | Pipeline real end-to-end: Issue #17 → R1 → R2 (PR #18) → R3 → R5 | ✅ |
+| 4   | Pipeline real end-to-end: Issue #31 → R1 → R2 (PR #32) → R3 → R5 | ✅ |
 | 5   | Documentar resultados, actualizar docs, revisión final             | ✅ |
 
-**Resultados del pipeline real (Issue #17 → PR #18)**:
+**Resultados del pipeline real (Issue #31 → PR #32)**:
 
 | Paso | Agente | Turns | Costo  | Resultado |
 |------|--------|-------|--------|-----------|
-| 1    | R1     | 9     | $0.04  | Análisis completado |
-| 2    | R2     | 14    | $0.30  | PR #18 creada, 0 permission denials |
+| 1    | R1     | 2     | $0.25  | Análisis completado |
+| 2    | R2     | 24    | $0.71  | PR #32 creada, código + 4 tests |
 | 3    | R3     | 1     | $0.01  | Review + label `ai-reviewed` |
 | 4    | R5     | 4     | $0.03  | CHANGELOG actualizado + push a main |
-| **Total** | | **28** | **$0.38** | **Pipeline completo** |
+| **Total** | | **31** | **$1.00** | **Pipeline completo** |
+
+**Optimización posterior**: Issues #33 y #35 incluyeron diffs exactos en la descripción, reduciendo turns de R2 y coste total.
 
 **Métricas a recopilar**:
 
