@@ -14,28 +14,24 @@ const baseProps = {
 };
 
 describe("ActivityListItem RPE label", () => {
-  it("muestra número y descripción en tooltip cuando rpe tiene valor", () => {
+  it("muestra número y descripción combinados en tooltip cuando rpe tiene valor", () => {
     render(<ActivityListItem {...baseProps} rpe={7} />);
-    expect(screen.getByText("7")).toBeInTheDocument();
-    expect(screen.getByText("Alto, esfuerzo sostenido")).toBeInTheDocument();
+    expect(screen.getByText("7: Alto, esfuerzo sostenido")).toBeInTheDocument();
   });
 
-  it('muestra "—" cuando rpe es null', () => {
+  it("no muestra tooltip cuando rpe es null", () => {
     render(<ActivityListItem {...baseProps} rpe={null} />);
-    // El label de RPE nulo muestra "—"
-    const dashes = screen.getAllByText("—");
-    expect(dashes.length).toBeGreaterThanOrEqual(1);
+    // Sin número RPE no hay tooltip con descripción
+    expect(screen.queryByText(/\d+:.*$/)).not.toBeInTheDocument();
   });
 
-  it("muestra descripción en tooltip para rpe=3", () => {
+  it("muestra número y descripción combinados en tooltip para rpe=3", () => {
     render(<ActivityListItem {...baseProps} rpe={3} />);
-    expect(screen.getByText("3")).toBeInTheDocument();
-    expect(screen.getByText("Ligero, respiración cómoda")).toBeInTheDocument();
+    expect(screen.getByText("3: Ligero, respiración cómoda")).toBeInTheDocument();
   });
 
-  it("muestra descripción en tooltip para rpe=10", () => {
+  it("muestra número y descripción combinados en tooltip para rpe=10", () => {
     render(<ActivityListItem {...baseProps} rpe={10} />);
-    expect(screen.getByText("10")).toBeInTheDocument();
-    expect(screen.getByText("Esfuerzo total, sprint máximo")).toBeInTheDocument();
+    expect(screen.getByText("10: Esfuerzo total, sprint máximo")).toBeInTheDocument();
   });
 });
