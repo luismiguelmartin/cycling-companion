@@ -80,7 +80,7 @@ SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 ANTHROPIC_API_KEY=
 PORT=3001
-FRONTEND_URL=http://localhost:3000  # URL del frontend para CORS
+FRONTEND_URL=http://localhost:3000  # URL del frontend para CORS (default en config/env.ts)
 ```
 
 ---
@@ -157,7 +157,7 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle completo 
 
 ### Metodología
 
-Metodología híbrida: pipeline completo (L1→L2→L3→L4) para features complejas, implementación directa para CRUD predecible. Specs en `docs/specs/` (28 archivos).
+Metodología híbrida: pipeline completo (L1→L2→L3→L4) para features complejas, implementación directa para CRUD predecible. Specs en `docs/specs/` (33 archivos).
 
 ---
 
@@ -172,10 +172,10 @@ Metodología híbrida: pipeline completo (L1→L2→L3→L4) para features compl
 ## Estado de Implementación
 
 ### Resumen
-- **Frontend**: 9 pantallas (login, onboarding, dashboard, activities, import, plan, insights, profile) — todas migradas a API backend ✅
+- **Frontend**: 10 pantallas (login, onboarding, dashboard, activities, activity-detail, import, plan, insights, profile, auth-error) — todas migradas a API backend ✅
 - **Backend**: 8 bloques completados (infra, perfil, actividades, insights, training rules, IA, plan, import) — 15+ endpoints bajo `/api/v1`
 - **Agentes remotos**: 5 agentes (R1 analyzer, R2 PR generator, R3 reviewer, R5 changelog, @claude interactive) + label sync
-- **Tests**: ~300 (72 web + 90 shared + 136 API)
+- **Tests**: ~343 (108 web + 90 shared + 145 API)
 
 ---
 
@@ -222,7 +222,7 @@ Metodología híbrida: pipeline completo (L1→L2→L3→L4) para features compl
 | PRD completo (modelo de datos, endpoints, flujo IA) | `docs/02-PRD.md` |
 | Plan de agentes y desarrollo | `docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md` |
 | Design system (pantallas, tokens, componentes, conversión JSX→Next.js) | `docs/DESIGN-SYSTEM.md` |
-| Especificaciones (28 archivos L1/L2/L3: 8 pantallas + 9 bloques backend + Fase 4) | `docs/specs/` |
+| Especificaciones (33 archivos L1/L2/L3: 8 pantallas + 9 bloques backend + Fase 4) | `docs/specs/` |
 | Spec L2 Fase 4: Agentes Remotos | `docs/specs/L2-phase4-remote-agents.md` |
 | Prompts de agentes remotos (R1, R2, R3, R5) | `prompts/remote/` |
 | Configuración Google OAuth | `docs/GOOGLE-OAUTH-SETUP.md` |
