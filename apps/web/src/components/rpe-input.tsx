@@ -70,8 +70,13 @@ export function RPEInput({ value, onChange }: RPEInputProps) {
         })}
       </div>
       {value > 0 && (
-        <div className="text-[12px] font-medium" style={{ color: RPE_BAR_COLORS[value] }}>
-          {value}/10 — {RPE_LABELS[value]}
+        <div className="group relative inline-flex items-center">
+          <div className="text-[12px] font-medium" style={{ color: RPE_BAR_COLORS[value] }}>
+            {value}/10
+          </div>
+          <div className="pointer-events-none absolute bottom-full left-0 mb-1 hidden whitespace-nowrap rounded-md border border-[var(--tooltip-border)] bg-[var(--tooltip-bg)] px-2 py-1 text-[11px] text-[var(--text-primary)] shadow-lg group-hover:block">
+            {RPE_LABELS[value]}
+          </div>
         </div>
       )}
     </div>
