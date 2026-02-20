@@ -17,9 +17,10 @@ describe("GoalCard", () => {
     expect(screen.getByText("Subir FTP, más potencia")).toBeInTheDocument();
   });
 
-  it("renderiza el icono", () => {
-    render(<GoalCard {...defaultProps} />);
-    expect(screen.getByText("Target")).toBeInTheDocument();
+  it("renderiza el icono como SVG", () => {
+    const { container } = render(<GoalCard {...defaultProps} />);
+    const svgs = container.querySelectorAll("svg");
+    expect(svgs.length).toBeGreaterThanOrEqual(1);
   });
 
   it("llama onClick al hacer clic", () => {

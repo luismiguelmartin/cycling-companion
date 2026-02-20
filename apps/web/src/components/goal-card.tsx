@@ -1,6 +1,13 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, Target, Heart, TrendingDown, Shield, type LucideIcon } from "lucide-react";
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Target,
+  Heart,
+  TrendingDown,
+  Shield,
+};
 
 interface GoalCardProps {
   icon: string;
@@ -11,6 +18,8 @@ interface GoalCardProps {
 }
 
 export function GoalCard({ icon, label, description, active, onClick }: GoalCardProps) {
+  const IconComponent = ICON_MAP[icon];
+
   return (
     <button
       onClick={onClick}
@@ -23,7 +32,11 @@ export function GoalCard({ icon, label, description, active, onClick }: GoalCard
       aria-checked={active}
     >
       <div className="flex items-center gap-2">
-        <span className="text-[22px]">{icon}</span>
+        {IconComponent ? (
+          <IconComponent className={`h-5 w-5 ${active ? "text-orange-500" : "text-[var(--text-muted)]"}`} />
+        ) : (
+          <span className="text-[22px]">{icon}</span>
+        )}
         <span
           className={`flex-1 text-[15px] font-semibold ${
             active ? "text-orange-500" : "text-[var(--text-primary)]"

@@ -1,10 +1,14 @@
 "use client";
 
-import { Zap } from "lucide-react";
+import { useState } from "react";
+import { Zap, Play } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { DemoModal } from "@/components/demo/demo-modal";
 import { LoginButton } from "./login-button";
 
 export function LoginContent() {
+  const [showDemo, setShowDemo] = useState(false);
+
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[image:var(--hero-bg)]">
       {/* Glow effects */}
@@ -70,11 +74,23 @@ export function LoginContent() {
 
           <LoginButton />
 
+          {/* Demo button */}
+          <button
+            onClick={() => setShowDemo(true)}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--input-border)] bg-transparent px-4 py-3 text-[14px] font-medium text-[var(--text-secondary)] transition-all duration-200 hover:border-orange-500/40 hover:bg-orange-500/[0.06] hover:text-orange-500"
+          >
+            <Play className="h-4 w-4" />
+            Explorar demo
+          </button>
+
           <p className="mt-6 text-center text-[11px] leading-[1.5] text-[var(--text-muted)]">
             Al continuar, aceptas nuestros términos de servicio y política de privacidad.
           </p>
         </div>
       </div>
+
+      {/* Demo modal */}
+      {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
     </div>
   );
 }
