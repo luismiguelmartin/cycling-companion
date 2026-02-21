@@ -94,6 +94,13 @@ vi.mock("../activity.service.js", () => ({
   }),
 }));
 
+// Import mocked services for per-test overrides
+const { getProfile } = await import("../profile.service.js");
+const { getActivity, listActivities } = await import("../activity.service.js");
+const mockGetProfile = vi.mocked(getProfile);
+const mockGetActivity = vi.mocked(getActivity);
+const mockListActivities = vi.mocked(listActivities);
+
 const { analyzeActivity, generateWeeklyPlan, generateWeeklySummary, getCoachTip } =
   await import("./ai.service.js");
 
@@ -324,6 +331,70 @@ describe("ai.service", () => {
 
       const result = await getCoachTip("user-123");
       expect(() => aiCoachTipSchema.parse(result)).not.toThrow();
+    });
+  });
+
+  describe("resiliencia ante fallos de datos", () => {
+    it("analyzeActivity retorna fallback genérico si getProfile falla", async () => {
+      setupSupabaseMock({});
+      mockGetProfile.mockRejectedValueOnce(new AppError("Profile not found", 404, "NOT_FOUND"));
+
+      const result = await analyzeActivity("user-123", "act-123");
+      expect(() => aiActivityAnalysisSchema.parse(result)).not.toThrow();
+      expect(result.summary).toContain("No se pudieron obtener");
+    });
+
+    it("analyzeActivity retorna fallback genérico si getActivity falla", async () => {
+      setupSupabaseMock({});
+      mockGetActivity.mockRejectedValueOnce(new AppError("Activity not found", 404, "NOT_FOUND"));
+
+      const result = await analyzeActivity("user-123", "act-123");
+      expect(() => aiActivityAnalysisSchema.parse(result)).not.toThrow();
+      expect(result.summary).toContain("No se pudieron obtener");
+    });
+
+    it("analyzeActivity retorna fallback genérico si listActivities falla", async () => {
+      setupSupabaseMock({});
+      mockListActivities.mockRejectedValueOnce(
+        new AppError("Failed to fetch activities", 500, "DATABASE_ERROR"),
+      );
+
+      const result = await analyzeActivity("user-123", "act-123");
+      expect(() => aiActivityAnalysisSchema.parse(result)).not.toThrow();
+      expect(result.summary).toContain("No se pudieron obtener");
+    });
+
+    it("getCoachTip retorna fallback genérico si getProfile falla", async () => {
+      setupSupabaseMock({});
+      mockGetProfile.mockRejectedValueOnce(new AppError("Profile not found", 404, "NOT_FOUND"));
+
+      const result = await getCoachTip("user-123");
+      expect(() => aiCoachTipSchema.parse(result)).not.toThrow();
+      expect(result.recommendation).toContain("No se pudieron obtener");
+    });
+
+    it("generateWeeklyPlan retorna fallback si getProfile falla", async () => {
+      setupSupabaseMock({});
+      mockGetProfile.mockRejectedValueOnce(new AppError("Profile not found", 404, "NOT_FOUND"));
+
+      const result = await generateWeeklyPlan("user-123");
+      expect(() => aiWeeklyPlanResponseSchema.parse(result)).not.toThrow();
+      expect(result.days).toHaveLength(7);
+    });
+
+    it("generateWeeklySummary retorna fallback genérico si getProfile falla", async () => {
+      setupSupabaseMock({});
+      mockGetProfile.mockRejectedValueOnce(new AppError("Profile not found", 404, "NOT_FOUND"));
+
+      const result = await generateWeeklySummary(
+        "user-123",
+        "2026-02-01",
+        "2026-02-07",
+        "2026-02-08",
+        "2026-02-15",
+      );
+      expect(() => aiWeeklySummarySchema.parse(result)).not.toThrow();
+      expect(result.summary).toContain("No se pudieron obtener");
     });
   });
 
