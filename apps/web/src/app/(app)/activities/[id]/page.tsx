@@ -58,7 +58,7 @@ export default async function ActivityDetailPage({ params }: PageProps) {
     // No metrics available
   }
 
-  const timeSeries = transformTimeSeries(metricsRows);
+  const timeSeries = transformTimeSeries(metricsRows, activity.distance_km);
   const dateFormatted = formatActivityDate(activity.date);
 
   const metrics: MetricItem[] = [

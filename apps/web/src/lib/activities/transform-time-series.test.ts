@@ -37,7 +37,21 @@ describe("transformTimeSeries", () => {
     expect(result[0]).toEqual({ km: 0, power: 0, hr: 0, cadence: 0 });
   });
 
-  it("no acumula distancia si speed_kmh es null", () => {
+  it("usa totalDistanceKm como fallback si speed_kmh es null", () => {
+    const input = [
+      { timestamp_seconds: 0, power_watts: 200, hr_bpm: 140, cadence_rpm: 90, speed_kmh: null },
+      { timestamp_seconds: 60, power_watts: 220, hr_bpm: 150, cadence_rpm: 92, speed_kmh: null },
+      { timestamp_seconds: 120, power_watts: 210, hr_bpm: 148, cadence_rpm: 88, speed_kmh: null },
+    ];
+
+    const result = transformTimeSeries(input, 10);
+
+    expect(result[0].km).toBe(0);
+    expect(result[1].km).toBe(5);
+    expect(result[2].km).toBe(10);
+  });
+
+  it("devuelve km=0 si speed_kmh es null y no hay totalDistanceKm", () => {
     const input = [
       { timestamp_seconds: 0, power_watts: 200, hr_bpm: 140, cadence_rpm: 90, speed_kmh: null },
       { timestamp_seconds: 60, power_watts: 220, hr_bpm: 150, cadence_rpm: 92, speed_kmh: null },
@@ -47,6 +61,18 @@ describe("transformTimeSeries", () => {
 
     expect(result[0].km).toBe(0);
     expect(result[1].km).toBe(0);
+  });
+
+  it("convierte speed_kmh string (DECIMAL) a number", () => {
+    const input = [
+      { timestamp_seconds: 0, power_watts: 200, hr_bpm: 140, cadence_rpm: 90, speed_kmh: "30.00" as unknown as number },
+      { timestamp_seconds: 60, power_watts: 220, hr_bpm: 150, cadence_rpm: 92, speed_kmh: "30.00" as unknown as number },
+    ];
+
+    const result = transformTimeSeries(input);
+
+    expect(result[0].km).toBe(0);
+    expect(result[1].km).toBe(0.5);
   });
 
   it("acumula distancia correctamente con velocidades variables", () => {
