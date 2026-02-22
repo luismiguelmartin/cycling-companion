@@ -54,6 +54,12 @@ export function ActivityChart({ data }: ActivityChartProps) {
   const gradientId = useId();
 
   const activeTab = CHART_TABS.find((t) => t.key === activeChart)!;
+  const maxKm = data.length > 0 ? data[data.length - 1].km : 0;
+  const distanceTicks: number[] = [];
+  for (let k = 0; k <= maxKm; k += 5) distanceTicks.push(k);
+  if (distanceTicks[distanceTicks.length - 1] !== Math.round(maxKm)) {
+    distanceTicks.push(Math.round(maxKm));
+  }
 
   if (data.length === 0) {
     return (
@@ -109,6 +115,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
               axisLine={false}
               tickLine={false}
               domain={[0, "dataMax"]}
+              ticks={distanceTicks}
               tick={<DistanceTick />}
             />
             <YAxis
