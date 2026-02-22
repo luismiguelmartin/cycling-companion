@@ -402,7 +402,7 @@ CREATE TABLE IF NOT EXISTS ai_cache (
   user_id UUID NOT NULL REFERENCES users(id),
   cache_key TEXT NOT NULL,         -- ej: 'coach_tip_2026-02-15'
   response JSONB NOT NULL,
-  model TEXT,                      -- 'claude-sonnet-4-5-20250929'
+  model TEXT,                      -- 'claude-sonnet-4-6'
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   expires_at TIMESTAMPTZ NOT NULL,
   UNIQUE(user_id, cache_key)

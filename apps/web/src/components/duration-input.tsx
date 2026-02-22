@@ -33,6 +33,7 @@ export function DurationInput({
             placeholder="1"
             value={hours}
             onChange={(e) => onHoursChange(e.target.value)}
+            aria-label="Horas"
             className="w-full rounded-[9px] border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2.5 text-center text-[14px] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
           />
           <span className="text-[12px] text-[var(--text-muted)]">h</span>
@@ -44,6 +45,7 @@ export function DurationInput({
             placeholder="45"
             value={minutes}
             onChange={(e) => onMinutesChange(e.target.value)}
+            aria-label="Minutos"
             className="w-full rounded-[9px] border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2.5 text-center text-[14px] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
           />
           <span className="text-[12px] text-[var(--text-muted)]">min</span>
@@ -55,6 +57,7 @@ export function DurationInput({
             placeholder="00"
             value={seconds}
             onChange={(e) => onSecondsChange(e.target.value)}
+            aria-label="Segundos"
             className="w-full rounded-[9px] border border-[var(--input-border)] bg-[var(--input-bg)] px-3 py-2.5 text-center text-[14px] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
           />
           <span className="text-[12px] text-[var(--text-muted)]">seg</span>

@@ -28,7 +28,7 @@ Crear 4 endpoints de IA que conectan con Claude API para generar contenido perso
 |----------|----------|-----------|
 | Estructura servicio | `ai.service.ts` + `prompts.ts` + `fallback.ts` | Orquestador único con módulos especializados |
 | Rutas | `routes/ai.ts` flat | Consistente con `profile.ts`, `insights.ts` |
-| Modelo | `claude-sonnet-4-5-20250929` | Balance coste/velocidad para free tier |
+| Modelo | `claude-sonnet-4-6` | Balance coste/velocidad para free tier |
 | Rate limiting | DB-based (tabla `ai_cache`) | Sobrevive restarts de Render |
 | Fallback | Training-rules de shared (Bloque 4) | Degradación elegante, nunca falla |
 

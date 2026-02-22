@@ -21,6 +21,7 @@ export function DashboardEmptyActions() {
       router.refresh();
     } catch (err) {
       console.error("Error creando datos demo:", err);
+    } finally {
       setLoading(false);
     }
   }

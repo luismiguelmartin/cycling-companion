@@ -17,7 +17,7 @@ Fase 4 implementa un pipeline de **agentes remotos** basado en `anthropic/claude
 - **16 labels** organizadas en 4 categorias
 - **CHANGELOG.md** generado automaticamente tras cada merge
 
-**Modelo**: Todos los agentes usan `claude-sonnet-4-5-20250929` para balance coste/velocidad.
+**Modelo**: Todos los agentes usan `claude-sonnet-4-6` para balance coste/velocidad.
 
 **Principio**: Los agentes remotos ejecutan y verifican; el humano siempre supervisa y valida. Ningun agente bloquea el merge de una PR.
 
@@ -55,7 +55,7 @@ Fase 4 implementa un pipeline de **agentes remotos** basado en `anthropic/claude
 │              claude-code-action@v1                            │
 │                                                              │
 │  - Lee repositorio completo (CLAUDE.md, codigo, specs)      │
-│  - Modelo: claude-sonnet-4-5-20250929                       │
+│  - Modelo: claude-sonnet-4-6                       │
 │  - Prompts en prompts/remote/*.md                           │
 │  - Herramientas: bash, file read/write, git, gh CLI         │
 └──────────┬──────────────────────────────────────────────────┘
@@ -95,7 +95,7 @@ cycling-companion/
 
 Todos los workflows comparten:
 - **Action**: `anthropic/claude-code-action@v1`
-- **Modelo**: `claude-sonnet-4-5-20250929`
+- **Modelo**: `claude-sonnet-4-6`
 - **Checkout**: `actions/checkout@v4`
 - **Node**: `actions/setup-node@v4` con Node 22
 - **pnpm**: `pnpm/action-setup@v4`
@@ -113,7 +113,7 @@ Todos los workflows comparten:
 |-------|-------|
 | **Trigger** | `issues.labeled` → label `ai-analyze` |
 | **Workflow** | `.github/workflows/ai-analyze-issue.yml` |
-| **Modelo** | `claude-sonnet-4-5-20250929` |
+| **Modelo** | `claude-sonnet-4-6` |
 | **Max turns** | 3 |
 | **Timeout** | 5 minutos |
 | **Prompt** | `prompts/remote/issue-analyzer.md` |
@@ -168,7 +168,7 @@ jobs:
       - uses: anthropic/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-5-20250929
+          model: claude-sonnet-4-6
           max_turns: 3
           timeout_minutes: 5
           prompt_file: prompts/remote/issue-analyzer.md
@@ -184,7 +184,7 @@ jobs:
 |-------|-------|
 | **Trigger** | `issues.labeled` → label `ai-generate-pr` |
 | **Workflow** | `.github/workflows/ai-generate-pr.yml` |
-| **Modelo** | `claude-sonnet-4-5-20250929` |
+| **Modelo** | `claude-sonnet-4-6` |
 | **Max turns** | 15 |
 | **Timeout** | 15 minutos |
 | **Prompt** | `prompts/remote/pr-generator.md` |
@@ -262,7 +262,7 @@ Convenciones:
 |-------|-------|
 | **Trigger** | `pull_request.opened` / `pull_request.synchronize` |
 | **Workflow** | `.github/workflows/ai-review-pr.yml` |
-| **Modelo** | `claude-sonnet-4-5-20250929` |
+| **Modelo** | `claude-sonnet-4-6` |
 | **Max turns** | 3 |
 | **Timeout** | 5 minutos |
 | **Prompt** | `prompts/remote/pr-reviewer.md` |
@@ -324,7 +324,7 @@ Anade el label ai-reviewed a la PR.
 |-------|-------|
 | **Trigger** | `pull_request.closed` (con `merged == true`) |
 | **Workflow** | `.github/workflows/ai-update-changelog.yml` |
-| **Modelo** | `claude-sonnet-4-5-20250929` |
+| **Modelo** | `claude-sonnet-4-6` |
 | **Max turns** | 5 |
 | **Timeout** | 5 minutos |
 | **Prompt** | `prompts/remote/doc-generator.md` |
@@ -404,7 +404,7 @@ Formato: Keep a Changelog (https://keepachangelog.com/es/1.1.0/)
 |-------|-------|
 | **Trigger** | `issue_comment.created` conteniendo `@claude` |
 | **Workflow** | `.github/workflows/ai-claude-interactive.yml` |
-| **Modelo** | `claude-sonnet-4-5-20250929` |
+| **Modelo** | `claude-sonnet-4-6` |
 | **Max turns** | 5 |
 | **Timeout** | 10 minutos |
 
@@ -450,7 +450,7 @@ jobs:
       - uses: anthropic/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-5-20250929
+          model: claude-sonnet-4-6
           max_turns: 5
           timeout_minutes: 10
 ```
@@ -563,7 +563,7 @@ Los demas workflows son idempotentes (sticky comments) o no generan conflictos.
 | R5 — Doc Generator | 5 | 5-10/semana | ~5K |
 | @claude Interactivo | 5 | 2-3/semana | ~15K |
 
-**Estimacion semanal**: ~300K-500K tokens con `claude-sonnet-4-5-20250929`.
+**Estimacion semanal**: ~300K-500K tokens con `claude-sonnet-4-6`.
 
 ---
 

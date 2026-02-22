@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Upload,
@@ -98,13 +98,18 @@ export function ImportActivityContent() {
       }
 
       setSaved(true);
-      setTimeout(() => {
-        router.push("/activities");
-      }, 1500);
     } catch {
       setIsSaving(false);
     }
   };
+
+  useEffect(() => {
+    if (!saved) return;
+    const timer = setTimeout(() => {
+      router.push("/activities");
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [saved, router]);
 
   const handleCancel = () => {
     router.push("/activities");

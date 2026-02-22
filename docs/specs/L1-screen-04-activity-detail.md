@@ -555,6 +555,6 @@ interface AIAnalysisDB {
     sleep?: string;          // "Mín 8h sueño"
   };
   generated_at: string;      // ISO datetime
-  model_version: string;     // "claude-sonnet-4-5-20250929"
+  model_version: string;     // "claude-sonnet-4-6"
 }
 ```

@@ -37,7 +37,7 @@ export function InsightsContent({
             Comparar periodos
           </h1>
           <p className="mt-1 text-[13px] text-[var(--text-muted)]">
-            Analiza tu progresion entre semanas
+            Analiza tu progresión entre semanas
           </p>
         </div>
 
@@ -47,7 +47,7 @@ export function InsightsContent({
             Necesitas al menos 2 semanas de datos para comparar periodos.
           </p>
           <p className="mt-2 text-[13px] text-[var(--text-muted)]">
-            Sigue entrenando y podras ver tu progresion aqui.
+            Sigue entrenando y podrás ver tu progresión aquí.
           </p>
         </div>
       </div>
@@ -62,7 +62,7 @@ export function InsightsContent({
           Comparar periodos
         </h1>
         <p className="mt-1 text-[13px] text-[var(--text-muted)]">
-          Analiza tu progresion entre semanas
+          Analiza tu progresión entre semanas
         </p>
       </div>
 

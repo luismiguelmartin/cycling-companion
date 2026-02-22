@@ -307,7 +307,7 @@ cycling-companion/
    ↓
 5. Construir prompt versionado (prompts.ts)
    ↓
-6. Llamar a Claude API (claude-sonnet-4-5-20250929)
+6. Llamar a Claude API (claude-sonnet-4-6)
    ↓
 7. Parsear + validar con schema Zod → si falla: fallback heurístico
    ↓

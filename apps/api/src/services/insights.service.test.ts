@@ -60,14 +60,13 @@ const makeActivity = (overrides: Record<string, unknown> = {}) => ({
  */
 function dateInWeek(weekOffset: number, dayOffset = 0): string {
   const now = new Date();
-  const day = now.getDay();
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(now);
-  monday.setDate(diff);
-  monday.setHours(0, 0, 0, 0);
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const day = d.getUTCDay();
+  const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
+  d.setUTCDate(diff);
 
-  const target = new Date(monday);
-  target.setDate(target.getDate() + weekOffset * 7 + dayOffset);
+  const target = new Date(d);
+  target.setUTCDate(target.getUTCDate() + weekOffset * 7 + dayOffset);
   return target.toISOString().split("T")[0];
 }
 

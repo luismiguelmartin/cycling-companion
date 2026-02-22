@@ -45,6 +45,7 @@ export function RPEInput({ value, onChange }: RPEInputProps) {
         aria-valuemin={1}
         aria-valuemax={10}
         aria-valuenow={value || undefined}
+        aria-valuetext={value > 0 ? `${value} de 10 — ${RPE_LABELS[value]}` : undefined}
         aria-label="Esfuerzo percibido"
       >
         {Array.from({ length: 10 }, (_, i) => {

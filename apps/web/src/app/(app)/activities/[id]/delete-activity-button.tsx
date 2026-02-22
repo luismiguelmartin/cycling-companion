@@ -45,9 +45,22 @@ export function DeleteActivityButton({ activityId, activityName }: DeleteActivit
           />
 
           {/* Card */}
-          <div className="relative z-10 mx-4 w-full max-w-sm rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6 shadow-2xl">
-            <h2 className="text-[16px] font-bold text-[var(--text-primary)]">Eliminar actividad</h2>
-            <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-secondary)]">
+          <div
+            role="alertdialog"
+            aria-labelledby="delete-dialog-title"
+            aria-describedby="delete-dialog-desc"
+            className="relative z-10 mx-4 w-full max-w-sm rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6 shadow-2xl"
+          >
+            <h2
+              id="delete-dialog-title"
+              className="text-[16px] font-bold text-[var(--text-primary)]"
+            >
+              Eliminar actividad
+            </h2>
+            <p
+              id="delete-dialog-desc"
+              className="mt-2 text-[13px] leading-relaxed text-[var(--text-secondary)]"
+            >
               ¿Seguro que quieres eliminar «{activityName}»? Esta acción no se puede deshacer.
             </p>
             <div className="mt-5 flex gap-3">
