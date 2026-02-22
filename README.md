@@ -5,6 +5,8 @@
 
 Plataforma web de análisis y planificación de entrenamiento para ciclistas amateur (40+), impulsada por IA.
 
+**Demo en producción**: [cycling-companion-web.vercel.app](https://cycling-companion-web.vercel.app/)
+
 **Cycling Companion** es un banco de pruebas para un pipeline AI-first de integración de IA en el ciclo de vida del desarrollo. Proporciona un entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables de entrenamiento, nutrición y descanso.
 
 ---
@@ -331,7 +333,7 @@ cycling-companion/
 | -------------------- | ------------- | ----------------------------------------------------------------- | --------------- |
 | `/auth/login`        | Login         | Autenticación con Google OAuth                                    | Supabase Auth   |
 | `/onboarding`        | Onboarding    | Wizard de 4 pasos: perfil → objetivos → zonas → resumen           | API backend     |
-| `/`                  | Dashboard     | KPIs, gráficas de potencia/carga, coach IA, últimas actividades   | API backend     |
+| `/`                  | Dashboard     | KPIs, gráficas de potencia/carga, coach IA, últimas actividades, creación de datos demo | API backend     |
 | `/activities`        | Lista         | Tabla paginada con filtros por tipo y búsqueda por nombre         | API backend     |
 | `/activities/[id]`   | Detalle       | Métricas, gráficas temporales (potencia/FC/cadencia), análisis IA | API backend     |
 | `/activities/import` | Importar      | Entrada manual o subida de archivo (.fit/.gpx)                    | API backend     |

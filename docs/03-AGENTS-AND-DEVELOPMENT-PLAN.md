@@ -372,7 +372,7 @@ jobs:
 
 ## 3. Resumen de agentes
 
-| ID  | Nombre         | Tipo   | Trigger                | Fase     | Estado (2026-02-16) |
+| ID  | Nombre         | Tipo   | Trigger                | Fase     | Estado (2026-02-22) |
 | --- | -------------- | ------ | ---------------------- | -------- | ------------------- |
 | L1  | UX Interpreter | Local  | Manual                 | Fase 1   | ✅ Usado (8 pantallas) |
 | L2  | Architect      | Local  | Manual                 | Fase 1-3 | ✅ Usado (8 pantallas + 8 bloques backend) |
@@ -390,7 +390,7 @@ jobs:
 
 El desarrollo se organiza en **4 fases** distribuidas en **7 semanas**, diseñado para ganar confianza y experiencia de forma progresiva.
 
-### Estado actual (2026-02-16)
+### Estado actual (2026-02-22)
 
 ```
 Fase 1: Cimientos                    ✅ COMPLETADA
@@ -453,7 +453,7 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 
 - ✅ Dashboard funcional con datos de Supabase
 - ✅ Agentes L1, L2, L3 usados para todas las pantallas
-- ✅ Specs L1/L2/L3 generadas para 8 pantallas (22 archivos en `docs/specs/`)
+- ✅ Specs L1/L2/L3 generadas para 8 pantallas + 9 bloques backend + Fase 4 (33 archivos en `docs/specs/`)
 - ✅ Design System documentado (`docs/DESIGN-SYSTEM.md`, 920 líneas)
 - ✅ Schemas Zod compartidos en `packages/shared`
 
@@ -537,7 +537,7 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 - ✅ API Fastify con 15+ endpoints funcionales
 - ✅ 4 endpoints IA con Claude API, caché, fallback y rate limiting
 - ✅ Importación real de archivos .fit/.gpx
-- ✅ 136 tests API + 82 tests shared (218 total backend)
+- ✅ 151 tests API + 90 tests shared (241 total backend)
 - ✅ 4 migraciones SQL aplicadas
 - ✅ 9 specs L2-backend generadas (Bloques 0-8)
 - ✅ Deploy en producción (Render)
@@ -574,7 +574,7 @@ Fase 4: Pulido y evaluación (métricas + documentación)
 - ✅ Frontend migrado a API backend (Bloque 8)
 - ✅ Análisis IA: auto-trigger tras import + botón manual en detalle
 - ✅ Gráficas de actividad con eje X en kilómetros
-- ✅ 290 tests (29 archivos): 72 web + 82 shared + 136 API
+- ✅ ~355 tests (30 archivos): 114 web + 90 shared + 151 API
 - ✅ Agentes remotos configurados: R1, R2, R3, R5 + @claude interactivo (Fase 4)
 - ✅ 16 labels para pipeline AI-first + label sync automático
 - ✅ CHANGELOG.md con auto-update en merge
@@ -839,7 +839,7 @@ Para los agentes R1 y R2 que usan Claude, hay dos opciones:
 
 ## 10. Checklist de arranque
 
-> Estado actualizado: 2026-02-16
+> Estado actualizado: 2026-02-22
 
 - [x] Crear proyecto en Supabase (con 4 migraciones aplicadas)
 - [x] Configurar Google OAuth en Google Cloud Console + Supabase (ref: `docs/GOOGLE-OAUTH-SETUP.md`)

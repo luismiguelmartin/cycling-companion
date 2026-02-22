@@ -209,7 +209,7 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 
 ## 10. Estado actual de implementación
 
-> Última actualización: 2026-02-16
+> Última actualización: 2026-02-22
 
 ### Frontend (Fase 2 completada ✅)
 
@@ -255,8 +255,8 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 
 - **Design System**: `docs/DESIGN-SYSTEM.md` — guía completa con tokens, componentes, paleta y guía de conversión JSX→Next.js
 - **Mockups JSX**: `docs/design/` — fuente de verdad visual (excluidos de git)
-- **Especificaciones**: 22 archivos L1/L2/L3 (frontend) + 9 archivos L2-backend (API) en `docs/specs/`
-- **Schemas compartidos**: `packages/shared/src/` — 5 schemas Zod + 7 módulos de constantes + utils de training (TSS, IF, CTL/ATL/TSB, NP)
+- **Especificaciones**: 33 archivos L1/L2/L3 (frontend + backend + Fase 4) en `docs/specs/`
+- **Schemas compartidos**: `packages/shared/src/` — 5 schemas Zod + 8 módulos de constantes + utils de training (TSS, IF, CTL/ATL/TSB, NP)
 
 ### Infraestructura
 
@@ -266,5 +266,5 @@ El protagonista es el **pipeline AI-first**. El producto es el terreno donde se 
 - Frontend migrado completamente a API backend (Bloque 8)
 - Auth: Google OAuth via Supabase Auth
 - Deploy: Vercel (frontend) + Render (API) + Supabase (DB)
-- Tests: 29 archivos, 290 tests (72 web + 82 shared + 136 API)
+- Tests: 30 archivos, ~355 tests (114 web + 90 shared + 151 API)
 - Labels: 16 labels para pipeline AI-first (sync automático via `label-sync`)

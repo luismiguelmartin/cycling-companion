@@ -532,7 +532,7 @@ La arquitectura ya soporta datos reales:
 
 ## 9. Estado de especificaciones
 
-> Última actualización: 2026-02-16
+> Última actualización: 2026-02-22
 
 ### Especificaciones frontend (L1/L2/L3 por pantalla)
 
