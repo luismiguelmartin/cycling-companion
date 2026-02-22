@@ -327,6 +327,7 @@ cycling-companion/
 - Tarjeta IA: recomendación del día (2-3 frases)
 - Alerta de sobrecarga si carga semanal > umbral
 - Accesos rápidos: última actividad, plan, comparar
+- Empty state con CTAs: "Crear datos demo" (genera 5 actividades mock de la semana) e "Importar actividad"
 
 #### F03 — Lista de Actividades
 
@@ -342,6 +343,14 @@ cycling-companion/
 - Normalized Power (NP) calculado automáticamente para TSS preciso
 - RPE y notas editables en ambos modos
 - Análisis IA auto-trigger tras importar
+- **Archivos GPX de ejemplo** en `docs/data/` para probar la importación:
+
+| Archivo | Ruta | Fecha |
+|---------|------|-------|
+| Badajoz - Villar del Rey - La Roca - Montijo - Alcazaba - Badajoz | 110 km aprox. | 2026-02-01 |
+| Badajoz - Elvas - Olivenza - Valverde - Badajoz | 90 km aprox. | 2026-02-08 |
+| Badajoz - Elvas - Vila Fernando - Sta. Eulalia - Elvas - Badajoz | 85 km aprox. | 2026-02-15 |
+| Badajoz - Elvas - Vila Fernando - Barbacena - Sta. Eulalia - Campo Maior - Badajoz | 105 km aprox. | 2026-02-22 |
 
 #### F05 — Detalle de Actividad
 

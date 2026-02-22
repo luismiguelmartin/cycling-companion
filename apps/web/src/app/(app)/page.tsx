@@ -7,6 +7,7 @@ import { OverloadAlert } from "@/components/overload-alert";
 import { RecentActivityItem } from "@/components/recent-activity-item";
 import { PowerTrendChart } from "@/components/charts/power-trend-chart";
 import { DailyLoadChart } from "@/components/charts/daily-load-chart";
+import { DashboardEmptyActions } from "@/components/dashboard-empty-actions";
 import {
   calculateWeeklyKPIs,
   calculateTrends,
@@ -245,11 +246,7 @@ export default async function DashboardPage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6 text-center">
-            <p className="text-[13px] text-[var(--text-muted)]">
-              Aún no tienes actividades registradas. ¡Importa tu primera sesión!
-            </p>
-          </div>
+          <DashboardEmptyActions />
         )}
       </div>
     </div>

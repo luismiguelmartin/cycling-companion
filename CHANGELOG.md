@@ -26,6 +26,7 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 - Diapositivas de presentación para MVP de Cycling Companion (#29)
 - Modo demo con datos mock de febrero 2026 y modal carrusel (#30)
 - Etiqueta descriptiva de RPE en lista de actividades (#32)
+- Botones "Crear datos demo" e "Importar actividad" en el empty state del dashboard para mejorar la experiencia de usuario nuevo
 
 ### Cambiado
 
