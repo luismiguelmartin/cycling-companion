@@ -28,6 +28,27 @@ const CHART_TABS = [
 
 type ChartKey = (typeof CHART_TABS)[number]["key"];
 
+interface DistanceTickProps {
+  x?: number;
+  y?: number;
+  payload?: { value: number };
+  visibleTicksCount?: number;
+  index?: number;
+}
+
+function DistanceTick({ x, y, payload, visibleTicksCount, index }: DistanceTickProps) {
+  const isLast = visibleTicksCount != null && index === visibleTicksCount - 1;
+  const label = isLast
+    ? `${Math.round(payload?.value ?? 0)} km`
+    : String(Math.round(payload?.value ?? 0));
+
+  return (
+    <text x={x} y={(y ?? 0) + 12} textAnchor="middle" fontSize={10} fill="var(--text-muted)">
+      {label}
+    </text>
+  );
+}
+
 export function ActivityChart({ data }: ActivityChartProps) {
   const [activeChart, setActiveChart] = useState<ChartKey>("power");
   const gradientId = useId();
@@ -74,7 +95,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
       {/* Chart */}
       <div className="h-[160px] md:h-[220px]">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 5, right: 5, bottom: 0, left: -20 }}>
+          <AreaChart data={data} margin={{ top: 5, right: 30, bottom: 0, left: -20 }}>
             <defs>
               <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={activeTab.color} stopOpacity={0.25} />
@@ -83,11 +104,12 @@ export function ActivityChart({ data }: ActivityChartProps) {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-color)" vertical={false} />
             <XAxis
+              type="number"
               dataKey="km"
-              tick={{ fontSize: 10, fill: "var(--text-muted)" }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={(v: number) => `${v} km`}
+              domain={[0, "dataMax"]}
+              tick={<DistanceTick />}
             />
             <YAxis
               tick={{ fontSize: 10, fill: "var(--text-muted)" }}

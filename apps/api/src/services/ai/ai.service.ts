@@ -230,6 +230,7 @@ export async function analyzeActivity(
     return GENERIC_ANALYSIS_FALLBACK;
   }
 
+  let result: AIActivityAnalysis;
   try {
     const prompt = buildAnalyzeActivityPrompt({
       profile,
@@ -241,25 +242,27 @@ export async function analyzeActivity(
     });
 
     const raw = await callClaude(prompt.system, prompt.user, 1024);
-    const result = parseAndValidate(raw, aiActivityAnalysisSchema);
-
-    // Persist to activity and cache
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 30);
-
-    await Promise.all([
-      supabaseAdmin
-        .from("activities")
-        .update({ ai_analysis: result })
-        .eq("id", activityId)
-        .eq("user_id", userId),
-      cacheResponse(userId, cacheKey, "analyze-activity", result, expiresAt),
-    ]);
-
-    return result;
+    result = parseAndValidate(raw, aiActivityAnalysisSchema);
   } catch {
-    return fallbackAnalyzeActivity(activity, profile, trainingLoad, alerts);
+    result = fallbackAnalyzeActivity(activity, profile, trainingLoad, alerts);
   }
+
+  // Persist to activity and cache (both AI and fallback results)
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 30);
+
+  await Promise.all([
+    supabaseAdmin
+      .from("activities")
+      .update({ ai_analysis: result })
+      .eq("id", activityId)
+      .eq("user_id", userId),
+    cacheResponse(userId, cacheKey, "analyze-activity", result, expiresAt),
+  ]).catch(() => {
+    // Persist errors should not prevent returning the result
+  });
+
+  return result;
 }
 
 export async function generateWeeklyPlan(

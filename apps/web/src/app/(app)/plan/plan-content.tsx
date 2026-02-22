@@ -37,12 +37,13 @@ export function PlanContent({ serverPlanDays }: PlanContentProps) {
   async function handleGeneratePlan(forceRegenerate = false) {
     setIsGenerating(true);
     try {
-      const res = await apiClientPost<{ data: { plan_data: PlanDay[] } }>("/ai/weekly-plan", {
-        force_regenerate: forceRegenerate,
-      });
-      if (res.data?.plan_data) {
-        setPlanDays(res.data.plan_data);
-        setSelectedIndex(getTodayIndex(res.data.plan_data));
+      const res = await apiClientPost<{ data: { days: PlanDay[]; rationale: string } }>(
+        "/ai/weekly-plan",
+        { force_regenerate: forceRegenerate },
+      );
+      if (res.data?.days) {
+        setPlanDays(res.data.days);
+        setSelectedIndex(getTodayIndex(res.data.days));
       }
     } catch {
       // Error generating plan

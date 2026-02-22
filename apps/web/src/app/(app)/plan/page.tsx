@@ -6,7 +6,7 @@ interface PlanResponse {
   data: {
     id: string;
     week_start: string;
-    plan_data: PlanDay[];
+    days: PlanDay[];
     ai_rationale: string | null;
   };
 }
@@ -28,8 +28,8 @@ export default async function PlanPage() {
 
   try {
     const res = await apiGet<PlanResponse>(`/plan?week_start=${weekStartStr}`, token);
-    if (res.data?.plan_data) {
-      planDays = res.data.plan_data;
+    if (res.data?.days) {
+      planDays = res.data.days;
     }
   } catch {
     // No plan found — will show empty state
