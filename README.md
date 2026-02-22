@@ -5,9 +5,11 @@
 
 Plataforma web de análisis y planificación de entrenamiento para ciclistas amateur (40+), impulsada por IA.
 
+**Cycling Companion** es un banco de pruebas para un pipeline AI-first de integración de IA en el ciclo de vida del desarrollo. Proporciona un entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables de entrenamiento, nutrición y descanso.
+
 **Demo en producción**: [cycling-companion-web.vercel.app](https://cycling-companion-web.vercel.app/)
 
-**Cycling Companion** es un banco de pruebas para un pipeline AI-first de integración de IA en el ciclo de vida del desarrollo. Proporciona un entrenador IA personal que traduce datos de ciclismo en recomendaciones accionables de entrenamiento, nutrición y descanso.
+Si no hay datos, el dashboard permite generar datos de demostración o importar actividades reales en formato GPX (ver [archivos de ejemplo](docs/data/)).
 
 ---
 
