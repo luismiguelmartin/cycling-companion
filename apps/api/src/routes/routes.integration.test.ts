@@ -32,7 +32,7 @@ const { buildApp } = await import("../app.js");
 const { supabaseAdmin } = await import("../services/supabase.js");
 
 const mockProfile = {
-  id: "user-123",
+  id: "00000000-0000-0000-0000-000000000001",
   email: "test@example.com",
   display_name: "Test User",
   age: 42,
@@ -46,8 +46,8 @@ const mockProfile = {
 };
 
 const mockActivity = {
-  id: "act-123",
-  user_id: "user-123",
+  id: "00000000-0000-0000-0000-000000000002",
+  user_id: "00000000-0000-0000-0000-000000000001",
   name: "Morning Ride",
   date: "2026-02-10",
   type: "endurance",
@@ -71,7 +71,7 @@ const authHeaders = { Authorization: "Bearer test-token" };
 
 function mockAuthSuccess() {
   vi.mocked(supabaseAdmin.auth.getUser).mockResolvedValue({
-    data: { user: { id: "user-123", email: "test@example.com" } },
+    data: { user: { id: "00000000-0000-0000-0000-000000000001", email: "test@example.com" } },
     error: null,
   } as ReturnType<typeof supabaseAdmin.auth.getUser> extends Promise<infer R> ? R : never);
 }
@@ -268,7 +268,7 @@ describe("API Integration", () => {
       mockFromChain({ data: mockActivity, error: null });
       const res = await app.inject({
         method: "GET",
-        url: "/api/v1/activities/act-123",
+        url: "/api/v1/activities/00000000-0000-0000-0000-000000000002",
         headers: authHeaders,
       });
       expect(res.statusCode).toBe(200);
@@ -304,7 +304,7 @@ describe("API Integration", () => {
       } as ReturnType<typeof supabaseAdmin.from>);
       const res = await app.inject({
         method: "DELETE",
-        url: "/api/v1/activities/act-123",
+        url: "/api/v1/activities/00000000-0000-0000-0000-000000000002",
         headers: authHeaders,
       });
       expect(res.statusCode).toBe(204);
@@ -504,7 +504,7 @@ describe("API Integration", () => {
         method: "POST",
         url: "/api/v1/ai/analyze-activity",
         headers: authHeaders,
-        payload: { activity_id: "act-123" },
+        payload: { activity_id: "00000000-0000-0000-0000-000000000002" },
       });
       expect(res.statusCode).toBe(200);
       const body = res.json();
@@ -597,7 +597,7 @@ describe("API Integration", () => {
   describe("Plan", () => {
     const mockPlanRow = {
       id: "plan-123",
-      user_id: "user-123",
+      user_id: "00000000-0000-0000-0000-000000000001",
       week_start: "2026-02-10",
       plan_data: {
         days: Array.from({ length: 7 }, (_, i) => ({

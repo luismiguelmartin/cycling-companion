@@ -31,7 +31,7 @@ vi.mock("../anthropic.js", () => ({
 // Mock profile service
 vi.mock("../profile.service.js", () => ({
   getProfile: vi.fn().mockResolvedValue({
-    id: "user-123",
+    id: "00000000-0000-0000-0000-000000000001",
     email: "test@example.com",
     display_name: "Test User",
     age: 45,
@@ -48,8 +48,8 @@ vi.mock("../profile.service.js", () => ({
 // Mock activity service
 vi.mock("../activity.service.js", () => ({
   getActivity: vi.fn().mockResolvedValue({
-    id: "act-123",
-    user_id: "user-123",
+    id: "00000000-0000-0000-0000-000000000002",
+    user_id: "00000000-0000-0000-0000-000000000001",
     name: "Morning Ride",
     date: "2026-02-15",
     type: "endurance",
@@ -71,8 +71,8 @@ vi.mock("../activity.service.js", () => ({
   listActivities: vi.fn().mockResolvedValue({
     data: [
       {
-        id: "act-123",
-        user_id: "user-123",
+        id: "00000000-0000-0000-0000-000000000002",
+        user_id: "00000000-0000-0000-0000-000000000001",
         name: "Morning Ride",
         date: "2026-02-15",
         type: "endurance",
@@ -205,7 +205,10 @@ describe("ai.service", () => {
       setupSupabaseMock({});
       mockClaudeResponse(validAnalysis);
 
-      const result = await analyzeActivity("user-123", "act-123");
+      const result = await analyzeActivity(
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000002",
+      );
       expect(() => aiActivityAnalysisSchema.parse(result)).not.toThrow();
       expect(result.summary).toBe(validAnalysis.summary);
     });
@@ -214,7 +217,10 @@ describe("ai.service", () => {
       setupSupabaseMock({});
       mockCreate.mockRejectedValue(new Error("API down"));
 
-      const result = await analyzeActivity("user-123", "act-123");
+      const result = await analyzeActivity(
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000002",
+      );
       expect(() => aiActivityAnalysisSchema.parse(result)).not.toThrow();
       expect(result.summary).toBeDefined();
     });
@@ -225,14 +231,20 @@ describe("ai.service", () => {
         content: [{ type: "text", text: "esto no es json" }],
       });
 
-      const result = await analyzeActivity("user-123", "act-123");
+      const result = await analyzeActivity(
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000002",
+      );
       expect(() => aiActivityAnalysisSchema.parse(result)).not.toThrow();
     });
 
     it("retorna caché si existe", async () => {
       setupSupabaseMock({ cachedResponse: validAnalysis });
 
-      const result = await analyzeActivity("user-123", "act-123");
+      const result = await analyzeActivity(
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000002",
+      );
       expect(result).toEqual(validAnalysis);
       expect(mockCreate).not.toHaveBeenCalled();
     });
@@ -243,7 +255,7 @@ describe("ai.service", () => {
       setupSupabaseMock({});
       mockClaudeResponse(validWeeklyPlan);
 
-      const result = await generateWeeklyPlan("user-123");
+      const result = await generateWeeklyPlan("00000000-0000-0000-0000-000000000001");
       expect(() => aiWeeklyPlanResponseSchema.parse(result)).not.toThrow();
       expect(result.days).toHaveLength(7);
     });
@@ -252,7 +264,7 @@ describe("ai.service", () => {
       setupSupabaseMock({});
       mockCreate.mockRejectedValue(new Error("API down"));
 
-      const result = await generateWeeklyPlan("user-123");
+      const result = await generateWeeklyPlan("00000000-0000-0000-0000-000000000001");
       expect(() => aiWeeklyPlanResponseSchema.parse(result)).not.toThrow();
       expect(result.days).toHaveLength(7);
     });
@@ -261,7 +273,7 @@ describe("ai.service", () => {
       setupSupabaseMock({ cachedResponse: validWeeklyPlan });
       mockClaudeResponse(validWeeklyPlan);
 
-      await generateWeeklyPlan("user-123", undefined, true);
+      await generateWeeklyPlan("00000000-0000-0000-0000-000000000001", undefined, true);
       expect(mockCreate).toHaveBeenCalled();
     });
   });
@@ -272,7 +284,7 @@ describe("ai.service", () => {
       mockClaudeResponse(validWeeklySummary);
 
       const result = await generateWeeklySummary(
-        "user-123",
+        "00000000-0000-0000-0000-000000000001",
         "2026-02-01",
         "2026-02-07",
         "2026-02-08",
@@ -286,7 +298,7 @@ describe("ai.service", () => {
       mockCreate.mockRejectedValue(new Error("API down"));
 
       const result = await generateWeeklySummary(
-        "user-123",
+        "00000000-0000-0000-0000-000000000001",
         "2026-02-01",
         "2026-02-07",
         "2026-02-08",
@@ -301,14 +313,14 @@ describe("ai.service", () => {
       setupSupabaseMock({});
       mockClaudeResponse(validCoachTip);
 
-      const result = await getCoachTip("user-123");
+      const result = await getCoachTip("00000000-0000-0000-0000-000000000001");
       expect(() => aiCoachTipSchema.parse(result)).not.toThrow();
     });
 
     it("retorna caché si existe (no llama a Claude)", async () => {
       setupSupabaseMock({ cachedResponse: validCoachTip });
 
-      const result = await getCoachTip("user-123");
+      const result = await getCoachTip("00000000-0000-0000-0000-000000000001");
       expect(result).toEqual(validCoachTip);
       expect(mockCreate).not.toHaveBeenCalled();
     });
@@ -317,7 +329,7 @@ describe("ai.service", () => {
       setupSupabaseMock({});
       mockCreate.mockRejectedValue(new Error("API down"));
 
-      const result = await getCoachTip("user-123");
+      const result = await getCoachTip("00000000-0000-0000-0000-000000000001");
       expect(() => aiCoachTipSchema.parse(result)).not.toThrow();
     });
   });
@@ -327,7 +339,10 @@ describe("ai.service", () => {
       setupSupabaseMock({});
       mockGetProfile.mockRejectedValueOnce(new AppError("Profile not found", 404, "NOT_FOUND"));
 
-      const result = await analyzeActivity("user-123", "act-123");
+      const result = await analyzeActivity(
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000002",
+      );
       expect(() => aiActivityAnalysisSchema.parse(result)).not.toThrow();
       expect(result.summary).toContain("No se pudieron obtener");
     });
@@ -336,7 +351,10 @@ describe("ai.service", () => {
       setupSupabaseMock({});
       mockGetActivity.mockRejectedValueOnce(new AppError("Activity not found", 404, "NOT_FOUND"));
 
-      const result = await analyzeActivity("user-123", "act-123");
+      const result = await analyzeActivity(
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000002",
+      );
       expect(() => aiActivityAnalysisSchema.parse(result)).not.toThrow();
       expect(result.summary).toContain("No se pudieron obtener");
     });
@@ -347,7 +365,10 @@ describe("ai.service", () => {
         new AppError("Failed to fetch activities", 500, "DATABASE_ERROR"),
       );
 
-      const result = await analyzeActivity("user-123", "act-123");
+      const result = await analyzeActivity(
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000002",
+      );
       expect(() => aiActivityAnalysisSchema.parse(result)).not.toThrow();
       expect(result.summary).toContain("No se pudieron obtener");
     });
@@ -356,7 +377,7 @@ describe("ai.service", () => {
       setupSupabaseMock({});
       mockGetProfile.mockRejectedValueOnce(new AppError("Profile not found", 404, "NOT_FOUND"));
 
-      const result = await getCoachTip("user-123");
+      const result = await getCoachTip("00000000-0000-0000-0000-000000000001");
       expect(() => aiCoachTipSchema.parse(result)).not.toThrow();
       expect(result.recommendation).toContain("No se pudieron obtener");
     });
@@ -365,7 +386,7 @@ describe("ai.service", () => {
       setupSupabaseMock({});
       mockGetProfile.mockRejectedValueOnce(new AppError("Profile not found", 404, "NOT_FOUND"));
 
-      const result = await generateWeeklyPlan("user-123");
+      const result = await generateWeeklyPlan("00000000-0000-0000-0000-000000000001");
       expect(() => aiWeeklyPlanResponseSchema.parse(result)).not.toThrow();
       expect(result.days).toHaveLength(7);
     });
@@ -375,7 +396,7 @@ describe("ai.service", () => {
       mockGetProfile.mockRejectedValueOnce(new AppError("Profile not found", 404, "NOT_FOUND"));
 
       const result = await generateWeeklySummary(
-        "user-123",
+        "00000000-0000-0000-0000-000000000001",
         "2026-02-01",
         "2026-02-07",
         "2026-02-08",
@@ -390,10 +411,20 @@ describe("ai.service", () => {
     it("lanza AppError 429 tras 20 llamadas/día", async () => {
       setupSupabaseMock({ rateLimitCount: 20 });
 
-      await expect(analyzeActivity("user-123", "act-123")).rejects.toThrow(AppError);
+      await expect(
+        analyzeActivity(
+          "00000000-0000-0000-0000-000000000001",
+          "00000000-0000-0000-0000-000000000002",
+        ),
+      ).rejects.toThrow(AppError);
 
       setupSupabaseMock({ rateLimitCount: 20 });
-      await expect(analyzeActivity("user-123", "act-123")).rejects.toMatchObject({
+      await expect(
+        analyzeActivity(
+          "00000000-0000-0000-0000-000000000001",
+          "00000000-0000-0000-0000-000000000002",
+        ),
+      ).rejects.toMatchObject({
         statusCode: 429,
       });
     });

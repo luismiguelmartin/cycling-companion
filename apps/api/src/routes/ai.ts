@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import { z } from "zod";
 import { AppError } from "../plugins/error-handler.js";
 import {
   analyzeActivity,
@@ -7,62 +8,66 @@ import {
   getCoachTip,
 } from "../services/ai/ai.service.js";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+const analyzeBodySchema = z.object({
+  activity_id: z.string().regex(UUID_RE, "Invalid UUID format"),
+});
+
+const weeklyPlanBodySchema = z.object({
+  week_start: z.string().regex(DATE_RE, "Must be YYYY-MM-DD").optional(),
+  force_regenerate: z.boolean().optional(),
+});
+
+const weeklySummaryBodySchema = z.object({
+  period_a_start: z.string().regex(DATE_RE, "Must be YYYY-MM-DD"),
+  period_a_end: z.string().regex(DATE_RE, "Must be YYYY-MM-DD"),
+  period_b_start: z.string().regex(DATE_RE, "Must be YYYY-MM-DD"),
+  period_b_end: z.string().regex(DATE_RE, "Must be YYYY-MM-DD"),
+});
+
 export default async function aiRoutes(fastify: FastifyInstance) {
   fastify.post("/ai/analyze-activity", async (request) => {
-    const { activity_id } = request.body as { activity_id?: string };
-
-    if (!activity_id) {
-      throw new AppError("Missing required field: activity_id", 400, "BAD_REQUEST");
+    const parsed = analyzeBodySchema.safeParse(request.body);
+    if (!parsed.success) {
+      throw new AppError("Missing or invalid field: activity_id", 400, "BAD_REQUEST");
     }
 
-    const analysis = await analyzeActivity(request.userId, activity_id);
+    const analysis = await analyzeActivity(request.userId, parsed.data.activity_id);
     return { data: analysis };
   });
 
   fastify.post("/ai/weekly-plan", async (request) => {
-    const { week_start, force_regenerate } = (request.body ?? {}) as {
-      week_start?: string;
-      force_regenerate?: boolean;
-    };
+    const parsed = weeklyPlanBodySchema.safeParse(request.body ?? {});
+    if (!parsed.success) {
+      throw new AppError("Invalid request body", 400, "BAD_REQUEST");
+    }
 
-    const result = await generateWeeklyPlan(request.userId, week_start, force_regenerate);
+    const result = await generateWeeklyPlan(
+      request.userId,
+      parsed.data.week_start,
+      parsed.data.force_regenerate,
+    );
     return { data: result };
   });
 
   fastify.post("/ai/weekly-summary", async (request) => {
-    const body = request.body as {
-      period_a_start?: string;
-      period_a_end?: string;
-      period_b_start?: string;
-      period_b_end?: string;
-    };
-
-    const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-    const { period_a_start, period_a_end, period_b_start, period_b_end } = body;
-
-    if (!period_a_start || !period_a_end || !period_b_start || !period_b_end) {
+    const parsed = weeklySummaryBodySchema.safeParse(request.body);
+    if (!parsed.success) {
       throw new AppError(
-        "Missing required fields: period_a_start, period_a_end, period_b_start, period_b_end",
+        "Missing or invalid date fields (YYYY-MM-DD): period_a_start, period_a_end, period_b_start, period_b_end",
         400,
         "BAD_REQUEST",
       );
     }
 
-    if (
-      !DATE_RE.test(period_a_start) ||
-      !DATE_RE.test(period_a_end) ||
-      !DATE_RE.test(period_b_start) ||
-      !DATE_RE.test(period_b_end)
-    ) {
-      throw new AppError("Date fields must be YYYY-MM-DD format", 400, "BAD_REQUEST");
-    }
-
     const summary = await generateWeeklySummary(
       request.userId,
-      period_a_start,
-      period_a_end,
-      period_b_start,
-      period_b_end,
+      parsed.data.period_a_start,
+      parsed.data.period_a_end,
+      parsed.data.period_b_start,
+      parsed.data.period_b_end,
     );
     return { data: summary };
   });

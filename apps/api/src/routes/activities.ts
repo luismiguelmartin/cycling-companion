@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
-import type { ActivityCreateInput, ActivityType } from "shared";
+import { z } from "zod";
+import { activityCreateSchema, activityTypeEnum } from "shared";
 import {
   listActivities,
   getActivity,
@@ -14,6 +15,20 @@ import { AppError } from "../plugins/error-handler.js";
 
 const MAX_LIMIT = 100;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function validateUUID(id: string): void {
+  if (!UUID_RE.test(id)) {
+    throw new AppError("Invalid UUID format", 400, "BAD_REQUEST");
+  }
+}
+
+const uploadOverridesSchema = z.object({
+  name: z.string().min(1).max(255).optional(),
+  type: activityTypeEnum.optional(),
+  rpe: z.coerce.number().int().min(1).max(10).optional(),
+  notes: z.string().max(1000).optional(),
+});
 
 export default async function activityRoutes(fastify: FastifyInstance) {
   fastify.get("/activities", async (request) => {
@@ -45,38 +60,42 @@ export default async function activityRoutes(fastify: FastifyInstance) {
 
   fastify.get("/activities/:id", async (request) => {
     const { id } = request.params as { id: string };
+    validateUUID(id);
     const activity = await getActivity(request.userId, id);
     return { data: activity };
   });
 
   fastify.post("/activities", async (request, reply) => {
+    const parsed = activityCreateSchema.safeParse(request.body);
+    if (!parsed.success) {
+      throw new AppError("Datos de actividad inválidos", 400, "BAD_REQUEST");
+    }
     const profile = await getProfile(request.userId);
-    const activity = await createActivity(
-      request.userId,
-      request.body as ActivityCreateInput,
-      profile.ftp,
-    );
+    const activity = await createActivity(request.userId, parsed.data, profile.ftp);
     return reply.status(201).send({ data: activity });
   });
 
   fastify.patch("/activities/:id", async (request) => {
     const { id } = request.params as { id: string };
-    const activity = await updateActivity(
-      request.userId,
-      id,
-      request.body as Partial<ActivityCreateInput>,
-    );
+    validateUUID(id);
+    const parsed = activityCreateSchema.partial().safeParse(request.body);
+    if (!parsed.success) {
+      throw new AppError("Datos de actividad inválidos", 400, "BAD_REQUEST");
+    }
+    const activity = await updateActivity(request.userId, id, parsed.data);
     return { data: activity };
   });
 
   fastify.delete("/activities/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
+    validateUUID(id);
     await deleteActivity(request.userId, id);
     return reply.status(204).send();
   });
 
   fastify.get("/activities/:id/metrics", async (request) => {
     const { id } = request.params as { id: string };
+    validateUUID(id);
     const metrics = await getActivityMetrics(request.userId, id);
     return { data: metrics };
   });
@@ -96,21 +115,21 @@ export default async function activityRoutes(fastify: FastifyInstance) {
 
     const fileBuffer = await data.toBuffer();
 
-    // Extraer overrides de los campos multipart
+    // Extraer y validar overrides de los campos multipart
     const fields = data.fields;
-    const name = (fields.name as { value?: string } | undefined)?.value;
-    const type = (fields.type as { value?: string } | undefined)?.value as ActivityType | undefined;
-    const rpeStr = (fields.rpe as { value?: string } | undefined)?.value;
-    const notes = (fields.notes as { value?: string } | undefined)?.value;
+    const rawOverrides = {
+      name: (fields.name as { value?: string } | undefined)?.value || undefined,
+      type: (fields.type as { value?: string } | undefined)?.value || undefined,
+      rpe: (fields.rpe as { value?: string } | undefined)?.value || undefined,
+      notes: (fields.notes as { value?: string } | undefined)?.value || undefined,
+    };
 
-    const rpe = rpeStr ? parseInt(rpeStr, 10) : undefined;
+    const parsedOverrides = uploadOverridesSchema.safeParse(rawOverrides);
+    if (!parsedOverrides.success) {
+      throw new AppError("Campos de actividad inválidos", 400, "BAD_REQUEST");
+    }
 
-    const result = await processUpload(request.userId, fileBuffer, fileName, {
-      name: name || undefined,
-      type: type || undefined,
-      rpe: rpe && !isNaN(rpe) ? rpe : undefined,
-      notes: notes || undefined,
-    });
+    const result = await processUpload(request.userId, fileBuffer, fileName, parsedOverrides.data);
 
     const activity = await getActivity(request.userId, result.activityId);
 
