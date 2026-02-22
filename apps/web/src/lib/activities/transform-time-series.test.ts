@@ -65,8 +65,20 @@ describe("transformTimeSeries", () => {
 
   it("convierte speed_kmh string (DECIMAL) a number", () => {
     const input = [
-      { timestamp_seconds: 0, power_watts: 200, hr_bpm: 140, cadence_rpm: 90, speed_kmh: "30.00" as unknown as number },
-      { timestamp_seconds: 60, power_watts: 220, hr_bpm: 150, cadence_rpm: 92, speed_kmh: "30.00" as unknown as number },
+      {
+        timestamp_seconds: 0,
+        power_watts: 200,
+        hr_bpm: 140,
+        cadence_rpm: 90,
+        speed_kmh: "30.00" as unknown as number,
+      },
+      {
+        timestamp_seconds: 60,
+        power_watts: 220,
+        hr_bpm: 150,
+        cadence_rpm: 92,
+        speed_kmh: "30.00" as unknown as number,
+      },
     ];
 
     const result = transformTimeSeries(input);

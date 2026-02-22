@@ -46,7 +46,7 @@ export function transformTimeSeries(
     if (totalTime > 0) {
       return metrics.map((m) => {
         const elapsed = m.timestamp_seconds - metrics[0].timestamp_seconds;
-        const km = Math.round((totalDistanceKm * elapsed) / totalTime * 10) / 10;
+        const km = Math.round(((totalDistanceKm * elapsed) / totalTime) * 10) / 10;
         return {
           km,
           power: m.power_watts ?? 0,
