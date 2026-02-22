@@ -12,6 +12,9 @@ import { getProfile } from "../services/profile.service.js";
 import { processUpload } from "../services/import.service.js";
 import { AppError } from "../plugins/error-handler.js";
 
+const MAX_LIMIT = 100;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 export default async function activityRoutes(fastify: FastifyInstance) {
   fastify.get("/activities", async (request) => {
     const query = request.query as {
@@ -22,13 +25,19 @@ export default async function activityRoutes(fastify: FastifyInstance) {
       date_to?: string;
       search?: string;
     };
+
+    const page = query.page ? Math.max(1, Math.floor(Number(query.page) || 1)) : undefined;
+    const limit = query.limit
+      ? Math.min(MAX_LIMIT, Math.max(1, Math.floor(Number(query.limit) || 20)))
+      : undefined;
+
     const result = await listActivities({
       userId: request.userId,
-      page: query.page ? Number(query.page) : undefined,
-      limit: query.limit ? Number(query.limit) : undefined,
+      page,
+      limit,
       type: query.type,
-      dateFrom: query.date_from,
-      dateTo: query.date_to,
+      dateFrom: query.date_from && DATE_RE.test(query.date_from) ? query.date_from : undefined,
+      dateTo: query.date_to && DATE_RE.test(query.date_to) ? query.date_to : undefined,
       search: query.search,
     });
     return result;

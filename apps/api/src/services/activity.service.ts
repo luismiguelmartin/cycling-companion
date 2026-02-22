@@ -55,7 +55,9 @@ export async function listActivities(
   }
 
   if (search) {
-    query = query.or(`name.ilike.%${search}%,notes.ilike.%${search}%`);
+    // Sanitizar: escapar caracteres especiales de ILIKE y limitar longitud
+    const sanitized = search.slice(0, 100).replace(/[%_\\]/g, "\\$&");
+    query = query.or(`name.ilike.%${sanitized}%,notes.ilike.%${sanitized}%`);
   }
 
   const offset = (page - 1) * limit;

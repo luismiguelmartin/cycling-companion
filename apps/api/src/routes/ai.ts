@@ -37,7 +37,10 @@ export default async function aiRoutes(fastify: FastifyInstance) {
       period_b_end?: string;
     };
 
-    if (!body.period_a_start || !body.period_a_end || !body.period_b_start || !body.period_b_end) {
+    const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+    const { period_a_start, period_a_end, period_b_start, period_b_end } = body;
+
+    if (!period_a_start || !period_a_end || !period_b_start || !period_b_end) {
       throw new AppError(
         "Missing required fields: period_a_start, period_a_end, period_b_start, period_b_end",
         400,
@@ -45,12 +48,21 @@ export default async function aiRoutes(fastify: FastifyInstance) {
       );
     }
 
+    if (
+      !DATE_RE.test(period_a_start) ||
+      !DATE_RE.test(period_a_end) ||
+      !DATE_RE.test(period_b_start) ||
+      !DATE_RE.test(period_b_end)
+    ) {
+      throw new AppError("Date fields must be YYYY-MM-DD format", 400, "BAD_REQUEST");
+    }
+
     const summary = await generateWeeklySummary(
       request.userId,
-      body.period_a_start,
-      body.period_a_end,
-      body.period_b_start,
-      body.period_b_end,
+      period_a_start,
+      period_a_end,
+      period_b_start,
+      period_b_end,
     );
     return { data: summary };
   });

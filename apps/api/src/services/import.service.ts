@@ -272,8 +272,16 @@ export async function processUpload(
     parsed.normalizedPowerWatts,
   );
 
-  // Insertar métricas en batch (si hay)
+  // Insertar métricas en batch (si hay), limitar a 100.000 data points
+  const MAX_METRICS = 100_000;
   let metricsCount = 0;
+  if (parsed.metrics.length > MAX_METRICS) {
+    throw new AppError(
+      `El archivo contiene demasiados data points (${parsed.metrics.length}). Máximo: ${MAX_METRICS}`,
+      400,
+      "FILE_TOO_LARGE",
+    );
+  }
   if (parsed.metrics.length > 0) {
     const metricsRows = parsed.metrics.map((m) => ({
       activity_id: activity.id,

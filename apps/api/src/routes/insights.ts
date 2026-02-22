@@ -2,6 +2,8 @@ import type { FastifyInstance } from "fastify";
 import { AppError } from "../plugins/error-handler.js";
 import { getInsights, checkOverload } from "../services/insights.service.js";
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 export default async function insightsRoutes(fastify: FastifyInstance) {
   fastify.get("/insights", async (request) => {
     const query = request.query as {
@@ -11,12 +13,9 @@ export default async function insightsRoutes(fastify: FastifyInstance) {
       period_b_end?: string;
     };
 
-    if (
-      !query.period_a_start ||
-      !query.period_a_end ||
-      !query.period_b_start ||
-      !query.period_b_end
-    ) {
+    const { period_a_start, period_a_end, period_b_start, period_b_end } = query;
+
+    if (!period_a_start || !period_a_end || !period_b_start || !period_b_end) {
       throw new AppError(
         "Missing required query params: period_a_start, period_a_end, period_b_start, period_b_end",
         400,
@@ -24,12 +23,21 @@ export default async function insightsRoutes(fastify: FastifyInstance) {
       );
     }
 
+    if (
+      !DATE_RE.test(period_a_start) ||
+      !DATE_RE.test(period_a_end) ||
+      !DATE_RE.test(period_b_start) ||
+      !DATE_RE.test(period_b_end)
+    ) {
+      throw new AppError("Date params must be YYYY-MM-DD format", 400, "BAD_REQUEST");
+    }
+
     const result = await getInsights(
       request.userId,
-      query.period_a_start,
-      query.period_a_end,
-      query.period_b_start,
-      query.period_b_end,
+      period_a_start,
+      period_a_end,
+      period_b_start,
+      period_b_end,
     );
 
     return { data: result };

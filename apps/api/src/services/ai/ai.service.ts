@@ -91,7 +91,13 @@ async function checkRateLimit(userId: string): Promise<void> {
     .eq("user_id", userId)
     .gte("created_at", `${today}T00:00:00Z`);
 
-  if (error) return; // Don't block on rate limit query failure
+  if (error) {
+    throw new AppError(
+      "Error al verificar el límite de uso. Inténtalo más tarde.",
+      503,
+      "RATE_LIMIT_CHECK_FAILED",
+    );
+  }
 
   if ((count ?? 0) >= MAX_DAILY_CALLS) {
     throw new AppError(

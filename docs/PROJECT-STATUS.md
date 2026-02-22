@@ -22,7 +22,7 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle en `docs/
 
 - **Frontend**: Vercel (`cycling-companion-web.vercel.app`)
 - **API**: Render (`cycling-companion.onrender.com`)
-- **DB/Auth**: Supabase (project ref: `bxstffwatktcxantoelm`)
+- **DB/Auth**: Supabase (PostgreSQL + Auth + RLS)
 
 ## Documentos de Referencia
 
