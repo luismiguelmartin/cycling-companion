@@ -37,6 +37,31 @@ import {
 const MODEL = "claude-sonnet-4-6";
 const MAX_DAILY_CALLS = 20;
 
+// Generic fallbacks when data fetching fails and we can't build a context-aware response
+const GENERIC_ANALYSIS_FALLBACK: AIActivityAnalysis = {
+  summary: "No se pudieron obtener todos los datos necesarios para un análisis completo.",
+  recommendation:
+    "Verifica que tu perfil esté completo y vuelve a intentarlo. Si el problema persiste, intenta de nuevo más tarde.",
+  tips: {
+    hydration: "Recuerda hidratarte bien: 500ml por hora de ejercicio.",
+  },
+};
+
+const GENERIC_COACH_TIP_FALLBACK: AICoachTip = {
+  recommendation:
+    "No se pudieron obtener todos los datos necesarios. Asegúrate de que tu perfil esté completo para recibir recomendaciones personalizadas.",
+  tips: {
+    hydration: "Bebe 500ml de agua 2 horas antes de entrenar.",
+    sleep: "7-8 horas de sueño para una recuperación óptima.",
+  },
+};
+
+const GENERIC_WEEKLY_SUMMARY_FALLBACK: AIWeeklySummary = {
+  summary: "No se pudieron obtener todos los datos necesarios para el resumen semanal.",
+  recommendation:
+    "Verifica que tu perfil esté completo y que tengas actividades registradas en ambos periodos.",
+};
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -165,36 +190,45 @@ export async function analyzeActivity(
   const cached = await getCachedResponse(userId, cacheKey, aiActivityAnalysisSchema);
   if (cached) return cached;
 
-  const [profile, activity, recent] = await Promise.all([
-    getProfile(userId),
-    getActivity(userId, activityId),
-    listActivities({ userId, limit: 14 }),
-  ]);
+  let profile, activity, recent, trainingLoad, alerts, zone;
 
-  const trainingInputs = getRecentActivities(recent.data);
-  const today = new Date().toISOString().slice(0, 10);
-  const trainingLoad = calculateTrainingLoad(trainingInputs, today);
-  const zone = classifyActivityZone(activity.avg_power_watts, profile.ftp ?? null);
+  try {
+    [profile, activity, recent] = await Promise.all([
+      getProfile(userId),
+      getActivity(userId, activityId),
+      listActivities({ userId, limit: 14 }),
+    ]);
 
-  const weekStart = getWeekStart(new Date());
-  const weeklyTSS = calculateWeeklyTSS(trainingInputs, weekStart);
-  const prevWeekStart = new Date(weekStart);
-  prevWeekStart.setDate(prevWeekStart.getDate() - 7);
-  const avgWeeklyTSS = calculateWeeklyTSS(trainingInputs, prevWeekStart.toISOString().slice(0, 10));
+    const trainingInputs = getRecentActivities(recent.data);
+    const today = new Date().toISOString().slice(0, 10);
+    trainingLoad = calculateTrainingLoad(trainingInputs, today);
+    zone = classifyActivityZone(activity.avg_power_watts, profile.ftp ?? null);
 
-  const alerts = evaluateTrainingAlerts({
-    weeklyTSS,
-    avgWeeklyTSS,
-    recentActivities: recent.data.map((a) => ({
-      date: a.date,
-      tss: a.tss,
-      rpe: a.rpe,
-    })),
-    trainingLoad,
-    ctlPreviousWeek: trainingLoad.ctl,
-    lastActivityDate: recent.data[0]?.date ?? null,
-    today,
-  });
+    const weekStart = getWeekStart(new Date());
+    const weeklyTSS = calculateWeeklyTSS(trainingInputs, weekStart);
+    const prevWeekStart = new Date(weekStart);
+    prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+    const avgWeeklyTSS = calculateWeeklyTSS(
+      trainingInputs,
+      prevWeekStart.toISOString().slice(0, 10),
+    );
+
+    alerts = evaluateTrainingAlerts({
+      weeklyTSS,
+      avgWeeklyTSS,
+      recentActivities: recent.data.map((a) => ({
+        date: a.date,
+        tss: a.tss,
+        rpe: a.rpe,
+      })),
+      trainingLoad,
+      ctlPreviousWeek: trainingLoad.ctl,
+      lastActivityDate: recent.data[0]?.date ?? null,
+      today,
+    });
+  } catch {
+    return GENERIC_ANALYSIS_FALLBACK;
+  }
 
   try {
     const prompt = buildAnalyzeActivityPrompt({
@@ -243,35 +277,48 @@ export async function generateWeeklyPlan(
     if (cached) return cached;
   }
 
-  const [profile, recent] = await Promise.all([
-    getProfile(userId),
-    listActivities({ userId, limit: 14 }),
-  ]);
-
-  const trainingInputs = getRecentActivities(recent.data);
-  const today = new Date().toISOString().slice(0, 10);
-  const trainingLoad = calculateTrainingLoad(trainingInputs, today);
-
-  const weeklyTSS = calculateWeeklyTSS(trainingInputs, getWeekStart(new Date()));
-  const prevWeekStart = new Date(getWeekStart(new Date()));
-  prevWeekStart.setDate(prevWeekStart.getDate() - 7);
-  const avgWeeklyTSS = calculateWeeklyTSS(trainingInputs, prevWeekStart.toISOString().slice(0, 10));
-
-  const alerts = evaluateTrainingAlerts({
-    weeklyTSS,
-    avgWeeklyTSS,
-    recentActivities: recent.data.map((a) => ({
-      date: a.date,
-      tss: a.tss,
-      rpe: a.rpe,
-    })),
-    trainingLoad,
-    ctlPreviousWeek: trainingLoad.ctl,
-    lastActivityDate: recent.data[0]?.date ?? null,
-    today,
-  });
-
   const weekDates = getWeekDates(effectiveWeekStart);
+  let profile, recent, trainingLoad, alerts;
+
+  try {
+    [profile, recent] = await Promise.all([
+      getProfile(userId),
+      listActivities({ userId, limit: 14 }),
+    ]);
+
+    const trainingInputs = getRecentActivities(recent.data);
+    const today = new Date().toISOString().slice(0, 10);
+    trainingLoad = calculateTrainingLoad(trainingInputs, today);
+
+    const weeklyTSS = calculateWeeklyTSS(trainingInputs, getWeekStart(new Date()));
+    const prevWeekStart = new Date(getWeekStart(new Date()));
+    prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+    const avgWeeklyTSS = calculateWeeklyTSS(
+      trainingInputs,
+      prevWeekStart.toISOString().slice(0, 10),
+    );
+
+    alerts = evaluateTrainingAlerts({
+      weeklyTSS,
+      avgWeeklyTSS,
+      recentActivities: recent.data.map((a) => ({
+        date: a.date,
+        tss: a.tss,
+        rpe: a.rpe,
+      })),
+      trainingLoad,
+      ctlPreviousWeek: trainingLoad.ctl,
+      lastActivityDate: recent.data[0]?.date ?? null,
+      today,
+    });
+  } catch {
+    return fallbackWeeklyPlan(
+      weekDates,
+      { goal: "general" } as unknown as Parameters<typeof fallbackWeeklyPlan>[1],
+      { ctl: 0, atl: 0, tsb: 0 },
+      [],
+    );
+  }
 
   try {
     const prompt = buildWeeklyPlanPrompt({
@@ -346,63 +393,84 @@ export async function generateWeeklySummary(
   const cached = await getCachedResponse(userId, cacheKey, aiWeeklySummarySchema);
   if (cached) return cached;
 
-  const [profile, recentResult] = await Promise.all([
-    getProfile(userId),
-    listActivities({ userId, limit: 30 }),
-  ]);
+  interface PeriodMetrics {
+    start: string;
+    end: string;
+    sessionCount: number;
+    totalTSS: number;
+    avgPower: number | null;
+  }
 
-  const allActivities = recentResult.data;
-  const trainingInputs = getRecentActivities(allActivities);
-  const today = new Date().toISOString().slice(0, 10);
-  const trainingLoad = calculateTrainingLoad(trainingInputs, today);
+  let profile, allActivities, trainingLoad, alerts;
+  let periodA: PeriodMetrics, periodB: PeriodMetrics;
 
-  // Aggregate period metrics
-  const periodAActivities = allActivities.filter(
-    (a) => a.date >= periodAStart && a.date <= periodAEnd,
-  );
-  const periodBActivities = allActivities.filter(
-    (a) => a.date >= periodBStart && a.date <= periodBEnd,
-  );
+  try {
+    const [profileResult, recentResult] = await Promise.all([
+      getProfile(userId),
+      listActivities({ userId, limit: 30 }),
+    ]);
+    profile = profileResult;
 
-  const avgPower = (acts: Activity[]) => {
-    const powers = acts.map((a) => a.avg_power_watts).filter((v): v is number => v != null);
-    return powers.length > 0 ? Math.round(powers.reduce((s, v) => s + v, 0) / powers.length) : null;
-  };
+    allActivities = recentResult.data;
+    const trainingInputs = getRecentActivities(allActivities);
+    const today = new Date().toISOString().slice(0, 10);
+    trainingLoad = calculateTrainingLoad(trainingInputs, today);
 
-  const periodA = {
-    start: periodAStart,
-    end: periodAEnd,
-    sessionCount: periodAActivities.length,
-    totalTSS: periodAActivities.reduce((s, a) => s + (a.tss ?? 0), 0),
-    avgPower: avgPower(periodAActivities),
-  };
+    // Aggregate period metrics
+    const periodAActivities = allActivities.filter(
+      (a) => a.date >= periodAStart && a.date <= periodAEnd,
+    );
+    const periodBActivities = allActivities.filter(
+      (a) => a.date >= periodBStart && a.date <= periodBEnd,
+    );
 
-  const periodB = {
-    start: periodBStart,
-    end: periodBEnd,
-    sessionCount: periodBActivities.length,
-    totalTSS: periodBActivities.reduce((s, a) => s + (a.tss ?? 0), 0),
-    avgPower: avgPower(periodBActivities),
-  };
+    const avgPower = (acts: Activity[]) => {
+      const powers = acts.map((a) => a.avg_power_watts).filter((v): v is number => v != null);
+      return powers.length > 0
+        ? Math.round(powers.reduce((s, v) => s + v, 0) / powers.length)
+        : null;
+    };
 
-  const weeklyTSS = calculateWeeklyTSS(trainingInputs, getWeekStart(new Date()));
-  const prevWeekStart = new Date(getWeekStart(new Date()));
-  prevWeekStart.setDate(prevWeekStart.getDate() - 7);
-  const avgWeeklyTSS = calculateWeeklyTSS(trainingInputs, prevWeekStart.toISOString().slice(0, 10));
+    periodA = {
+      start: periodAStart,
+      end: periodAEnd,
+      sessionCount: periodAActivities.length,
+      totalTSS: periodAActivities.reduce((s, a) => s + (a.tss ?? 0), 0),
+      avgPower: avgPower(periodAActivities),
+    };
 
-  const alerts = evaluateTrainingAlerts({
-    weeklyTSS,
-    avgWeeklyTSS,
-    recentActivities: allActivities.map((a) => ({
-      date: a.date,
-      tss: a.tss,
-      rpe: a.rpe,
-    })),
-    trainingLoad,
-    ctlPreviousWeek: trainingLoad.ctl,
-    lastActivityDate: allActivities[0]?.date ?? null,
-    today,
-  });
+    periodB = {
+      start: periodBStart,
+      end: periodBEnd,
+      sessionCount: periodBActivities.length,
+      totalTSS: periodBActivities.reduce((s, a) => s + (a.tss ?? 0), 0),
+      avgPower: avgPower(periodBActivities),
+    };
+
+    const weeklyTSS = calculateWeeklyTSS(trainingInputs, getWeekStart(new Date()));
+    const prevWeekStart = new Date(getWeekStart(new Date()));
+    prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+    const avgWeeklyTSS = calculateWeeklyTSS(
+      trainingInputs,
+      prevWeekStart.toISOString().slice(0, 10),
+    );
+
+    alerts = evaluateTrainingAlerts({
+      weeklyTSS,
+      avgWeeklyTSS,
+      recentActivities: allActivities.map((a) => ({
+        date: a.date,
+        tss: a.tss,
+        rpe: a.rpe,
+      })),
+      trainingLoad,
+      ctlPreviousWeek: trainingLoad.ctl,
+      lastActivityDate: allActivities[0]?.date ?? null,
+      today,
+    });
+  } catch {
+    return GENERIC_WEEKLY_SUMMARY_FALLBACK;
+  }
 
   try {
     const prompt = buildWeeklySummaryPrompt({
@@ -434,33 +502,42 @@ export async function getCoachTip(userId: string): Promise<AICoachTip> {
   const cached = await getCachedResponse(userId, cacheKey, aiCoachTipSchema);
   if (cached) return cached;
 
-  const [profile, recent] = await Promise.all([
-    getProfile(userId),
-    listActivities({ userId, limit: 14 }),
-  ]);
+  let profile, recent, trainingLoad, lastActivity, alerts;
 
-  const trainingInputs = getRecentActivities(recent.data);
-  const trainingLoad = calculateTrainingLoad(trainingInputs, today);
-  const lastActivity = recent.data[0] ?? null;
+  try {
+    [profile, recent] = await Promise.all([
+      getProfile(userId),
+      listActivities({ userId, limit: 14 }),
+    ]);
 
-  const weeklyTSS = calculateWeeklyTSS(trainingInputs, getWeekStart(new Date()));
-  const prevWeekStart = new Date(getWeekStart(new Date()));
-  prevWeekStart.setDate(prevWeekStart.getDate() - 7);
-  const avgWeeklyTSS = calculateWeeklyTSS(trainingInputs, prevWeekStart.toISOString().slice(0, 10));
+    const trainingInputs = getRecentActivities(recent.data);
+    trainingLoad = calculateTrainingLoad(trainingInputs, today);
+    lastActivity = recent.data[0] ?? null;
 
-  const alerts = evaluateTrainingAlerts({
-    weeklyTSS,
-    avgWeeklyTSS,
-    recentActivities: recent.data.map((a) => ({
-      date: a.date,
-      tss: a.tss,
-      rpe: a.rpe,
-    })),
-    trainingLoad,
-    ctlPreviousWeek: trainingLoad.ctl,
-    lastActivityDate: lastActivity?.date ?? null,
-    today,
-  });
+    const weeklyTSS = calculateWeeklyTSS(trainingInputs, getWeekStart(new Date()));
+    const prevWeekStart = new Date(getWeekStart(new Date()));
+    prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+    const avgWeeklyTSS = calculateWeeklyTSS(
+      trainingInputs,
+      prevWeekStart.toISOString().slice(0, 10),
+    );
+
+    alerts = evaluateTrainingAlerts({
+      weeklyTSS,
+      avgWeeklyTSS,
+      recentActivities: recent.data.map((a) => ({
+        date: a.date,
+        tss: a.tss,
+        rpe: a.rpe,
+      })),
+      trainingLoad,
+      ctlPreviousWeek: trainingLoad.ctl,
+      lastActivityDate: lastActivity?.date ?? null,
+      today,
+    });
+  } catch {
+    return GENERIC_COACH_TIP_FALLBACK;
+  }
 
   try {
     const prompt = buildCoachTipPrompt({
