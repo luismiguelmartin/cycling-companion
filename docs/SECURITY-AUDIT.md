@@ -8,15 +8,15 @@
 
 ## Resumen ejecutivo
 
-Se auditaron 5 áreas de seguridad del proyecto. Se encontraron **4 vulnerabilidades corregidas en este commit** y varias observaciones de mejora futura. El perfil de seguridad general es **bueno** para un proyecto académico en producción.
+Se auditaron 5 áreas de seguridad del proyecto. Se encontraron **9 vulnerabilidades corregidas** y varias observaciones de mejora futura. El perfil de seguridad general es **muy bueno** para un proyecto académico en producción. `pnpm audit --prod` reporta **0 vulnerabilidades** en producción.
 
 | Área auditada | Hallazgos | Corregidos | Pendientes |
 |---|---|---|---|
-| Dependencias y CVEs | 4 CVEs (2 high, 2 moderate) | 0 | 4 (3 en devDeps) |
+| Dependencias y CVEs | 4 CVEs (2 high, 2 moderate) | 1 (ajv prod) | 3 (devDeps) |
 | Autenticación y RLS | 2 observaciones menores | 0 | 2 |
 | Inyección y validación de inputs | 8 hallazgos | 6 | 2 |
 | Secrets y exposición de datos | 1 hallazgo crítico | 1 | 0 |
-| Rate limiting y DoS | 5 hallazgos | 2 | 3 |
+| Rate limiting y DoS | 5 hallazgos | 4 | 1 |
 
 ---
 
@@ -30,18 +30,23 @@ Se auditaron 5 áreas de seguridad del proyecto. Se encontraron **4 vulnerabilid
 | `ajv@6.12.6` | 6.12.6 | MODERATE | devDeps (ESLint) | ReDoS con opción `$data` (GHSA-2g4f-4pwh-qvx6) |
 | `ajv@8.17.1` | 8.17.1 | MODERATE | **Producción** (Fastify) | ReDoS con opción `$data` (GHSA-2g4f-4pwh-qvx6) |
 
-**Nota**: La vulnerabilidad de `ajv@8.17.1` en producción solo se activa si se usa la opción `$data` de ajv, que Fastify no utiliza por defecto. El riesgo real es bajo.
+**Nota**: La vulnerabilidad de `ajv@8.17.1` en producción solo se activaba si se usa la opción `$data` de ajv, que Fastify no utiliza por defecto.
 
-### 1.2 Paquetes de riesgo supply-chain
+### 1.2 Corregido: override de ajv en producción
+
+| Hallazgo | Severidad | Corrección |
+|---|---|---|
+| **`ajv@8.17.1` ReDoS en producción** | MODERADA | `pnpm.overrides` en root `package.json` fuerza `ajv@>=8.18.0`. `pnpm audit --prod` reporta 0 vulnerabilidades. |
+
+### 1.3 Paquetes de riesgo supply-chain
 
 | Paquete | Riesgo | Razón |
 |---|---|---|
 | `fit-file-parser@2.3.3` | Bajo | Single maintainer, paquete niche. Activo. MIT. |
 | `@we-gold/gpxjs@1.1.0` | Bajo | Single maintainer, 0 dependencias, última publicación hace 1 año. |
 
-### 1.3 Recomendaciones pendientes
+### 1.4 Recomendaciones pendientes
 
-- Añadir `pnpm.overrides` en root `package.json` para forzar `ajv@>=8.18.0` (fix producción)
 - Evaluar migración a ESLint 10.x cuando sea estable (resuelve minimatch + ajv en devDeps)
 - Monitorizar periódicamente `fit-file-parser` y `@we-gold/gpxjs`
 
@@ -121,24 +126,25 @@ RLS está habilitado como capa de defensa adicional en la BD.
 
 ## 5. Rate limiting y protección DoS
 
-### 5.1 Corregidos en este commit
+### 5.1 Corregidos
 
 | Hallazgo | Severidad | Archivo | Corrección |
 |---|---|---|---|
 | **Rate limit falla silenciosamente en error de BD** | ALTA | `ai.service.ts` | Ahora lanza error 503 en lugar de ignorar (`RATE_LIMIT_CHECK_FAILED`) |
 | **Sin límite de data points en upload** | MEDIA | `import.service.ts` | Límite de 100.000 métricas (ver sección 3.1) |
+| **Race condition en rate limit** | MEDIA | `ai.service.ts` + migración SQL | Reemplazada verificación read-then-check por función SQL `check_ai_rate_limit()` invocada via `supabaseAdmin.rpc()`. La función ejecuta el conteo de forma atómica en una sola transacción. Migración: `005_atomic_rate_limit.sql`. |
+| **Sin timeout en Claude API** | MEDIA | `anthropic.ts` | Añadido `timeout: 30_000` (30s) y `maxRetries: 1` al constructor del cliente Anthropic. Evita bloqueo indefinido de workers Fastify. |
 
 ### 5.2 Implementación actual del rate limiting
 
-- **Endpoints IA**: 20 llamadas/usuario/día, verificadas contra tabla `ai_cache`
+- **Endpoints IA**: 20 llamadas/usuario/día, verificadas via función SQL atómica `check_ai_rate_limit()`
 - **Endpoints no-IA**: Sin rate limiting específico (protegido por Render/infraestructura)
-- **Upload**: Límite de 10 MB por archivo (`@fastify/multipart`)
+- **Upload**: Límite de 10 MB por archivo (`@fastify/multipart`) + 100.000 data points máximo
+- **Claude API**: Timeout de 30s + 1 reintento máximo
 
-### 5.3 Pendientes (riesgo bajo-medio en contexto académico)
+### 5.3 Pendientes (riesgo bajo en contexto académico)
 
-- **Race condition en rate limit**: La verificación no es atómica (read-then-check). Requests paralelos pueden bypassear el límite momentáneamente. Fix ideal: transacción SQL atómica o Redis. En contexto académico con pocos usuarios el riesgo real es bajo.
 - **Sin rate limiting global**: Los endpoints no-IA no tienen límite de tasa. Para un proyecto con pocos usuarios autenticados esto es aceptable.
-- **Sin timeout en Claude API**: Las llamadas a la API de Anthropic no tienen timeout explícito. Añadir `timeout: 30_000` al constructor de `Anthropic` es recomendable.
 
 ---
 
@@ -166,11 +172,11 @@ RLS está habilitado como capa de defensa adicional en la BD.
 | 4 | Project ref expuesto en docs | ALTA | **CORREGIDO** |
 | 5 | page/limit sin validar | MEDIA | **CORREGIDO** |
 | 6 | Límite de data points en upload | MEDIA | **CORREGIDO** |
-| 7 | `ajv@8.17.1` ReDoS (producción) | MODERADA | Pendiente (override) |
-| 8 | Race condition en rate limit | MEDIA | Pendiente (atómico) |
-| 9 | Sin timeout en Claude API | MEDIA | Pendiente |
+| 7 | `ajv@8.17.1` ReDoS (producción) | MODERADA | **CORREGIDO** (pnpm.overrides) |
+| 8 | Race condition en rate limit | MEDIA | **CORREGIDO** (función SQL atómica) |
+| 9 | Sin timeout en Claude API | MEDIA | **CORREGIDO** (30s + 1 retry) |
 | 10 | UUIDs sin validar en rutas | BAJA | Pendiente |
 | 11 | Validación Zod tardía en rutas | BAJA | Pendiente |
 | 12 | `minimatch` + `ajv` en devDeps | HIGH/MOD | Pendiente (ESLint 10) |
 
-**Score de seguridad**: 8.5/10 (post-correcciones)
+**Score de seguridad**: 9/10 (post-correcciones) — 0 vulnerabilidades en producción (`pnpm audit --prod`)

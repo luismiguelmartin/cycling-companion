@@ -15,6 +15,7 @@ vi.mock("../services/supabase.js", () => ({
   supabaseAdmin: {
     auth: { getUser: vi.fn() },
     from: vi.fn(),
+    rpc: vi.fn().mockResolvedValue({ data: 0, error: null }),
   },
 }));
 

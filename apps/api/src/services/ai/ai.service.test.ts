@@ -9,10 +9,12 @@ import { AppError } from "../../plugins/error-handler.js";
 
 // Mock Supabase
 const mockFrom = vi.fn();
+const mockRpc = vi.fn();
 
 vi.mock("../supabase.js", () => ({
   supabaseAdmin: {
     from: (...args: unknown[]) => mockFrom(...args),
+    rpc: (...args: unknown[]) => mockRpc(...args),
   },
 }));
 
@@ -144,11 +146,14 @@ function mockClaudeResponse(response: unknown) {
 /**
  * Sets up supabase mock with self-referencing chains for all operations.
  * Uses mockReturnThis() to avoid infinite recursion.
- * Supports: from().select().eq().gte().gt().single() for cache reads and rate limit checks.
+ * Supports: rpc() for rate limit, from().select().eq().gt().single() for cache reads.
  * Also supports: from().update().eq() and from().upsert() for writes.
  */
 function setupSupabaseMock(options: { rateLimitCount?: number; cachedResponse?: unknown }) {
   const { rateLimitCount = 0, cachedResponse = null } = options;
+
+  // Rate limit via rpc("check_ai_rate_limit")
+  mockRpc.mockResolvedValue({ data: rateLimitCount, error: null });
 
   mockFrom.mockImplementation((table: string) => {
     if (table === "ai_cache") {
@@ -158,28 +163,11 @@ function setupSupabaseMock(options: { rateLimitCount?: number; cachedResponse?: 
 
       // Build a self-referencing chain (no recursion)
       const chain: Record<string, unknown> = {};
-      const chainMethods = ["eq", "gte", "gt", "upsert"];
+      const chainMethods = ["select", "eq", "gte", "gt", "upsert"];
       for (const m of chainMethods) {
         chain[m] = vi.fn().mockReturnValue(chain);
       }
       chain["single"] = vi.fn().mockResolvedValue(cacheResult);
-      chain["select"] = vi
-        .fn()
-        .mockImplementation((_cols?: string, opts?: { count?: string; head?: boolean }) => {
-          if (opts?.count === "exact" && opts?.head) {
-            // Rate limit query — return a thenable that resolves with count
-            const rateLink: Record<string, unknown> = {};
-            for (const m of chainMethods) {
-              rateLink[m] = vi.fn().mockReturnValue(rateLink);
-            }
-            rateLink["then"] = (
-              resolve: (v: unknown) => unknown,
-              reject: (e: unknown) => unknown,
-            ) => Promise.resolve({ count: rateLimitCount, error: null }).then(resolve, reject);
-            return rateLink;
-          }
-          return chain;
-        });
       chain["then"] = (resolve: (v: unknown) => unknown, reject: (e: unknown) => unknown) =>
         Promise.resolve({ data: null, error: null }).then(resolve, reject);
       return chain as ReturnType<typeof mockFrom>;

@@ -83,13 +83,10 @@ async function callClaude(system: string, user: string, maxTokens = 2048): Promi
 }
 
 async function checkRateLimit(userId: string): Promise<void> {
-  const today = new Date().toISOString().slice(0, 10);
-
-  const { count, error } = await supabaseAdmin
-    .from("ai_cache")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .gte("created_at", `${today}T00:00:00Z`);
+  const { data, error } = await supabaseAdmin.rpc("check_ai_rate_limit", {
+    p_user_id: userId,
+    p_max_daily_calls: MAX_DAILY_CALLS,
+  });
 
   if (error) {
     throw new AppError(
@@ -99,7 +96,7 @@ async function checkRateLimit(userId: string): Promise<void> {
     );
   }
 
-  if ((count ?? 0) >= MAX_DAILY_CALLS) {
+  if ((data ?? 0) >= MAX_DAILY_CALLS) {
     throw new AppError(
       `Has alcanzado el límite de ${MAX_DAILY_CALLS} consultas IA por día.`,
       429,
