@@ -220,7 +220,9 @@ cycling-companion/
 │   │   ├── 003_align_activity_type_enum.sql
 │   │   └── 004_ai_cache.sql
 │   ├── seed.sql                    # Seed genérico (placeholder <USER_ID>)
-│   └── seed_personalized.sql       # Seed con datos de ejemplo
+│   ├── seed_personalized.sql       # Seed con datos de ejemplo
+│   ├── cleanup_mock_data.sql       # Limpieza de datos mock
+│   └── delete-user.sql             # Script para borrar usuario por email
 │
 ├── docs/
 │   ├── 01-PRODUCT-VISION.md        # Visión del producto
@@ -228,20 +230,22 @@ cycling-companion/
 │   ├── 03-AGENTS-AND-DEVELOPMENT-PLAN.md  # Plan de agentes
 │   ├── DESIGN-SYSTEM.md            # Design system (tokens, componentes, conversión JSX)
 │   ├── PROJECT-STATUS.md           # Estado actual del proyecto
+│   ├── SECURITY-AUDIT.md           # Auditoría de seguridad (hallazgos + correcciones)
 │   ├── GOOGLE-OAUTH-SETUP.md       # Guía configuración OAuth
 │   ├── SUPABASE-SETUP.md           # Guía configuración Supabase
 │   ├── CI-CD-SETUP.md              # Guía configuración CI/CD
-│   ├── data/                       # 4 archivos GPX de ejemplo para importación
+│   ├── SETUP-CHECKLIST.md          # Checklist de setup del proyecto
+│   ├── data/                       # 4 archivos GPX de ejemplo + PDF del TFM
 │   ├── design/                     # Assets de diseño
 │   └── specs/                      # 33 especificaciones L1/L2/L3
 │
-├── prompts/                        # Prompts para agentes IA
+├── prompts/                        # Prompts para agentes IA (12 archivos)
 │   ├── CONVENTIONS.md              # Convenciones de desarrollo
-│   ├── product/                    # Prompts de producto
-│   ├── remote/                     # Prompts para agentes remotos
-│   └── system/                     # Prompts de sistema
+│   ├── product/                    # Prompts de producto (analyzer, plan-generator, coach)
+│   ├── remote/                     # Prompts para agentes remotos (R1-R5)
+│   └── system/                     # Prompts de sistema (L1-L4)
 │
-├── .github/workflows/              # 8 workflows GitHub Actions
+├── .github/workflows/              # 8 workflows GitHub Actions (+1 legacy)
 │   ├── ci-frontend.yml             # CI: lint, typecheck, test, build (web)
 │   ├── ci-backend.yml              # CI: lint, typecheck, test (api + shared)
 │   ├── ai-analyze-issue.yml        # R1: Análisis de issues
@@ -443,9 +447,14 @@ Internamente implementado con:
 | [02-PRD.md](docs/02-PRD.md)                                                 | PRD completo: modelo de datos, endpoints, flujo IA, specs             |
 | [03-AGENTS-AND-DEVELOPMENT-PLAN.md](docs/03-AGENTS-AND-DEVELOPMENT-PLAN.md) | Plan de agentes locales y remotos, timeline de desarrollo             |
 | [DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md)                                   | Design system: pantallas, tokens, componentes, conversión JSX→Next.js |
+| [PROJECT-STATUS.md](docs/PROJECT-STATUS.md)                                  | Estado actual del proyecto, deploy, métricas                          |
+| [SECURITY-AUDIT.md](docs/SECURITY-AUDIT.md)                                 | Auditoría de seguridad: hallazgos, correcciones, matriz de riesgo     |
+| [CI-CD-SETUP.md](docs/CI-CD-SETUP.md)                                       | Guía de configuración de CI/CD con GitHub Actions                     |
 | [GOOGLE-OAUTH-SETUP.md](docs/GOOGLE-OAUTH-SETUP.md)                         | Guía de configuración de Google OAuth en Supabase                     |
 | [SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md)                                 | Guía de configuración de Supabase y base de datos                     |
+| [SETUP-CHECKLIST.md](docs/SETUP-CHECKLIST.md)                               | Checklist completo para setup inicial del proyecto                    |
 | [CLAUDE.md](CLAUDE.md)                                                      | Instrucciones para Claude Code (este repositorio)                     |
+| [AGENTS.md](AGENTS.md)                                                      | Instrucciones para agentes remotos (GitHub Actions)                   |
 | `docs/specs/`                                                               | 33 especificaciones L1/L2/L3 (8 pantallas + 9 bloques backend + Fase 4) |
 
 ---
@@ -482,8 +491,10 @@ Este proyecto implementa un pipeline multi-agente para integrar IA en el ciclo d
 
 - **RLS (Row Level Security)**: Cada usuario solo ve sus propios datos
 - **Autenticación**: JWT gestionado por Supabase, cookies httpOnly
-- **Validación**: Todos los inputs validados con Zod
+- **Validación**: Inputs validados con Zod + sanitización de búsquedas + validación de fechas en rutas
+- **Rate limiting**: 20 llamadas IA/usuario/día con caché y fallbacks heurísticos
 - **Secrets**: Variables de entorno, nunca commitear API keys
+- **Auditoría completa**: Ver [SECURITY-AUDIT.md](docs/SECURITY-AUDIT.md) (score 8.5/10)
 
 ---
 
