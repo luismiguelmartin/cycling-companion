@@ -48,9 +48,9 @@ Plataforma web de análisis y planificación de entrenamiento para ciclistas ama
 - ✅ Autenticación con Google OAuth (Supabase Auth)
 - ✅ Onboarding wizard (4 pasos)
 - ✅ **10 pantallas frontend implementadas** (todas las rutas del MVP + modo demo)
-- ✅ 32 componentes reutilizables
-- ✅ **~347 tests**: 112 web + 90 shared + 145 API
-- ✅ 5 schemas Zod compartidos + 7 módulos de constantes + utils de training
+- ✅ 37 componentes reutilizables
+- ✅ **~355 tests**: 114 web + 90 shared + 151 API
+- ✅ 5 schemas Zod compartidos + 8 módulos de constantes + utils de training
 - ✅ 4 migraciones SQL (schema, onboarding, activity types, ai_cache)
 - ✅ Design system documentado (dark/light theme)
 - ✅ 33 especificaciones L1/L2/L3 (frontend + backend + Fase 4)
@@ -182,28 +182,31 @@ cycling-companion/
 ├── apps/
 │   ├── web/                        # Next.js 16 Frontend
 │   │   ├── src/
-│   │   │   ├── app/                # App Router (9 rutas)
+│   │   │   ├── app/                # App Router (10 rutas)
 │   │   │   │   ├── (auth)/         #   Login, Onboarding, OAuth callback
 │   │   │   │   └── (app)/          #   Dashboard, Activities, Plan, Insights, Profile
-│   │   │   ├── components/         # 32 componentes reutilizables
+│   │   │   ├── components/         # 37 componentes reutilizables
 │   │   │   │   ├── charts/         #   Recharts (power-trend, daily-load, radar, activity)
+│   │   │   │   ├── demo/           #   Modo demo (dashboard, modal, onboarding, screen-wrapper)
 │   │   │   │   └── ui/             #   shadcn/ui (button, switch, tabs)
-│   │   │   └── lib/                # Utilidades (Supabase, cálculos, formateo)
+│   │   │   └── lib/                # Utilidades (API, Supabase, cálculos, formateo, demo)
 │   │   └── vitest.config.ts
 │   │
 │   └── api/                        # Fastify 5 Backend
 │       └── src/
 │           ├── index.ts            # Punto de entrada
 │           ├── app.ts              # Setup Fastify (plugins, routes)
-│           ├── plugins/            # Auth, CORS, error-handler, env
-│           ├── routes/             # profile, activities, insights, ai, plan
-│           └── services/           # Lógica de negocio + AI service
+│           ├── config/             # Variables de entorno
+│           ├── plugins/            # Auth, CORS, error-handler
+│           ├── routes/             # health, profile, activities, insights, ai, plan
+│           ├── services/           # Lógica de negocio + AI service
+│           └── types/              # Declaraciones de tipos Fastify
 │
 ├── packages/
 │   └── shared/                     # Types y validaciones compartidas
 │       └── src/
 │           ├── schemas/            # 5 schemas Zod (user, activity, plan, insights, ai-response)
-│           ├── constants/          # 7 módulos (goals, zones, types, rpe, filters)
+│           ├── constants/          # 8 módulos (goals, zones, types, rpe, filters, weather, intensity, navigation)
 │           └── utils/              # Training calculations, training rules
 │
 ├── supabase/
@@ -220,14 +223,38 @@ cycling-companion/
 │   ├── 02-PRD.md                   # Product Requirements Document
 │   ├── 03-AGENTS-AND-DEVELOPMENT-PLAN.md  # Plan de agentes
 │   ├── DESIGN-SYSTEM.md            # Design system (tokens, componentes, conversión JSX)
+│   ├── PROJECT-STATUS.md           # Estado actual del proyecto
 │   ├── GOOGLE-OAUTH-SETUP.md       # Guía configuración OAuth
 │   ├── SUPABASE-SETUP.md           # Guía configuración Supabase
-│   └── specs/                      # 27 especificaciones L1/L2/L3
+│   ├── CI-CD-SETUP.md              # Guía configuración CI/CD
+│   ├── data/                       # 4 archivos GPX de ejemplo para importación
+│   ├── design/                     # Assets de diseño
+│   └── specs/                      # 33 especificaciones L1/L2/L3
+│
+├── prompts/                        # Prompts para agentes IA
+│   ├── CONVENTIONS.md              # Convenciones de desarrollo
+│   ├── product/                    # Prompts de producto
+│   ├── remote/                     # Prompts para agentes remotos
+│   └── system/                     # Prompts de sistema
+│
+├── .github/workflows/              # 8 workflows GitHub Actions
+│   ├── ci-frontend.yml             # CI: lint, typecheck, test, build (web)
+│   ├── ci-backend.yml              # CI: lint, typecheck, test (api + shared)
+│   ├── ai-analyze-issue.yml        # R1: Análisis de issues
+│   ├── ai-generate-pr.yml          # R2: Generación de PRs
+│   ├── ai-review-pr.yml            # R3: Code review automático
+│   ├── ai-update-changelog.yml     # R5: CHANGELOG automático
+│   ├── ai-claude-interactive.yml   # @claude: Handler interactivo
+│   └── ai-label-sync.yml           # Sincronización de labels
 │
 ├── turbo.json                      # Configuración Turborepo
 ├── pnpm-workspace.yaml             # Workspace pnpm
 ├── eslint.config.mjs               # ESLint 9 flat config
+├── tsconfig.base.json              # TypeScript base config
+├── render.yaml                     # Configuración deploy Render
 ├── CLAUDE.md                       # Instrucciones para Claude Code
+├── AGENTS.md                       # Instrucciones para agentes remotos
+├── CHANGELOG.md                    # Historial de cambios
 └── README.md
 ```
 
@@ -415,7 +442,7 @@ Internamente implementado con:
 | [GOOGLE-OAUTH-SETUP.md](docs/GOOGLE-OAUTH-SETUP.md)                         | Guía de configuración de Google OAuth en Supabase                     |
 | [SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md)                                 | Guía de configuración de Supabase y base de datos                     |
 | [CLAUDE.md](CLAUDE.md)                                                      | Instrucciones para Claude Code (este repositorio)                     |
-| `docs/specs/`                                                               | 27 especificaciones L1/L2/L3 (8 pantallas + 9 bloques backend)        |
+| `docs/specs/`                                                               | 33 especificaciones L1/L2/L3 (8 pantallas + 9 bloques backend + Fase 4) |
 
 ---
 

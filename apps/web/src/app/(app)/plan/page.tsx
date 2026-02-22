@@ -15,14 +15,13 @@ export default async function PlanPage() {
   const token = await getServerToken();
   if (!token) return null;
 
-  // Calcular inicio de semana (lunes)
+  // Calcular inicio de semana (lunes) en UTC — debe coincidir con plan.service.ts getWeekStart()
   const now = new Date();
-  const dayOfWeek = now.getDay();
-  const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() + diffToMonday);
-  weekStart.setHours(0, 0, 0, 0);
-  const weekStartStr = weekStart.toISOString().split("T")[0];
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const dayOfWeek = d.getUTCDay();
+  const diff = d.getUTCDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+  d.setUTCDate(diff);
+  const weekStartStr = d.toISOString().slice(0, 10);
 
   let planDays: PlanDay[] | null = null;
 

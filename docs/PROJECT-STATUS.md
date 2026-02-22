@@ -5,7 +5,7 @@
 - **Frontend**: 10 pantallas (login, onboarding, dashboard, activities, activity-detail, import, plan, insights, profile, auth-error) — todas migradas a API backend
 - **Backend**: 8 bloques completados (infra, perfil, actividades, insights, training rules, IA, plan, import) — 19 endpoints bajo `/api/v1`
 - **Agentes remotos**: 5 agentes (R1 analyzer, R2 PR generator, R3 reviewer, R5 changelog, @claude interactive) + label sync
-- **Tests**: ~347 (112 web + 90 shared + 145 API)
+- **Tests**: ~355 (114 web + 90 shared + 151 API)
 - **Modo demo**: Modal interactiva en login con datos mock (6 pantallas sin autenticación)
 
 ## Pipeline AI-First
@@ -37,4 +37,3 @@ El desarrollo sigue un pipeline multi-agente (local + remoto). Detalle en `docs/
 | Prompts de agentes remotos | `prompts/remote/` |
 | Configuración Google OAuth | `docs/GOOGLE-OAUTH-SETUP.md` |
 | Configuración Supabase | `docs/SUPABASE-SETUP.md` |
-| Presentación TFM | `docs/presentation-slides.md` |
