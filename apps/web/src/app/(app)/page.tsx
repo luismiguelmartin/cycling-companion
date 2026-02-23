@@ -64,14 +64,22 @@ export default async function DashboardPage() {
   fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
   const dateFrom = fourWeeksAgo.toISOString().split("T")[0];
 
-  const [profileRes, activitiesRes, overloadRes] = await Promise.all([
-    apiGet<ProfileData>("/profile", token),
-    apiGet<ActivitiesResponse>(`/activities?date_from=${dateFrom}&limit=100`, token),
-    apiGet<OverloadResponse>("/insights/overload-check", token).catch(() => null),
-  ]);
+  let profile: ProfileData["data"] | null = null;
+  let allActivities: ActivityRow[] = [];
+  let overloadRes: OverloadResponse | null = null;
 
-  const profile = profileRes.data;
-  const allActivities = activitiesRes.data;
+  try {
+    const [profileRes, activitiesResult, overloadResult] = await Promise.all([
+      apiGet<ProfileData>("/profile", token),
+      apiGet<ActivitiesResponse>(`/activities?date_from=${dateFrom}&limit=100`, token),
+      apiGet<OverloadResponse>("/insights/overload-check", token).catch(() => null),
+    ]);
+    profile = profileRes.data;
+    allActivities = activitiesResult.data;
+    overloadRes = overloadResult;
+  } catch {
+    // API no disponible — continuar con datos vacíos
+  }
 
   // Calcular rangos de semana (UTC para consistencia con fechas de actividad)
   const now = new Date();

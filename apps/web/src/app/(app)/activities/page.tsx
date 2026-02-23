@@ -22,7 +22,13 @@ export default async function ActivitiesPage() {
   const token = await getServerToken();
   if (!token) return null;
 
-  const res = await apiGet<ActivitiesResponse>("/activities?limit=200", token);
+  let activities: ActivityRow[] = [];
+  try {
+    const res = await apiGet<ActivitiesResponse>("/activities?limit=200", token);
+    activities = res.data;
+  } catch {
+    // API no disponible — mostrar lista vacía
+  }
 
-  return <ActivitiesContent activities={res.data} />;
+  return <ActivitiesContent activities={activities} />;
 }
