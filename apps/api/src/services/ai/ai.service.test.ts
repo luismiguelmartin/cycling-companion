@@ -149,11 +149,19 @@ function mockClaudeResponse(response: unknown) {
  * Supports: rpc() for rate limit, from().select().eq().gt().single() for cache reads.
  * Also supports: from().update().eq() and from().upsert() for writes.
  */
-function setupSupabaseMock(options: { rateLimitCount?: number; cachedResponse?: unknown }) {
-  const { rateLimitCount = 0, cachedResponse = null } = options;
+function setupSupabaseMock(options: {
+  rateLimitCount?: number;
+  cachedResponse?: unknown;
+  rpcError?: boolean;
+}) {
+  const { rateLimitCount = 0, cachedResponse = null, rpcError = false } = options;
 
   // Rate limit via rpc("check_ai_rate_limit")
-  mockRpc.mockResolvedValue({ data: rateLimitCount, error: null });
+  if (rpcError) {
+    mockRpc.mockResolvedValue({ data: null, error: { message: "function not found" } });
+  } else {
+    mockRpc.mockResolvedValue({ data: rateLimitCount, error: null });
+  }
 
   mockFrom.mockImplementation((table: string) => {
     if (table === "ai_cache") {
@@ -169,7 +177,7 @@ function setupSupabaseMock(options: { rateLimitCount?: number; cachedResponse?: 
       }
       chain["single"] = vi.fn().mockResolvedValue(cacheResult);
       chain["then"] = (resolve: (v: unknown) => unknown, reject: (e: unknown) => unknown) =>
-        Promise.resolve({ data: null, error: null }).then(resolve, reject);
+        Promise.resolve({ data: null, error: null, count: rateLimitCount }).then(resolve, reject);
       return chain as ReturnType<typeof mockFrom>;
     }
 
@@ -419,6 +427,40 @@ describe("ai.service", () => {
       ).rejects.toThrow(AppError);
 
       setupSupabaseMock({ rateLimitCount: 20 });
+      await expect(
+        analyzeActivity(
+          "00000000-0000-0000-0000-000000000001",
+          "00000000-0000-0000-0000-000000000002",
+        ),
+      ).rejects.toMatchObject({
+        statusCode: 429,
+      });
+    });
+
+    it("funciona con fallback COUNT cuando RPC check_ai_rate_limit falla", async () => {
+      setupSupabaseMock({ rpcError: true });
+      mockClaudeResponse(validAnalysis);
+
+      const result = await analyzeActivity(
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000002",
+      );
+      expect(() => aiActivityAnalysisSchema.parse(result)).not.toThrow();
+      expect(result.summary).toBe(validAnalysis.summary);
+    });
+
+    it("funciona con fallback COUNT para generateWeeklyPlan cuando RPC falla", async () => {
+      setupSupabaseMock({ rpcError: true });
+      mockClaudeResponse(validWeeklyPlan);
+
+      const result = await generateWeeklyPlan("00000000-0000-0000-0000-000000000001");
+      expect(() => aiWeeklyPlanResponseSchema.parse(result)).not.toThrow();
+      expect(result.days).toHaveLength(7);
+    });
+
+    it("aplica rate limit via fallback COUNT cuando RPC falla", async () => {
+      setupSupabaseMock({ rpcError: true, rateLimitCount: 20 });
+
       await expect(
         analyzeActivity(
           "00000000-0000-0000-0000-000000000001",
