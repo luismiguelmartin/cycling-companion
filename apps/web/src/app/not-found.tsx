@@ -11,9 +11,7 @@ export default function NotFound() {
 
         <h1 className="mb-2 text-6xl font-bold text-[var(--text-primary)]">404</h1>
 
-        <p className="mb-1 text-lg font-semibold text-[var(--text-primary)]">
-          Ruta no encontrada
-        </p>
+        <p className="mb-1 text-lg font-semibold text-[var(--text-primary)]">Ruta no encontrada</p>
         <p className="mb-8 text-sm text-[var(--text-muted)]">
           Parece que esta ruta no existe. Vuelve al dashboard para seguir pedaleando.
         </p>
