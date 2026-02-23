@@ -17,12 +17,22 @@ export default async function InsightsPage() {
 
   const { periodA, periodB } = getDefaultPeriods();
 
-  const res = await apiGet<InsightsResponse>(
-    `/insights?period_a_start=${periodA.start}&period_a_end=${periodA.end}&period_b_start=${periodB.start}&period_b_end=${periodB.end}`,
-    token,
-  );
+  let comparison: ComparisonMetric[] = [];
+  let radar: RadarDimension[] = [];
+  let analysis: InsightsAnalysis | null = null;
 
-  const { comparison, radar, analysis } = res.data;
+  try {
+    const res = await apiGet<InsightsResponse>(
+      `/insights?period_a_start=${periodA.start}&period_a_end=${periodA.end}&period_b_start=${periodB.start}&period_b_end=${periodB.end}`,
+      token,
+    );
+    comparison = res.data.comparison;
+    radar = res.data.radar;
+    analysis = res.data.analysis;
+  } catch {
+    // API no disponible — mostrar estado vacío
+  }
+
   const isEmpty = comparison.every((m) => m.valueA === 0 && m.valueB === 0);
 
   return (
