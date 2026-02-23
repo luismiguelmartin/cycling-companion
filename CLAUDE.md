@@ -74,6 +74,10 @@ Variables de entorno: ver `apps/web/.env.example` y `apps/api/.env.example`.
 - Padding centralizado en `app-shell.tsx` (`p-4 md:p-8`), no en páginas individuales
 - Iconos Server→Client: usar `ReactNode` (JSX pre-renderizado), no `LucideIcon` (función)
 - API client split: `lib/api/server.ts` (Server Components) y `lib/api/client.ts` (Client Components) — NO mezclar
+- Resiliencia SSR: llamadas `apiGet()` en Server Components DEBEN tener try/catch — sin protección, la página crashea si la API no responde
+- Timeouts SSR: `apiGet`/`apiPatch` usan `AbortSignal.timeout(9000)` para evitar 504 en Vercel
+- Coach tip: se carga client-side (`AICoachCardClient`) para no bloquear SSR con llamada IA lenta
+- Error boundary: `app/(app)/error.tsx` captura errores no manejados en rutas protegidas
 
 ### Backend
 - FitParser mock en tests: clase, no arrow function → `class MockFitParser { parseAsync = mockFn }`
@@ -82,6 +86,8 @@ Variables de entorno: ver `apps/web/.env.example` y `apps/api/.env.example`.
 - GPX Garmin extensions: `ext["gpxtpx:TrackPointExtension"]["gpxtpx:hr"]`, no `ext.heartRate`
 - Auth: JWT via `supabase.auth.getUser(token)` en plugin `auth.ts`
 - Análisis IA fire-and-forget tras import: `analyzeActivity(userId, id).catch(() => {})`
+- CORS: array de orígenes en `cors.ts` (`FRONTEND_URL` + localhost en dev). Requiere `FRONTEND_URL` en Render
+- Rate limit IA: `rpc("check_ai_rate_limit")` con fallback a query directa si la función SQL no existe
 
 ### Agentes Remotos
 - `--allowedTools` OBLIGATORIO en `claude-code-action@v1`
