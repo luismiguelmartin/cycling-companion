@@ -83,20 +83,36 @@ async function callClaude(system: string, user: string, maxTokens = 2048): Promi
 }
 
 async function checkRateLimit(userId: string): Promise<void> {
+  // Intentar rate limit atómico via rpc; fallback a query si la función no existe
   const { data, error } = await supabaseAdmin.rpc("check_ai_rate_limit", {
     p_user_id: userId,
     p_max_daily_calls: MAX_DAILY_CALLS,
   });
 
+  let count: number;
+
   if (error) {
-    throw new AppError(
-      "Error al verificar el límite de uso. Inténtalo más tarde.",
-      503,
-      "RATE_LIMIT_CHECK_FAILED",
-    );
+    // Fallback: query directa si la función SQL no existe (migración 005 no aplicada)
+    const today = new Date().toISOString().slice(0, 10);
+    const { count: queryCount, error: queryError } = await supabaseAdmin
+      .from("ai_cache")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("created_at", `${today}T00:00:00Z`);
+
+    if (queryError) {
+      throw new AppError(
+        "Error al verificar el límite de uso. Inténtalo más tarde.",
+        503,
+        "RATE_LIMIT_CHECK_FAILED",
+      );
+    }
+    count = queryCount ?? 0;
+  } else {
+    count = data ?? 0;
   }
 
-  if ((data ?? 0) >= MAX_DAILY_CALLS) {
+  if (count >= MAX_DAILY_CALLS) {
     throw new AppError(
       `Has alcanzado el límite de ${MAX_DAILY_CALLS} consultas IA por día.`,
       429,
