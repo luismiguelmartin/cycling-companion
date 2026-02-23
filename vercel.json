@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "apps/web/**/*.ts": {
+      "maxDuration": 30
+    },
+    "apps/web/**/*.tsx": {
+      "maxDuration": 30
+    }
+  }
+}

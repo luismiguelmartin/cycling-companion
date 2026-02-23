@@ -22,6 +22,7 @@ export async function apiGet<T>(path: string, token: string): Promise<T> {
   const res = await fetch(`${API_URL}/api/v1${path}`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
+    signal: AbortSignal.timeout(9000),
   });
 
   if (!res.ok) {
@@ -44,6 +45,7 @@ export async function apiPatch<T>(path: string, token: string, body: unknown): P
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(9000),
   });
 
   if (!res.ok) {
