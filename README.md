@@ -55,7 +55,7 @@ Si no hay datos, el dashboard permite generar datos de demostración o importar 
 - ✅ 37 componentes reutilizables
 - ✅ **~355 tests**: 114 web + 90 shared + 151 API
 - ✅ 5 schemas Zod compartidos + 8 módulos de constantes + utils de training
-- ✅ 4 migraciones SQL (schema, onboarding, activity types, ai_cache)
+- ✅ 5 migraciones SQL (schema, onboarding, activity types, ai_cache)
 - ✅ Design system documentado (dark/light theme)
 - ✅ 33 especificaciones L1/L2/L3 (frontend + backend + Fase 4)
 - ✅ **API Fastify completa**: 15+ endpoints (CRUD + IA + upload)
@@ -83,6 +83,7 @@ Si no hay datos, el dashboard permite generar datos de demostración o importar 
 | **IA**             | Claude API (Anthropic) para recomendaciones                         |
 | **Monorepo**       | Turborepo + pnpm                                                    |
 | **Testing**        | Vitest, React Testing Library                                       |
+| **Calidad**        | Husky + lint-staged (Prettier automático en pre-commit)             |
 | **Tipografía**     | DM Sans (400/500/600/700)                                           |
 
 ### Justificación Tecnológica
@@ -214,11 +215,12 @@ cycling-companion/
 │           └── utils/              # Training calculations, training rules
 │
 ├── supabase/
-│   ├── migrations/                 # 4 migraciones SQL
+│   ├── migrations/                 # 5 migraciones SQL
 │   │   ├── 001_initial_schema.sql
 │   │   ├── 002_alter_users_for_onboarding.sql
 │   │   ├── 003_align_activity_type_enum.sql
-│   │   └── 004_ai_cache.sql
+│   │   ├── 004_ai_cache.sql
+│   │   └── 005_atomic_rate_limit.sql
 │   ├── seed.sql                    # Seed genérico (placeholder <USER_ID>)
 │   ├── seed_personalized.sql       # Seed con datos de ejemplo
 │   ├── cleanup_mock_data.sql       # Limpieza de datos mock
@@ -257,6 +259,7 @@ cycling-companion/
 │
 ├── turbo.json                      # Configuración Turborepo
 ├── pnpm-workspace.yaml             # Workspace pnpm
+├── .husky/pre-commit               # Husky pre-commit hook (lint-staged)
 ├── eslint.config.mjs               # ESLint 9 flat config
 ├── tsconfig.base.json              # TypeScript base config
 ├── render.yaml                     # Configuración deploy Render
@@ -266,7 +269,7 @@ cycling-companion/
 └── README.md
 ```
 
-### Modelo de Datos (4 migraciones SQL)
+### Modelo de Datos (5 migraciones SQL)
 
 **users** — Perfil: edad, peso, FTP, FC máx/reposo, objetivo (performance/health/weight_loss/recovery)
 
@@ -327,6 +330,7 @@ cycling-companion/
 - **PRs**: Pequeñas y enfocadas (< 400 líneas), enlazar con issues
 - **Tests**: Unitarios para lógica compleja, integración para endpoints críticos
 - **Tailwind**: Utility classes, evitar CSS custom
+- **Formato**: Prettier se ejecuta automáticamente en cada commit vía Husky + lint-staged
 - **RLS**: Row Level Security activo en Supabase, nunca desactivar
 
 ---
@@ -494,7 +498,7 @@ Este proyecto implementa un pipeline multi-agente para integrar IA en el ciclo d
 - **Validación**: Inputs validados con Zod + sanitización de búsquedas + validación de fechas en rutas
 - **Rate limiting**: 20 llamadas IA/usuario/día con caché y fallbacks heurísticos
 - **Secrets**: Variables de entorno, nunca commitear API keys
-- **Auditoría completa**: Ver [SECURITY-AUDIT.md](docs/SECURITY-AUDIT.md) (score 8.5/10)
+- **Auditoría completa**: Ver [SECURITY-AUDIT.md](docs/SECURITY-AUDIT.md) (score 9.5/10)
 
 ---
 

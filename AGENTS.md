@@ -31,7 +31,7 @@ pnpm format:check           # Prettier --check
 - **Server Components** por defecto, Client Components solo con interactividad
 - **Commits**: español, prefijo `feat:` / `fix:` / `refactor:` / `docs:`
 - **PRs**: una por issue, body con `Closes #N`, label `ai-generated`
-- **Prettier**: semi, doble comilla, tabWidth 2, trailingComma all, printWidth 100
+- **Prettier**: semi, doble comilla, tabWidth 2, trailingComma all, printWidth 100. Pre-commit hook (Husky + lint-staged) formatea automáticamente
 - **Tailwind CSS**: utility classes, no CSS custom. shadcn/ui como base
 
 ## Gotchas críticos

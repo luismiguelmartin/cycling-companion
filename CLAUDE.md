@@ -51,7 +51,7 @@ Variables de entorno: ver `apps/web/.env.example` y `apps/api/.env.example`.
 - **Archivos**: PascalCase componentes, kebab-case archivos, co-locate tests
 - **Estilos**: Tailwind utility classes, shadcn/ui como base, iconos Lucide React (nunca emojis)
 - **Git**: commits en español (`feat:` / `fix:` / `refactor:` / `docs:`), PRs con `Closes #N`
-- **Prettier**: semi, doble comilla, tabWidth 2, trailingComma all, printWidth 100
+- **Prettier**: semi, doble comilla, tabWidth 2, trailingComma all, printWidth 100. Se ejecuta automáticamente en pre-commit vía Husky + lint-staged
 - **ESLint 9**: flat config (`eslint.config.mjs` raíz). `@next/eslint-plugin-next` + `react` + `react-hooks` en web, globals node en api, `eslint-config-prettier` al final
 - **Seguridad**: RLS activo siempre, nunca commitear API keys, validar inputs con Zod
 - **Migraciones**: SQL en `supabase/migrations/NNN_*.sql`, actualizar schemas Zod si cambia DB
