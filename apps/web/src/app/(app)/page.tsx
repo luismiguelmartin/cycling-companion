@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Activity, Clock, Zap, Heart, ChevronRight } from "lucide-react";
 import { apiGet, getServerToken } from "@/lib/api/server";
 import { KPICard } from "@/components/kpi-card";
-import { AICoachCard } from "@/components/ai-coach-card";
+import { AICoachCardClient } from "@/components/ai-coach-card-client";
 import { OverloadAlert } from "@/components/overload-alert";
 import { RecentActivityItem } from "@/components/recent-activity-item";
 import { PowerTrendChart } from "@/components/charts/power-trend-chart";
@@ -55,17 +55,6 @@ interface OverloadResponse {
   };
 }
 
-interface CoachTipResponse {
-  data: {
-    recommendation: string;
-    tips?: {
-      hydration?: string;
-      sleep?: string;
-      nutrition?: string;
-    };
-  };
-}
-
 export default async function DashboardPage() {
   const token = await getServerToken();
   if (!token) return null;
@@ -80,15 +69,6 @@ export default async function DashboardPage() {
     apiGet<ActivitiesResponse>(`/activities?date_from=${dateFrom}&limit=100`, token),
     apiGet<OverloadResponse>("/insights/overload-check", token).catch(() => null),
   ]);
-
-  // Coach tip — llamada independiente que puede fallar sin romper la página
-  let coachTip: CoachTipResponse["data"] | null = null;
-  try {
-    const tipRes = await apiGet<CoachTipResponse>("/ai/coach-tip", token);
-    coachTip = tipRes.data;
-  } catch {
-    // Si la IA no está disponible, usamos placeholder
-  }
 
   const profile = profileRes.data;
   const allActivities = activitiesRes.data;
@@ -126,22 +106,20 @@ export default async function DashboardPage() {
   const greeting = getGreeting();
   const userName = profile?.display_name ?? "Ciclista";
 
-  // Recomendación IA — usar coach tip real o fallback
-  const aiRecommendation =
-    coachTip?.recommendation ??
-    (allActivities.length > 0
+  // Fallback estático para el coach tip (se usa si la llamada client-side falla)
+  const fallbackRecommendation =
+    allActivities.length > 0
       ? `Tu semana lleva ${currentKPIs.activityCount} actividad${currentKPIs.activityCount !== 1 ? "es" : ""}. ${
           currentKPIs.avgPower
             ? `Tu potencia media es ${currentKPIs.avgPower}W.`
             : "Sigue registrando para obtener mejores insights."
         } ¡Mantén la constancia!`
-      : "Sube tu primera actividad para empezar a recibir recomendaciones personalizadas. Cuantos más datos tenga, mejores serán mis consejos.");
+      : "Sube tu primera actividad para empezar a recibir recomendaciones personalizadas. Cuantos más datos tenga, mejores serán mis consejos.";
 
-  const aiTips =
-    coachTip?.tips ??
-    (allActivities.length > 0
+  const fallbackTips =
+    allActivities.length > 0
       ? { hydration: "2.5L mínimo", sleep: "7.5h recomendadas", nutrition: "+30g carbohidratos" }
-      : undefined);
+      : undefined;
 
   return (
     <div>
@@ -209,7 +187,10 @@ export default async function DashboardPage() {
 
       {/* AI Coach Card */}
       <div className="mb-6">
-        <AICoachCard recommendation={aiRecommendation} tips={aiTips} />
+        <AICoachCardClient
+          fallbackRecommendation={fallbackRecommendation}
+          fallbackTips={fallbackTips}
+        />
       </div>
 
       {/* Recent Activities */}
