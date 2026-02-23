@@ -48,3 +48,4 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 - Eje X de gráficas de actividad: escala numérica continua de 0 a distancia total, graduada cada 5 km
 - Persistencia del análisis IA: el resultado (incluido fallback) se guarda en BBDD y persiste al recargar
 - Creación de plan semanal: corregir mismatch de estructura frontend/backend (plan_data → days)
+- Manejo de errores de API en server components para evitar crash en producción (#40)
