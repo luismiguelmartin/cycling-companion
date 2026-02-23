@@ -23,6 +23,7 @@ function getTodayIndex(days: PlanDay[]): number {
 export function PlanContent({ serverPlanDays }: PlanContentProps) {
   const [planDays, setPlanDays] = useState<PlanDay[] | null>(serverPlanDays);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const hasPlan = planDays && planDays.length > 0;
   const todayIndex = hasPlan ? getTodayIndex(planDays) : 0;
   const [selectedIndex, setSelectedIndex] = useState(todayIndex);
@@ -36,6 +37,7 @@ export function PlanContent({ serverPlanDays }: PlanContentProps) {
 
   async function handleGeneratePlan(forceRegenerate = false) {
     setIsGenerating(true);
+    setError(null);
     try {
       const res = await apiClientPost<{ data: { days: PlanDay[]; rationale: string } }>(
         "/ai/weekly-plan",
@@ -46,14 +48,20 @@ export function PlanContent({ serverPlanDays }: PlanContentProps) {
         setSelectedIndex(getTodayIndex(res.data.days));
       }
     } catch {
-      // Error generating plan
+      setError("No se pudo generar el plan. Inténtalo más tarde.");
     } finally {
       setIsGenerating(false);
     }
   }
 
   if (!hasPlan) {
-    return <EmptyState onGenerate={() => handleGeneratePlan(false)} isGenerating={isGenerating} />;
+    return (
+      <EmptyState
+        onGenerate={() => handleGeneratePlan(false)}
+        isGenerating={isGenerating}
+        error={error}
+      />
+    );
   }
 
   return (
@@ -112,6 +120,9 @@ export function PlanContent({ serverPlanDays }: PlanContentProps) {
         />
       </div>
 
+      {/* Error */}
+      {error && <p className="mt-3 text-center text-[12px] text-red-500">{error}</p>}
+
       {/* Day Detail */}
       {selectedDay && <DayDetail day={selectedDay} />}
     </div>
@@ -121,9 +132,11 @@ export function PlanContent({ serverPlanDays }: PlanContentProps) {
 function EmptyState({
   onGenerate,
   isGenerating,
+  error,
 }: {
   onGenerate: () => void;
   isGenerating: boolean;
+  error: string | null;
 }) {
   return (
     <div>
@@ -135,6 +148,7 @@ function EmptyState({
         <p className="mb-4 text-[14px] text-[var(--text-secondary)]">
           No hay plan generado para esta semana.
         </p>
+        {error && <p className="mb-3 text-[12px] text-red-500">{error}</p>}
         <button
           onClick={onGenerate}
           disabled={isGenerating}
