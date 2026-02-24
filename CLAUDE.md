@@ -15,7 +15,7 @@ Guía para Claude Code. Contexto para agentes remotos en `AGENTS.md`. Estado del
 Monorepo Turborepo + pnpm:
 - `apps/web/` → Next.js 16 (App Router, React 19, TypeScript, Tailwind CSS, shadcn/ui)
 - `apps/api/` → Fastify 5 (TypeScript, Zod)
-- `packages/shared/` → Types Zod, constantes, utils compartidos
+- `packages/shared/` → Types Zod, constantes, utils compartidos, motor de métricas ciclistas v2
 - `supabase/` → Migraciones SQL + seeds
 - DB: Supabase (PostgreSQL + Auth + RLS) · IA: Claude API · Deploy: Vercel + Render + Supabase
 
@@ -33,8 +33,8 @@ pnpm lint                   # ESLint (3 paquetes)
 pnpm typecheck              # TypeScript (3 paquetes)
 pnpm test                   # Vitest (3 paquetes)
 pnpm test --filter=web      # Solo web (114 tests)
-pnpm test --filter=api      # Solo API (151 tests)
-pnpm test --filter=shared   # Solo shared (90 tests)
+pnpm test --filter=api      # Solo API (156 tests)
+pnpm test --filter=shared   # Solo shared (189 tests)
 pnpm format                 # Prettier --write
 pnpm format:check           # Prettier --check
 ```
@@ -88,6 +88,15 @@ Variables de entorno: ver `apps/web/.env.example` y `apps/api/.env.example`.
 - Análisis IA fire-and-forget tras import: `analyzeActivity(userId, id).catch(() => {})`
 - CORS: array de orígenes en `cors.ts` (`FRONTEND_URL` + localhost en dev). Requiere `FRONTEND_URL` en Render
 - Rate limit IA: `rpc("check_ai_rate_limit")` con fallback a query directa si la función SQL no existe
+
+### Metrics v2 (`packages/shared/src/metrics/`)
+- Pipeline: sanitize → sort/dedup → resample 1Hz → speed → movement → compute-summary
+- Todos los módulos son funciones puras, sin side effects, 100% testeables
+- `computeActivitySummary(trackPoints, ftp, maxHr)` es el orquestador principal
+- `activityCreateSchema`: `distance_km` es `.positive().nullable()` — NO admite 0, pasar `null` en su lugar
+- `processUpload` ignora `summary.distance_km` si es 0 (datos sin GPS → usa distancia del parser)
+- Migración `006_enhanced_metrics.sql`: 11 columnas nuevas en `activities`, 3 en `activity_metrics` (lat, lon, elevation)
+- Frontend: segunda fila de métricas condicional (`hasAdvancedMetrics` = `duration_moving` o `normalized_power` no null)
 
 ### Agentes Remotos
 - `--allowedTools` OBLIGATORIO en `claude-code-action@v1`

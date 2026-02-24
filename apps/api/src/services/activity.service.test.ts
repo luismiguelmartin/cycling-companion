@@ -171,6 +171,79 @@ describe("activity.service", () => {
       expect(result.tss).toBeNull();
     });
 
+    it("usa TSS del summary cuando está disponible", async () => {
+      const activityData = {
+        name: "Summary Ride",
+        date: "2026-02-10",
+        type: "endurance" as const,
+        duration_seconds: 3600,
+        avg_power_watts: 250,
+      };
+      const summary = {
+        duration_total: 3600,
+        duration_moving: 3400,
+        distance_km: 30.5,
+        avg_speed: 32.29,
+        max_speed: 55.2,
+        avg_power: 245,
+        avg_power_non_zero: 260,
+        normalized_power: 270,
+        variability_index: 1.1,
+        intensity_factor: 0.9,
+        avg_hr: 148,
+        avg_hr_moving: 152,
+        max_hr: 178,
+        avg_cadence_moving: 88,
+        tss: 81,
+        elevation_gain: 650,
+        max_power: 850,
+      };
+      const chain = mockSupabaseChain({
+        data: { ...mockActivity, ...activityData, tss: 81 },
+        error: null,
+      });
+      await createActivity("user-123", activityData, 300, 270, summary);
+      // Verificar que insert recibe los campos v2 del summary
+      expect(chain.insert).toHaveBeenCalled();
+      const insertedData = (chain.insert as ReturnType<typeof vi.fn>).mock.calls[0][0];
+      expect(insertedData.tss).toBe(81); // TSS del summary, no calculado
+      expect(insertedData.duration_moving).toBe(3400);
+      expect(insertedData.normalized_power).toBe(270);
+      expect(insertedData.max_power).toBe(850);
+      expect(insertedData.avg_speed).toBe(32.29);
+      expect(insertedData.max_speed).toBe(55.2);
+      expect(insertedData.elevation_gain).toBe(650);
+      expect(insertedData.avg_hr_moving).toBe(152);
+      expect(insertedData.avg_cadence_moving).toBe(88);
+      expect(insertedData.variability_index).toBe(1.1);
+      expect(insertedData.intensity_factor).toBe(0.9);
+      expect(insertedData.avg_power_non_zero).toBe(260);
+    });
+
+    it("inserta null en campos v2 cuando no hay summary", async () => {
+      const activityData = {
+        name: "No Summary Ride",
+        date: "2026-02-10",
+        type: "endurance" as const,
+        duration_seconds: 3600,
+        avg_power_watts: 200,
+      };
+      const chain = mockSupabaseChain({
+        data: { ...mockActivity, ...activityData },
+        error: null,
+      });
+      await createActivity("user-123", activityData, 300);
+      const insertedData = (chain.insert as ReturnType<typeof vi.fn>).mock.calls[0][0];
+      expect(insertedData.duration_moving).toBeNull();
+      expect(insertedData.normalized_power).toBeNull();
+      expect(insertedData.max_power).toBeNull();
+      expect(insertedData.avg_speed).toBeNull();
+      expect(insertedData.max_speed).toBeNull();
+      expect(insertedData.elevation_gain).toBeNull();
+      expect(insertedData.avg_hr_moving).toBeNull();
+      expect(insertedData.avg_cadence_moving).toBeNull();
+    });
+
     it("lanza AppError 500 si Supabase falla en insert", async () => {
       const activityData = {
         name: "Fail Ride",

@@ -1,7 +1,13 @@
 import FitParser from "fit-file-parser";
 import { parseGPXWithCustomParser } from "@we-gold/gpxjs";
 import { DOMParser } from "linkedom";
-import { calculateNP, type ActivityType } from "shared";
+import {
+  calculateNP,
+  computeActivitySummary,
+  type ActivityType,
+  type TrackPoint,
+  type ActivitySummary,
+} from "shared";
 import { supabaseAdmin } from "./supabase.js";
 import { createActivity } from "./activity.service.js";
 import { getProfile } from "./profile.service.js";
@@ -20,6 +26,7 @@ export interface ParsedActivityData {
   maxHrBpm: number | null;
   avgCadenceRpm: number | null;
   metrics: ParsedMetric[];
+  trackPoints: TrackPoint[];
 }
 
 export interface ParsedMetric {
@@ -104,6 +111,7 @@ export async function parseFitBuffer(buffer: Buffer): Promise<ParsedActivityData
 
   // Extraer métricas segundo a segundo de los records
   const metrics: ParsedMetric[] = [];
+  const trackPoints: TrackPoint[] = [];
   const baseTimestamp = records[0]?.timestamp ? new Date(records[0].timestamp).getTime() : 0;
 
   for (const record of records) {
@@ -118,6 +126,16 @@ export async function parseFitBuffer(buffer: Buffer): Promise<ParsedActivityData
       cadenceRpm: record.cadence ?? null,
       speedKmh: record.speed ? Math.round(record.speed * 100) / 100 : null,
     });
+
+    trackPoints.push({
+      timestamp: recordTime,
+      lat: record.position_lat ?? 0,
+      lon: record.position_long ?? 0,
+      elevation: record.altitude ?? null,
+      power: record.power ?? null,
+      hr: record.heart_rate ?? null,
+      cadence: record.cadence ?? null,
+    });
   }
 
   return {
@@ -131,6 +149,7 @@ export async function parseFitBuffer(buffer: Buffer): Promise<ParsedActivityData
     maxHrBpm,
     avgCadenceRpm,
     metrics,
+    trackPoints,
   };
 }
 
@@ -173,6 +192,7 @@ export function parseGpxString(xmlString: string): ParsedActivityData {
   const baseTime = track.points[0].time ? new Date(track.points[0].time).getTime() : 0;
 
   const metrics: ParsedMetric[] = [];
+  const trackPoints: TrackPoint[] = [];
 
   for (const point of track.points) {
     const ext = point.extensions;
@@ -205,6 +225,16 @@ export function parseGpxString(xmlString: string): ParsedActivityData {
       cadenceRpm: cadence,
       speedKmh: speed ? Math.round(speed * 3.6 * 100) / 100 : null,
     });
+
+    trackPoints.push({
+      timestamp: pointTime,
+      lat: point.latitude ?? 0,
+      lon: point.longitude ?? 0,
+      elevation: point.elevation ?? null,
+      power,
+      hr,
+      cadence,
+    });
   }
 
   return {
@@ -218,6 +248,7 @@ export function parseGpxString(xmlString: string): ParsedActivityData {
     maxHrBpm: maxHr > 0 ? Math.round(maxHr) : null,
     avgCadenceRpm: cadenceCount > 0 ? Math.round(totalCadence / cadenceCount) : null,
     metrics,
+    trackPoints,
   };
 }
 
@@ -253,23 +284,38 @@ export async function processUpload(
   // Obtener FTP del usuario para calcular TSS
   const profile = await getProfile(userId);
 
+  // Calcular métricas avanzadas si hay trackPoints
+  let summary: ActivitySummary | undefined;
+  if (parsed.trackPoints.length > 0) {
+    summary = computeActivitySummary(
+      parsed.trackPoints,
+      profile.ftp ?? null,
+      profile.max_hr ?? null,
+    );
+  }
+
   const activity = await createActivity(
     userId,
     {
       name: overrides?.name || parsed.name,
       date: parsed.date,
       type: overrides?.type ?? "endurance",
-      duration_seconds: parsed.durationSeconds,
-      distance_km: parsed.distanceKm,
-      avg_power_watts: parsed.avgPowerWatts,
-      avg_hr_bpm: parsed.avgHrBpm,
-      max_hr_bpm: parsed.maxHrBpm,
+      duration_seconds: summary?.duration_total ?? parsed.durationSeconds,
+      distance_km:
+        summary?.distance_km && summary.distance_km > 0
+          ? Math.round(summary.distance_km * 100) / 100
+          : parsed.distanceKm,
+      avg_power_watts:
+        summary?.avg_power != null ? Math.round(summary.avg_power) : parsed.avgPowerWatts,
+      avg_hr_bpm: summary?.avg_hr != null ? Math.round(summary.avg_hr) : parsed.avgHrBpm,
+      max_hr_bpm: summary?.max_hr != null ? Math.round(summary.max_hr) : parsed.maxHrBpm,
       avg_cadence_rpm: parsed.avgCadenceRpm,
       rpe: overrides?.rpe ?? null,
       notes: overrides?.notes ?? null,
     },
     profile.ftp,
-    parsed.normalizedPowerWatts,
+    summary?.normalized_power ?? parsed.normalizedPowerWatts,
+    summary,
   );
 
   // Insertar métricas en batch (si hay), limitar a 100.000 data points
@@ -283,13 +329,16 @@ export async function processUpload(
     );
   }
   if (parsed.metrics.length > 0) {
-    const metricsRows = parsed.metrics.map((m) => ({
+    const metricsRows = parsed.metrics.map((m, i) => ({
       activity_id: activity.id,
       timestamp_seconds: m.timestampSeconds,
       power_watts: m.powerWatts,
       hr_bpm: m.hrBpm,
       cadence_rpm: m.cadenceRpm,
       speed_kmh: m.speedKmh,
+      lat: parsed.trackPoints[i]?.lat ?? null,
+      lon: parsed.trackPoints[i]?.lon ?? null,
+      elevation: parsed.trackPoints[i]?.elevation ?? null,
     }));
 
     // Insertar en bloques de 1000 para evitar límites

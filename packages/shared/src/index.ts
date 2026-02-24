@@ -18,6 +18,15 @@ export {
   type ActivityCreateInput,
 } from "./schemas/activity.js";
 
+export {
+  activitySourceEnum,
+  stravaConnectionStatusSchema,
+  stravaSyncResultSchema,
+  type ActivitySource,
+  type StravaConnectionStatus,
+  type StravaSyncResult,
+} from "./schemas/strava.js";
+
 // Constants
 export { GOALS, ONBOARDING_STEPS } from "./constants/goals.js";
 export { NAV_ITEMS } from "./constants/navigation.js";
@@ -33,6 +42,12 @@ export { ACTIVITY_FILTERS, type ActivityFilterKey } from "./constants/activity-f
 export { MAX_RPE, RPE_DESCRIPTIONS, RPE_COLORS, getRPEColor } from "./constants/rpe.js";
 export { INTENSITY_LEVELS, type IntensityLevel } from "./constants/intensity-levels.js";
 export { WEATHER_TYPES, type WeatherTypeKey, type WeatherType } from "./constants/weather.js";
+export {
+  STRAVA_SPORT_TYPE_MAP,
+  STRAVA_CYCLING_SPORT_TYPES,
+  STRAVA_STREAM_KEYS,
+  STRAVA_CONFIG,
+} from "./constants/strava.js";
 
 export {
   planDaySchema,
@@ -77,6 +92,9 @@ export {
   type TrainingAlert,
   type AlertParams,
 } from "./utils/training-rules.js";
+
+// Metrics engine v2
+export * from "./metrics/index.js";
 
 // AI response schemas
 export {

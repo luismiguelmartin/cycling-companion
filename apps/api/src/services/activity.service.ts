@@ -1,4 +1,9 @@
-import { activityCreateSchema, type Activity, type ActivityCreateInput } from "shared";
+import {
+  activityCreateSchema,
+  type Activity,
+  type ActivityCreateInput,
+  type ActivitySummary,
+} from "shared";
 import { supabaseAdmin } from "./supabase.js";
 import { AppError } from "../plugins/error-handler.js";
 
@@ -98,17 +103,21 @@ export async function createActivity(
   data: ActivityCreateInput,
   userFtp?: number | null,
   normalizedPowerWatts?: number | null,
+  summary?: ActivitySummary,
 ): Promise<Activity> {
   const parsedData = activityCreateSchema.parse(data);
 
+  // TSS: preferir el del summary si existe, sino calcular manualmente
   let tss: number | null = null;
-
-  // Preferir NP sobre avg power para TSS (más preciso)
-  const powerForTSS = normalizedPowerWatts ?? parsedData.avg_power_watts;
-  if (powerForTSS && userFtp) {
-    const intensityFactor = powerForTSS / userFtp;
-    const durationHours = parsedData.duration_seconds / 3600;
-    tss = Math.round(intensityFactor * intensityFactor * durationHours * 100);
+  if (summary?.tss != null) {
+    tss = summary.tss;
+  } else {
+    const powerForTSS = normalizedPowerWatts ?? parsedData.avg_power_watts;
+    if (powerForTSS && userFtp) {
+      const intensityFactor = powerForTSS / userFtp;
+      const durationHours = parsedData.duration_seconds / 3600;
+      tss = Math.round(intensityFactor * intensityFactor * durationHours * 100);
+    }
   }
 
   const { data: activity, error } = await supabaseAdmin
@@ -117,6 +126,25 @@ export async function createActivity(
       ...parsedData,
       user_id: userId,
       tss,
+      // Métricas avanzadas v2 (null si no hay summary)
+      duration_moving: summary?.duration_moving ?? null,
+      normalized_power:
+        summary?.normalized_power != null ? Math.round(summary.normalized_power) : null,
+      max_power: summary?.max_power != null ? Math.round(summary.max_power) : null,
+      max_speed: summary?.max_speed != null ? Math.round(summary.max_speed * 100) / 100 : null,
+      avg_speed: summary?.avg_speed != null ? Math.round(summary.avg_speed * 100) / 100 : null,
+      avg_power_non_zero:
+        summary?.avg_power_non_zero != null ? Math.round(summary.avg_power_non_zero) : null,
+      variability_index:
+        summary?.variability_index != null
+          ? Math.round(summary.variability_index * 100) / 100
+          : null,
+      intensity_factor:
+        summary?.intensity_factor != null ? Math.round(summary.intensity_factor * 100) / 100 : null,
+      elevation_gain: summary?.elevation_gain != null ? Math.round(summary.elevation_gain) : null,
+      avg_hr_moving: summary?.avg_hr_moving != null ? Math.round(summary.avg_hr_moving) : null,
+      avg_cadence_moving:
+        summary?.avg_cadence_moving != null ? Math.round(summary.avg_cadence_moving) : null,
     })
     .select()
     .single();

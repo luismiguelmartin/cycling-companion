@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Activity, Clock, Zap, Heart, TrendingUp } from "lucide-react";
+import { Activity, Clock, Zap, Heart, TrendingUp, Gauge, Timer, Mountain } from "lucide-react";
 import { apiGet, getServerToken } from "@/lib/api/server";
 import { formatDuration } from "@/lib/dashboard/calculations";
 import { formatActivityDate } from "@/lib/activities/format-date";
@@ -27,6 +27,18 @@ interface ActivityData {
   avg_cadence_rpm: number | null;
   tss: number | null;
   ai_analysis: Record<string, unknown> | null;
+  // Métricas v2 (nullable para retrocompatibilidad)
+  duration_moving: number | null;
+  normalized_power: number | null;
+  max_power: number | null;
+  max_speed: number | null;
+  avg_speed: number | null;
+  avg_power_non_zero: number | null;
+  variability_index: number | null;
+  intensity_factor: number | null;
+  elevation_gain: number | null;
+  avg_hr_moving: number | null;
+  avg_cadence_moving: number | null;
 }
 
 interface MetricRow {
@@ -89,8 +101,11 @@ export default async function ActivityDetailPage({ params }: PageProps) {
     {
       icon: <TrendingUp className="h-3 w-3" style={{ color: "#22c55e" }} />,
       label: "Cadencia",
-      value: activity.avg_cadence_rpm != null ? String(activity.avg_cadence_rpm) : "—",
-      unit: activity.avg_cadence_rpm != null ? "rpm" : "",
+      value:
+        (activity.avg_cadence_moving ?? activity.avg_cadence_rpm) != null
+          ? String(activity.avg_cadence_moving ?? activity.avg_cadence_rpm)
+          : "—",
+      unit: (activity.avg_cadence_moving ?? activity.avg_cadence_rpm) != null ? "rpm" : "",
     },
     {
       icon: <Zap className="h-3 w-3" style={{ color: "#eab308" }} />,
@@ -99,6 +114,49 @@ export default async function ActivityDetailPage({ params }: PageProps) {
       unit: "",
     },
   ];
+
+  const hasAdvancedMetrics = activity.duration_moving != null || activity.normalized_power != null;
+
+  const advancedMetrics: MetricItem[] = hasAdvancedMetrics
+    ? [
+        {
+          icon: <Gauge className="h-3 w-3" style={{ color: "#3b82f6" }} />,
+          label: "Vel. media",
+          value: activity.avg_speed != null ? activity.avg_speed.toFixed(1) : "—",
+          unit: activity.avg_speed != null ? "km/h" : "",
+        },
+        {
+          icon: <Timer className="h-3 w-3" style={{ color: "#8b5cf6" }} />,
+          label: "T. movimiento",
+          value: activity.duration_moving != null ? formatDuration(activity.duration_moving) : "—",
+          unit: "",
+        },
+        {
+          icon: <Zap className="h-3 w-3" style={{ color: "#f97316" }} />,
+          label: "NP",
+          value: activity.normalized_power != null ? String(activity.normalized_power) : "—",
+          unit: activity.normalized_power != null ? "W" : "",
+        },
+        {
+          icon: <Zap className="h-3 w-3" style={{ color: "#ef4444" }} />,
+          label: "Pot. max.",
+          value: activity.max_power != null ? String(activity.max_power) : "—",
+          unit: activity.max_power != null ? "W" : "",
+        },
+        {
+          icon: <Mountain className="h-3 w-3" style={{ color: "#22c55e" }} />,
+          label: "Desnivel+",
+          value: activity.elevation_gain != null ? String(activity.elevation_gain) : "—",
+          unit: activity.elevation_gain != null ? "m" : "",
+        },
+        {
+          icon: <TrendingUp className="h-3 w-3" style={{ color: "#eab308" }} />,
+          label: "IF",
+          value: activity.intensity_factor != null ? activity.intensity_factor.toFixed(2) : "—",
+          unit: "",
+        },
+      ]
+    : [];
 
   // Validate ai_analysis structure
   let analysis = null;
@@ -128,6 +186,7 @@ export default async function ActivityDetailPage({ params }: PageProps) {
         actions={<DeleteActivityButton activityId={activity.id} activityName={activity.name} />}
       />
       <MetricsGrid metrics={metrics} />
+      {advancedMetrics.length > 0 && <MetricsGrid metrics={advancedMetrics} />}
       <ActivityChart data={timeSeries} />
       <AIAnalysisCard analysis={analysis} activityId={activity.id} />
     </div>

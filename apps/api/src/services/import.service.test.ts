@@ -179,6 +179,30 @@ describe("import.service", () => {
       expect(result.metrics[2].timestampSeconds).toBe(2);
     });
 
+    it("genera trackPoints con lat/lon desde records FIT", async () => {
+      const fitWithGps = {
+        ...mockFitData,
+        records: mockFitData.records.map((r, i) => ({
+          ...r,
+          position_lat: 38.8794 + i * 0.0001,
+          position_long: -6.9707,
+          altitude: 200 + i * 5,
+        })),
+      };
+      mockParseAsync.mockResolvedValue(fitWithGps);
+
+      const result = await parseFitBuffer(Buffer.from("fit-gps"));
+
+      expect(result.trackPoints).toHaveLength(3);
+      expect(result.trackPoints[0].lat).toBeCloseTo(38.8794, 4);
+      expect(result.trackPoints[0].lon).toBeCloseTo(-6.9707, 4);
+      expect(result.trackPoints[0].elevation).toBe(200);
+      expect(result.trackPoints[0].power).toBe(200);
+      expect(result.trackPoints[0].hr).toBe(140);
+      expect(result.trackPoints[1].elevation).toBe(205);
+      expect(result.trackPoints[2].elevation).toBe(210);
+    });
+
     it("lanza error si el parser falla", async () => {
       mockParseAsync.mockRejectedValue(new Error("Invalid FIT"));
 
@@ -289,6 +313,21 @@ describe("import.service", () => {
       expect(result.metrics[0].cadenceRpm).toBe(86);
       expect(result.metrics[1].hrBpm).toBe(148);
       expect(result.metrics[1].cadenceRpm).toBe(90);
+    });
+
+    it("genera trackPoints con lat/lon/elevation desde puntos GPX", () => {
+      mockParseGPXWithCustomParser.mockReturnValue([mockGpxParsed, null]);
+
+      const result = parseGpxString("<gpx>fake</gpx>");
+
+      expect(result.trackPoints).toHaveLength(2);
+      expect(result.trackPoints[0].lat).toBeCloseTo(40.4, 4);
+      expect(result.trackPoints[0].lon).toBeCloseTo(-3.7, 4);
+      expect(result.trackPoints[0].elevation).toBe(650);
+      expect(result.trackPoints[0].power).toBe(200);
+      expect(result.trackPoints[0].hr).toBe(140);
+      expect(result.trackPoints[1].lat).toBeCloseTo(40.41, 4);
+      expect(result.trackPoints[1].elevation).toBe(660);
     });
 
     it("maneja puntos sin extensions", () => {
@@ -425,6 +464,44 @@ describe("import.service", () => {
       await expect(
         processUpload("user-123", Buffer.from("data"), "ride.csv"),
       ).rejects.toMatchObject({ statusCode: 400 });
+    });
+
+    it("persiste lat/lon/elevation en activity_metrics", async () => {
+      const fitWithGps = {
+        ...mockFitData,
+        records: mockFitData.records.map((r, i) => ({
+          ...r,
+          position_lat: 38.8794 + i * 0.0001,
+          position_long: -6.9707 + i * 0.0001,
+          altitude: 200 + i * 5,
+        })),
+      };
+      mockParseAsync.mockResolvedValue(fitWithGps);
+
+      const insertFn = vi.fn().mockResolvedValue({ error: null });
+      mockFrom.mockImplementation((table: string) => {
+        const chain = mockSupabaseChain({ data: null, error: null });
+        if (table === "users") {
+          chain["single"] = vi.fn().mockResolvedValue({ data: mockProfile, error: null });
+        }
+        if (table === "activities") {
+          chain["single"] = vi.fn().mockResolvedValue({ data: mockActivity, error: null });
+        }
+        if (table === "activity_metrics") {
+          chain["insert"] = insertFn;
+        }
+        return chain;
+      });
+
+      await processUpload("user-123", Buffer.from("fit-gps"), "ride.fit");
+
+      expect(insertFn).toHaveBeenCalled();
+      const batch = insertFn.mock.calls[0][0];
+      expect(batch[0]).toHaveProperty("lat");
+      expect(batch[0]).toHaveProperty("lon");
+      expect(batch[0]).toHaveProperty("elevation");
+      expect(batch[0].lat).toBeCloseTo(38.8794, 4);
+      expect(batch[0].elevation).toBe(200);
     });
 
     it("lanza error si la duración es 0", async () => {
