@@ -35,6 +35,7 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.
 
 ### Corregido
 
+- Restringir despliegues a rama main en Vercel, Render y GitHub CI (#41)
 - CI workflows para respetar pipeline de dependencias usando turbo run (#22)
 - Posición del botón cerrar en menú móvil (#20)
 - Manejo de fechas UTC en dashboard y backend (#21)
