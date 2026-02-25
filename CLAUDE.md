@@ -33,7 +33,7 @@ pnpm lint                   # ESLint (3 paquetes)
 pnpm typecheck              # TypeScript (3 paquetes)
 pnpm test                   # Vitest (3 paquetes)
 pnpm test --filter=web      # Solo web (114 tests)
-pnpm test --filter=api      # Solo API (156 tests)
+pnpm test --filter=api      # Solo API (228 tests)
 pnpm test --filter=shared   # Solo shared (189 tests)
 pnpm format                 # Prettier --write
 pnpm format:check           # Prettier --check
@@ -88,6 +88,9 @@ Variables de entorno: ver `apps/web/.env.example` y `apps/api/.env.example`.
 - Análisis IA fire-and-forget tras import: `analyzeActivity(userId, id).catch(() => {})`
 - CORS: array de orígenes en `cors.ts` (`FRONTEND_URL` + localhost en dev). Requiere `FRONTEND_URL` en Render
 - Rate limit IA: `rpc("check_ai_rate_limit")` con fallback a query directa si la función SQL no existe
+- Strava tokens cifrados con AES-256-GCM (`utils/crypto.ts`). Requiere `STRAVA_TOKEN_ENCRYPTION_KEY` (32 bytes base64)
+- Strava servicios en `services/strava/`: api (HTTP client), connection (CRUD BD + auto-refresh), mapper (Strava→schema propio)
+- `StravaAuthError` y `StravaRateLimitError` extienden `AppError` — manejo diferenciado en rutas
 
 ### Metrics v2 (`packages/shared/src/metrics/`)
 - Pipeline: sanitize → sort/dedup → resample 1Hz → speed → movement → compute-summary

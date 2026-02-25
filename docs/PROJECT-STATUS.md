@@ -5,7 +5,7 @@
 - **Frontend**: 10 pantallas (login, onboarding, dashboard, activities, activity-detail, import, plan, insights, profile, auth-error) — todas migradas a API backend
 - **Backend**: 8 bloques completados (infra, perfil, actividades, insights, training rules, IA, plan, import) — 19 endpoints bajo `/api/v1`
 - **Agentes remotos**: 5 agentes (R1 analyzer, R2 PR generator, R3 reviewer, R5 changelog, @claude interactive) + label sync
-- **Tests**: ~459 (114 web + 189 shared + 156 API)
+- **Tests**: ~531 (114 web + 189 shared + 228 API)
 - **Modo demo**: Modal interactiva en login con datos mock (6 pantallas sin autenticación)
 - **Métricas avanzadas**: En desarrollo (rama `feat/advanced-cycling-metrics`) — ver sección dedicada abajo
 
@@ -49,7 +49,7 @@ Motor de cálculo de métricas ciclistas v2: resampleo a 1Hz, detección de movi
 
 ## Integración Strava API (Planificada)
 
-**Rama**: `feat/strava-api` (pendiente de crear)
+**Rama**: `feat/advanced-cycling-metrics` (compartida con métricas v2)
 **PRD**: `docs/PRD-STRAVA-API.md`
 **Specs**: `docs/specs-strava-api/`
 
@@ -57,7 +57,7 @@ Sincronización automática de actividades desde Strava: OAuth 2.0, webhooks, ba
 
 | Fase | Descripción | Estado | Tests estimados |
 |------|-------------|--------|-----------------|
-| **0** | Infraestructura (BD, schemas, servicios base) | Pendiente | ~30 |
+| **0** | Infraestructura (BD, schemas, servicios base) | **Completada** | 72 |
 | **1** | OAuth flow (conectar/desconectar) | Pendiente | ~20 |
 | **2** | Webhook + sincronización automática | Pendiente | ~25 |
 | **3** | Backfill + UI perfil | Pendiente | ~15 |
