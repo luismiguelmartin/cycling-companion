@@ -1,6 +1,7 @@
 services:
   - type: web
     name: cycling-companion-api
+    branch: main
     rootDir: apps/api
     runtime: node
     plan: standard
