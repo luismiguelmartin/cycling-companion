@@ -11,6 +11,7 @@ on:
       - "turbo.json"
       - ".github/workflows/ci-backend.yml"
   pull_request:
+    branches: [main]
     paths:
       - "apps/api/**"
       - "packages/shared/**"
