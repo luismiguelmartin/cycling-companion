@@ -16,12 +16,13 @@ export function fallbackAnalyzeActivity(
   trainingLoad: TrainingLoad,
   alerts: TrainingAlert[],
 ): AIActivityAnalysis {
-  const zone = classifyActivityZone(activity.avg_power_watts, profile.ftp ?? null);
-  const durationMin = Math.round(activity.duration_seconds / 60);
+  const power = activity.avg_power_non_zero ?? activity.avg_power_watts;
+  const zone = classifyActivityZone(power, profile.ftp ?? null);
+  const durationMin = Math.round((activity.duration_moving ?? activity.duration_seconds) / 60);
 
   let summary = `Sesión de ${activity.type} de ${durationMin} minutos.`;
-  if (activity.avg_power_watts) {
-    summary += ` Potencia media de ${activity.avg_power_watts}W`;
+  if (power) {
+    summary += ` Potencia media de ${power}W`;
     if (zone) summary += ` (${zone})`;
     summary += ".";
   }

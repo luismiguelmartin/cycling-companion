@@ -14,14 +14,17 @@ export function DeleteActivityButton({ activityId, activityName }: DeleteActivit
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleDelete() {
     setIsDeleting(true);
+    setError(null);
     try {
       await apiClientDelete(`/activities/${activityId}`);
       router.push("/activities");
       router.refresh();
     } catch {
+      setError("Error al eliminar. Inténtalo de nuevo.");
       setIsDeleting(false);
     }
   }
@@ -63,6 +66,7 @@ export function DeleteActivityButton({ activityId, activityName }: DeleteActivit
             >
               ¿Seguro que quieres eliminar «{activityName}»? Esta acción no se puede deshacer.
             </p>
+            {error && <p className="mt-2 text-[12px] text-red-500">{error}</p>}
             <div className="mt-5 flex gap-3">
               <button
                 onClick={() => setOpen(false)}

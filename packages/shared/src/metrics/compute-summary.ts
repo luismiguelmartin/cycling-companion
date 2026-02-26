@@ -84,11 +84,11 @@ export function computeActivitySummary(
     .filter((s): s is number => s !== undefined && s > 0);
   const maxSpeed = movingSpeeds.length > 0 ? Math.round(Math.max(...movingSpeeds) * 100) / 100 : 0;
 
-  // Metricas de potencia
-  const avgPow = avgPower(processed);
-  const avgPowNonZero = avgPowerNonZero(processed);
+  // Metricas de potencia (solo puntos en movimiento para NP y medias)
+  const avgPow = avgPower(movingPoints);
+  const avgPowNonZero = avgPowerNonZero(movingPoints);
   const maxPow = maxPower(processed);
-  const np = normalizedPower(processed);
+  const np = normalizedPower(movingPoints);
 
   const vi =
     np !== null && avgPow !== null && avgPow > 0
@@ -98,8 +98,8 @@ export function computeActivitySummary(
   const intensityFactor =
     np !== null && userFtp !== null && userFtp > 0 ? Math.round((np / userFtp) * 100) / 100 : null;
 
-  // TSS
-  const tss = computeTSS(np, avgPow, userFtp, durationTotal, processed, userMaxHr);
+  // TSS (usa durationMoving para coincidir con Garmin/TrainingPeaks)
+  const tss = computeTSS(np, avgPow, userFtp, durationMoving, movingPoints, userMaxHr);
 
   // Metricas de FC
   const hrValues = processed.map((p) => p.hr).filter((h): h is number => h !== null);
@@ -118,10 +118,10 @@ export function computeActivitySummary(
   // Elevacion
   const elevGain = elevationGain(processed);
 
-  // Fase 3: distribución de zonas y best efforts
-  const powerZones = powerZoneDistribution(processed, userFtp, POWER_ZONES);
-  const hrZones = hrZoneDistribution(processed, userMaxHr ?? null, HR_ZONES);
-  const bestEfforts = computeBestEfforts(processed);
+  // Fase 3: distribución de zonas y best efforts (solo puntos en movimiento)
+  const powerZones = powerZoneDistribution(movingPoints, userFtp, POWER_ZONES);
+  const hrZones = hrZoneDistribution(movingPoints, userMaxHr ?? null, HR_ZONES);
+  const bestEfforts = computeBestEfforts(movingPoints);
 
   return {
     duration_total: durationTotal,

@@ -8,7 +8,9 @@ interface ActivityRow {
   type: string;
   distance_km: number | null;
   duration_seconds: number;
+  duration_moving: number | null;
   avg_power_watts: number | null;
+  avg_power_non_zero: number | null;
   avg_hr_bpm: number | null;
   rpe: number | null;
 }

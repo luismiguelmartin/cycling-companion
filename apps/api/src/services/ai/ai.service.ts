@@ -171,8 +171,8 @@ function parseAndValidate<T>(raw: string, schema: ZodSchema<T>): T {
 function getRecentActivities(activities: Activity[]): TrainingActivityInput[] {
   return activities.map((a) => ({
     date: a.date,
-    duration_seconds: a.duration_seconds,
-    avg_power_watts: a.avg_power_watts,
+    duration_seconds: a.duration_moving ?? a.duration_seconds,
+    avg_power_watts: a.avg_power_non_zero ?? a.avg_power_watts,
     tss: a.tss,
   }));
 }
@@ -221,7 +221,10 @@ export async function analyzeActivity(
     const trainingInputs = getRecentActivities(recent.data);
     const today = new Date().toISOString().slice(0, 10);
     trainingLoad = calculateTrainingLoad(trainingInputs, today);
-    zone = classifyActivityZone(activity.avg_power_watts, profile.ftp ?? null);
+    zone = classifyActivityZone(
+      activity.avg_power_non_zero ?? activity.avg_power_watts,
+      profile.ftp ?? null,
+    );
 
     const weekStart = getWeekStart(new Date());
     const weeklyTSS = calculateWeeklyTSS(trainingInputs, weekStart);
@@ -447,7 +450,9 @@ export async function generateWeeklySummary(
     );
 
     const avgPower = (acts: Activity[]) => {
-      const powers = acts.map((a) => a.avg_power_watts).filter((v): v is number => v != null);
+      const powers = acts
+        .map((a) => a.avg_power_non_zero ?? a.avg_power_watts)
+        .filter((v): v is number => v != null);
       return powers.length > 0
         ? Math.round(powers.reduce((s, v) => s + v, 0) / powers.length)
         : null;

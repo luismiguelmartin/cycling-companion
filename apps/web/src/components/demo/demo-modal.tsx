@@ -172,7 +172,9 @@ function DemoSlide({ screenId }: { screenId: string }) {
               type: a.type,
               distance_km: a.distance_km,
               duration_seconds: a.duration_seconds,
+              duration_moving: a.duration_seconds,
               avg_power_watts: a.avg_power_watts,
+              avg_power_non_zero: a.avg_power_watts,
               avg_hr_bpm: a.avg_hr_bpm,
               rpe: a.rpe,
             }))}

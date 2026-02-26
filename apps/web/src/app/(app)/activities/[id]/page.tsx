@@ -1,15 +1,5 @@
 import { notFound } from "next/navigation";
-import {
-  Activity,
-  Clock,
-  Zap,
-  Heart,
-  TrendingUp,
-  Gauge,
-  Timer,
-  Mountain,
-  Flame,
-} from "lucide-react";
+import { Activity, Clock, Zap, Heart, TrendingUp, Gauge, Mountain, Flame } from "lucide-react";
 import { apiGet, getServerToken } from "@/lib/api/server";
 import { formatDuration } from "@/lib/dashboard/calculations";
 import { formatActivityDate } from "@/lib/activities/format-date";
@@ -105,6 +95,11 @@ export default async function ActivityDetailPage({ params }: PageProps) {
   const timeSeries = transformTimeSeries(metricsRows, activity.distance_km);
   const dateFormatted = formatActivityDate(activity.date);
 
+  const movingDuration = activity.duration_moving ?? activity.duration_seconds;
+  const power = activity.avg_power_non_zero ?? activity.avg_power_watts;
+  const hr = activity.avg_hr_moving ?? activity.avg_hr_bpm;
+  const cadence = activity.avg_cadence_moving ?? activity.avg_cadence_rpm;
+
   const metrics: MetricItem[] = [
     {
       icon: <Activity className="h-3 w-3" style={{ color: "#3b82f6" }} />,
@@ -114,30 +109,27 @@ export default async function ActivityDetailPage({ params }: PageProps) {
     },
     {
       icon: <Clock className="h-3 w-3" style={{ color: "#8b5cf6" }} />,
-      label: "Tiempo",
-      value: formatDuration(activity.duration_seconds),
+      label: "T. mov.",
+      value: formatDuration(movingDuration),
       unit: "",
     },
     {
       icon: <Zap className="h-3 w-3" style={{ color: "#f97316" }} />,
       label: "Pot.",
-      value: activity.avg_power_watts != null ? String(activity.avg_power_watts) : "—",
-      unit: activity.avg_power_watts != null ? "W" : "",
+      value: power != null ? String(power) : "—",
+      unit: power != null ? "W" : "",
     },
     {
       icon: <Heart className="h-3 w-3" style={{ color: "#ef4444" }} />,
       label: "FC",
-      value: activity.avg_hr_bpm != null ? String(activity.avg_hr_bpm) : "—",
-      unit: activity.avg_hr_bpm != null ? "bpm" : "",
+      value: hr != null ? String(hr) : "—",
+      unit: hr != null ? "bpm" : "",
     },
     {
       icon: <TrendingUp className="h-3 w-3" style={{ color: "#22c55e" }} />,
       label: "Cadencia",
-      value:
-        (activity.avg_cadence_moving ?? activity.avg_cadence_rpm) != null
-          ? String(activity.avg_cadence_moving ?? activity.avg_cadence_rpm)
-          : "—",
-      unit: (activity.avg_cadence_moving ?? activity.avg_cadence_rpm) != null ? "rpm" : "",
+      value: cadence != null ? String(cadence) : "—",
+      unit: cadence != null ? "rpm" : "",
     },
     {
       icon: <Zap className="h-3 w-3" style={{ color: "#eab308" }} />,
@@ -156,12 +148,6 @@ export default async function ActivityDetailPage({ params }: PageProps) {
           label: "Vel. media",
           value: activity.avg_speed != null ? activity.avg_speed.toFixed(1) : "—",
           unit: activity.avg_speed != null ? "km/h" : "",
-        },
-        {
-          icon: <Timer className="h-3 w-3" style={{ color: "#8b5cf6" }} />,
-          label: "T. movimiento",
-          value: activity.duration_moving != null ? formatDuration(activity.duration_moving) : "—",
-          unit: "",
         },
         {
           icon: <Zap className="h-3 w-3" style={{ color: "#f97316" }} />,
@@ -187,14 +173,12 @@ export default async function ActivityDetailPage({ params }: PageProps) {
           value: activity.intensity_factor != null ? activity.intensity_factor.toFixed(2) : "—",
           unit: "",
         },
-        ...(activity.normalized_power != null &&
-        activity.avg_hr_bpm != null &&
-        activity.avg_hr_bpm > 0
+        ...(activity.normalized_power != null && hr != null && hr > 0
           ? [
               {
                 icon: <Flame className="h-3 w-3" style={{ color: "#f43f5e" }} />,
                 label: "EF",
-                value: (activity.normalized_power / activity.avg_hr_bpm).toFixed(2),
+                value: (activity.normalized_power / hr).toFixed(2),
                 unit: "",
               },
             ]

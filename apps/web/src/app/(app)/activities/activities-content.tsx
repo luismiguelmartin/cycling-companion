@@ -14,7 +14,9 @@ interface ActivityRow {
   type: string;
   distance_km: number | null;
   duration_seconds: number;
+  duration_moving: number | null;
   avg_power_watts: number | null;
+  avg_power_non_zero: number | null;
   avg_hr_bpm: number | null;
   rpe: number | null;
 }
@@ -138,8 +140,10 @@ export function ActivitiesContent({ activities }: ActivitiesContentProps) {
               date={activity.date}
               type={activity.type}
               distanceKm={activity.distance_km}
-              durationFormatted={formatDuration(activity.duration_seconds)}
-              avgPower={activity.avg_power_watts}
+              durationFormatted={formatDuration(
+                activity.duration_moving ?? activity.duration_seconds,
+              )}
+              avgPower={activity.avg_power_non_zero ?? activity.avg_power_watts}
               avgHR={activity.avg_hr_bpm}
               rpe={activity.rpe}
             />

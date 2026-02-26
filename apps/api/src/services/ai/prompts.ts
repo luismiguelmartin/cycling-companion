@@ -75,8 +75,8 @@ ACTIVIDAD A ANALIZAR:
 - Nombre: ${ctx.activity.name}
 - Tipo: ${ctx.activity.type}
 - Fecha: ${ctx.activity.date}
-- Duración: ${Math.round(ctx.activity.duration_seconds / 60)} minutos
-- Potencia media: ${ctx.activity.avg_power_watts ?? "N/A"}W
+- Duración en movimiento: ${Math.round((ctx.activity.duration_moving ?? ctx.activity.duration_seconds) / 60)} minutos
+- Potencia media (en movimiento): ${ctx.activity.avg_power_non_zero ?? ctx.activity.avg_power_watts ?? "N/A"}W
 - FC media: ${ctx.activity.avg_hr_bpm ?? "N/A"}bpm
 - TSS: ${ctx.activity.tss ?? "N/A"}
 - RPE: ${ctx.activity.rpe ?? "N/A"}/10
@@ -89,7 +89,7 @@ ALERTAS ACTIVAS:
 ${formatAlerts(ctx.alerts)}
 
 ACTIVIDADES RECIENTES (últimas 2 semanas):
-${ctx.recentActivities.length > 0 ? ctx.recentActivities.map((a) => `- ${a.date}: ${a.name} (${a.type}, TSS: ${a.tss ?? "N/A"}, ${Math.round(a.duration_seconds / 60)}min)`).join("\n") : "- Sin actividades recientes"}
+${ctx.recentActivities.length > 0 ? ctx.recentActivities.map((a) => `- ${a.date}: ${a.name} (${a.type}, TSS: ${a.tss ?? "N/A"}, ${Math.round((a.duration_moving ?? a.duration_seconds) / 60)}min)`).join("\n") : "- Sin actividades recientes"}
 
 Analiza esta sesión y genera el JSON de respuesta.`;
 
@@ -149,7 +149,7 @@ ALERTAS ACTIVAS:
 ${formatAlerts(ctx.alerts)}
 
 ACTIVIDADES RECIENTES (últimas 2 semanas):
-${ctx.recentActivities.length > 0 ? ctx.recentActivities.map((a) => `- ${a.date}: ${a.name} (${a.type}, TSS: ${a.tss ?? "N/A"}, ${Math.round(a.duration_seconds / 60)}min)`).join("\n") : "- Sin actividades recientes"}
+${ctx.recentActivities.length > 0 ? ctx.recentActivities.map((a) => `- ${a.date}: ${a.name} (${a.type}, TSS: ${a.tss ?? "N/A"}, ${Math.round((a.duration_moving ?? a.duration_seconds) / 60)}min)`).join("\n") : "- Sin actividades recientes"}
 
 SEMANA A PLANIFICAR:
 ${ctx.weekDates.map((d) => `- ${d.day} ${d.date}`).join("\n")}
@@ -243,7 +243,7 @@ FORMATO DE RESPUESTA (JSON exacto):
 ${formatProfile(ctx.profile)}
 
 ÚLTIMA ACTIVIDAD:
-${ctx.lastActivity ? `- ${ctx.lastActivity.date}: ${ctx.lastActivity.name} (${ctx.lastActivity.type}, TSS: ${ctx.lastActivity.tss ?? "N/A"}, ${Math.round(ctx.lastActivity.duration_seconds / 60)}min)` : "- Sin actividad reciente registrada"}
+${ctx.lastActivity ? `- ${ctx.lastActivity.date}: ${ctx.lastActivity.name} (${ctx.lastActivity.type}, TSS: ${ctx.lastActivity.tss ?? "N/A"}, ${Math.round((ctx.lastActivity.duration_moving ?? ctx.lastActivity.duration_seconds) / 60)}min)` : "- Sin actividad reciente registrada"}
 
 MÉTRICAS DE ENTRENAMIENTO:
 ${formatTrainingLoad(ctx.trainingLoad)}
