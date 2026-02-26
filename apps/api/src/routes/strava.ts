@@ -9,6 +9,8 @@ import {
   saveStravaConnection,
   deleteStravaConnection,
   deauthorizeAthlete,
+  processWebhookEvent,
+  backfillStravaActivities,
 } from "../services/strava/index.js";
 import { supabaseAdmin } from "../services/supabase.js";
 
@@ -142,6 +144,22 @@ export async function stravaProtectedRoutes(fastify: FastifyInstance) {
 
     return { data: { disconnected: true } };
   });
+
+  // POST /strava/sync — Backfill manual de actividades
+  fastify.post("/strava/sync", async (request: FastifyRequest<{ Body: { count?: number } }>) => {
+    const connection = await getStravaConnection(request.userId);
+    if (!connection) {
+      throw new AppError("No hay conexión con Strava", 404, "STRAVA_NOT_CONNECTED");
+    }
+
+    const count = (request.body as { count?: number })?.count ?? 30;
+    if (typeof count !== "number" || count < 1 || count > 100) {
+      throw new AppError("count debe estar entre 1 y 100", 400, "BAD_REQUEST");
+    }
+
+    const result = await backfillStravaActivities(request.userId, { count });
+    return { data: result };
+  });
 }
 
 /** Ruta pública de callback OAuth (no requiere auth) */
@@ -202,4 +220,46 @@ export async function stravaPublicRoutes(fastify: FastifyInstance) {
       return reply.redirect(`${frontendUrl}/profile?strava=connected`);
     },
   );
+
+  // GET /strava/webhook — Validación de suscripción (Strava challenge)
+  fastify.get(
+    "/strava/webhook",
+    async (
+      request: FastifyRequest<{
+        Querystring: {
+          "hub.mode"?: string;
+          "hub.challenge"?: string;
+          "hub.verify_token"?: string;
+        };
+      }>,
+      reply: FastifyReply,
+    ) => {
+      const mode = request.query["hub.mode"];
+      const challenge = request.query["hub.challenge"];
+      const verifyToken = request.query["hub.verify_token"];
+      const expectedToken = process.env.STRAVA_WEBHOOK_VERIFY_TOKEN;
+
+      if (mode === "subscribe" && challenge && expectedToken && verifyToken === expectedToken) {
+        return reply.status(200).send({ "hub.challenge": challenge });
+      }
+
+      return reply.status(403).send({ error: "Forbidden" });
+    },
+  );
+
+  // POST /strava/webhook — Recepción de eventos (fire-and-forget)
+  fastify.post("/strava/webhook", async (request: FastifyRequest, reply: FastifyReply) => {
+    // Responder 200 inmediatamente — Strava requiere respuesta en < 2 segundos
+    void reply.status(200).send("EVENT_RECEIVED");
+
+    // Procesar evento en background
+    const body = request.body as Record<string, unknown> | null;
+    if (body && typeof body === "object" && body.object_type && body.owner_id) {
+      processWebhookEvent(body as unknown as Parameters<typeof processWebhookEvent>[0]).catch(
+        (err) => {
+          request.log.error({ err }, "Error procesando webhook Strava");
+        },
+      );
+    }
+  });
 }

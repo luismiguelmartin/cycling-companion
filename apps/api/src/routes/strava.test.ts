@@ -42,6 +42,8 @@ const mockGetStravaConnectionByAthleteId = vi.fn();
 const mockSaveStravaConnection = vi.fn();
 const mockDeleteStravaConnection = vi.fn();
 const mockDeauthorizeAthlete = vi.fn();
+const mockProcessWebhookEvent = vi.fn();
+const mockBackfillStravaActivities = vi.fn();
 
 vi.mock("../services/strava/index.js", () => ({
   exchangeAuthCode: (...args: unknown[]) => mockExchangeAuthCode(...args),
@@ -51,6 +53,8 @@ vi.mock("../services/strava/index.js", () => ({
   saveStravaConnection: (...args: unknown[]) => mockSaveStravaConnection(...args),
   deleteStravaConnection: (...args: unknown[]) => mockDeleteStravaConnection(...args),
   deauthorizeAthlete: (...args: unknown[]) => mockDeauthorizeAthlete(...args),
+  processWebhookEvent: (...args: unknown[]) => mockProcessWebhookEvent(...args),
+  backfillStravaActivities: (...args: unknown[]) => mockBackfillStravaActivities(...args),
   getValidAccessToken: vi.fn(),
   refreshAccessToken: vi.fn(),
   getStravaAthlete: vi.fn(),
@@ -58,6 +62,7 @@ vi.mock("../services/strava/index.js", () => ({
   StravaRateLimitError: class extends Error {},
   mapStravaToActivity: vi.fn(),
   isStravaCyclingActivity: vi.fn(),
+  importStravaActivity: vi.fn(),
   updateStravaTokens: vi.fn(),
   updateLastSyncAt: vi.fn(),
 }));
@@ -524,6 +529,199 @@ describe("Strava Routes", () => {
         method: "DELETE",
         url: "/api/v1/strava/disconnect",
         headers: authHeaders,
+      });
+
+      expect(res.statusCode).toBe(401);
+    });
+  });
+
+  // ─── GET /strava/webhook (validación suscripción) ──────────────────
+
+  describe("GET /api/v1/strava/webhook", () => {
+    it("éxito — devuelve challenge", async () => {
+      process.env.STRAVA_WEBHOOK_VERIFY_TOKEN = "my-verify-token";
+
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/strava/webhook?hub.mode=subscribe&hub.challenge=abc123&hub.verify_token=my-verify-token",
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.json()).toEqual({ "hub.challenge": "abc123" });
+
+      delete process.env.STRAVA_WEBHOOK_VERIFY_TOKEN;
+    });
+
+    it("verify_token inválido → 403", async () => {
+      process.env.STRAVA_WEBHOOK_VERIFY_TOKEN = "my-verify-token";
+
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/strava/webhook?hub.mode=subscribe&hub.challenge=abc123&hub.verify_token=wrong",
+      });
+
+      expect(res.statusCode).toBe(403);
+
+      delete process.env.STRAVA_WEBHOOK_VERIFY_TOKEN;
+    });
+
+    it("mode inválido → 403", async () => {
+      process.env.STRAVA_WEBHOOK_VERIFY_TOKEN = "my-verify-token";
+
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/strava/webhook?hub.mode=unsubscribe&hub.challenge=abc123&hub.verify_token=my-verify-token",
+      });
+
+      expect(res.statusCode).toBe(403);
+
+      delete process.env.STRAVA_WEBHOOK_VERIFY_TOKEN;
+    });
+
+    it("sin params → 403", async () => {
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/strava/webhook",
+      });
+
+      expect(res.statusCode).toBe(403);
+    });
+  });
+
+  // ─── POST /strava/webhook (eventos) ────────────────────────────────
+
+  describe("POST /api/v1/strava/webhook", () => {
+    it("responde 200 con evento válido", async () => {
+      mockProcessWebhookEvent.mockResolvedValue(undefined);
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/strava/webhook",
+        payload: {
+          object_type: "activity",
+          object_id: 12345,
+          aspect_type: "create",
+          updates: {},
+          owner_id: 98765,
+          subscription_id: 1,
+          event_time: Date.now(),
+        },
+      });
+
+      expect(res.statusCode).toBe(200);
+    });
+
+    it("responde 200 con body vacío (no crashear)", async () => {
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/strava/webhook",
+        payload: {},
+      });
+
+      expect(res.statusCode).toBe(200);
+    });
+
+    it("funciona sin auth (ruta pública)", async () => {
+      mockAuthFailure();
+      mockProcessWebhookEvent.mockResolvedValue(undefined);
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/strava/webhook",
+        payload: {
+          object_type: "activity",
+          object_id: 12345,
+          aspect_type: "create",
+          updates: {},
+          owner_id: 98765,
+          subscription_id: 1,
+          event_time: Date.now(),
+        },
+      });
+
+      expect(res.statusCode).toBe(200);
+    });
+  });
+
+  // ─── POST /strava/sync (backfill) ─────────────────────────────────
+
+  describe("POST /api/v1/strava/sync", () => {
+    it("éxito con count por defecto", async () => {
+      mockGetStravaConnection.mockResolvedValue({
+        id: "conn-1",
+        user_id: USER_ID,
+        strava_athlete_id: 12345,
+        access_token: "access",
+        refresh_token: "refresh",
+        token_expires_at: new Date(Date.now() + 3600000),
+        scope: "activity:read_all",
+        connected_at: new Date(),
+        last_sync_at: null,
+      });
+      mockBackfillStravaActivities.mockResolvedValue({
+        imported: 5,
+        skipped: 3,
+        errors: 0,
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/strava/sync",
+        headers: authHeaders,
+        payload: {},
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.json()).toEqual({
+        data: { imported: 5, skipped: 3, errors: 0 },
+      });
+    });
+
+    it("sin conexión → 404", async () => {
+      mockGetStravaConnection.mockResolvedValue(null);
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/strava/sync",
+        headers: authHeaders,
+        payload: {},
+      });
+
+      expect(res.statusCode).toBe(404);
+      expect(res.json()).toMatchObject({ code: "STRAVA_NOT_CONNECTED" });
+    });
+
+    it("count inválido → 400", async () => {
+      mockGetStravaConnection.mockResolvedValue({
+        id: "conn-1",
+        user_id: USER_ID,
+        strava_athlete_id: 12345,
+        access_token: "access",
+        refresh_token: "refresh",
+        token_expires_at: new Date(Date.now() + 3600000),
+        scope: "activity:read_all",
+        connected_at: new Date(),
+        last_sync_at: null,
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/strava/sync",
+        headers: authHeaders,
+        payload: { count: 500 },
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("sin auth devuelve 401", async () => {
+      mockAuthFailure();
+
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/v1/strava/sync",
+        headers: authHeaders,
+        payload: {},
       });
 
       expect(res.statusCode).toBe(401);

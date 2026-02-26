@@ -104,6 +104,7 @@ export async function createActivity(
   userFtp?: number | null,
   normalizedPowerWatts?: number | null,
   summary?: ActivitySummary,
+  extra?: { strava_id?: number; source?: string },
 ): Promise<Activity> {
   const parsedData = activityCreateSchema.parse(data);
 
@@ -126,6 +127,8 @@ export async function createActivity(
       ...parsedData,
       user_id: userId,
       tss,
+      ...(extra?.strava_id != null ? { strava_id: extra.strava_id } : {}),
+      ...(extra?.source ? { source: extra.source } : {}),
       // Métricas avanzadas v2 (null si no hay summary)
       duration_moving: summary?.duration_moving ?? null,
       normalized_power:

@@ -36,3 +36,9 @@ export {
   type MappedActivityData,
   type MappedStravaResult,
 } from "./strava-mapper.service.js";
+
+export {
+  importStravaActivity,
+  processWebhookEvent,
+  backfillStravaActivities,
+} from "./strava-import.service.js";
