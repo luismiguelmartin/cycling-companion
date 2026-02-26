@@ -21,7 +21,23 @@ describe("transformTimeSeries", () => {
     expect(transformTimeSeries([])).toEqual([]);
   });
 
-  it("reemplaza valores null con 0", () => {
+  it("reemplaza valores null con 0 (punto con actividad)", () => {
+    const input = [
+      {
+        timestamp_seconds: 60,
+        power_watts: 100,
+        hr_bpm: null,
+        cadence_rpm: null,
+        speed_kmh: null,
+      },
+    ];
+
+    const result = transformTimeSeries(input);
+
+    expect(result[0]).toEqual({ km: 0, power: 100, hr: 0, cadence: 0 });
+  });
+
+  it("filtra puntos en pausa (todo null/0)", () => {
     const input = [
       {
         timestamp_seconds: 60,
@@ -34,7 +50,7 @@ describe("transformTimeSeries", () => {
 
     const result = transformTimeSeries(input);
 
-    expect(result[0]).toEqual({ km: 0, power: 0, hr: 0, cadence: 0 });
+    expect(result).toEqual([]);
   });
 
   it("usa totalDistanceKm como fallback si speed_kmh es null", () => {

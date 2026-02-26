@@ -235,14 +235,21 @@ export default async function ActivityDetailPage({ params }: PageProps) {
       {activity.best_efforts && activity.best_efforts.length > 0 && (
         <BestEffortsTable data={activity.best_efforts} />
       )}
-      {activity.power_zone_distribution && activity.power_zone_distribution.length > 0 && (
-        <ZoneDistributionChart data={activity.power_zone_distribution} title="Zonas de potencia" />
-      )}
-      {activity.hr_zone_distribution && activity.hr_zone_distribution.length > 0 && (
-        <ZoneDistributionChart
-          data={activity.hr_zone_distribution}
-          title="Zonas de frecuencia cardíaca"
-        />
+      {(activity.power_zone_distribution?.length || activity.hr_zone_distribution?.length) && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+          {activity.power_zone_distribution && activity.power_zone_distribution.length > 0 && (
+            <ZoneDistributionChart
+              data={activity.power_zone_distribution}
+              title="Zonas de potencia"
+            />
+          )}
+          {activity.hr_zone_distribution && activity.hr_zone_distribution.length > 0 && (
+            <ZoneDistributionChart
+              data={activity.hr_zone_distribution}
+              title="Zonas de frecuencia cardíaca"
+            />
+          )}
+        </div>
       )}
       <AIAnalysisCard analysis={analysis} activityId={activity.id} />
     </div>

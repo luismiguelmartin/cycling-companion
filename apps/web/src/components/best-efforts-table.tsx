@@ -14,19 +14,25 @@ export function BestEffortsTable({ data }: BestEffortsTableProps) {
   if (data.length === 0) return null;
 
   return (
-    <div className="rounded-lg border bg-card p-4">
-      <h3 className="mb-3 text-sm font-medium text-muted-foreground">Mejores esfuerzos</h3>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
+    <div>
+      <h3 className="mb-2 text-[13px] font-semibold text-[var(--text-primary)]">
+        Mejores esfuerzos
+      </h3>
+      <div className="grid grid-cols-3 gap-1.5 md:grid-cols-5 md:gap-2.5">
         {data.map((effort) => (
           <div
             key={effort.windowSeconds}
-            className="flex flex-col items-center rounded-md border bg-muted/50 p-3"
+            className="rounded-[10px] border border-[var(--card-border)] bg-[var(--card-bg)] p-2 md:p-3"
           >
-            <span className="text-xs text-muted-foreground">{effort.label}</span>
-            <div className="mt-1 flex items-center gap-1">
+            <div className="mb-1 flex items-center gap-1.5">
               <Zap className="h-3 w-3" style={{ color: "#f97316" }} />
-              <span className="text-lg font-semibold">{effort.power}</span>
-              <span className="text-xs text-muted-foreground">W</span>
+              <span className="text-[10px] text-[var(--text-muted)]">{effort.label}</span>
+            </div>
+            <div>
+              <span className="text-base font-bold text-[var(--text-primary)] md:text-xl">
+                {effort.power}
+              </span>
+              <span className="ml-0.5 text-[10px] text-[var(--text-muted)]">W</span>
             </div>
           </div>
         ))}

@@ -60,17 +60,23 @@ export function ZoneDistributionChart({ data, title }: ZoneDistributionChartProp
   }));
 
   return (
-    <div className="rounded-lg border bg-card p-4">
-      <h3 className="mb-3 text-sm font-medium text-muted-foreground">{title}</h3>
+    <div className="rounded-[10px] border border-[var(--card-border)] bg-[var(--card-bg)] p-2 md:p-3">
+      <h3 className="mb-2 text-[13px] font-semibold text-[var(--text-primary)]">{title}</h3>
       <ResponsiveContainer width="100%" height={data.length * 36 + 20}>
         <BarChart data={chartData} layout="vertical" margin={{ left: 80, right: 40 }}>
-          <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} fontSize={11} />
+          <XAxis
+            type="number"
+            domain={[0, 100]}
+            tickFormatter={(v) => `${v}%`}
+            fontSize={11}
+            tick={{ fill: "var(--text-muted)" }}
+          />
           <YAxis
             type="category"
             dataKey="label"
             width={75}
             fontSize={11}
-            tick={{ fill: "hsl(var(--muted-foreground))" }}
+            tick={{ fill: "var(--text-muted)" }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Bar dataKey="percentage" radius={[0, 4, 4, 0]}>
