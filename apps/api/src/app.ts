@@ -9,6 +9,7 @@ import activityRoutes from "./routes/activities.js";
 import insightsRoutes from "./routes/insights.js";
 import aiRoutes from "./routes/ai.js";
 import planRoutes from "./routes/plans.js";
+import { stravaProtectedRoutes, stravaPublicRoutes } from "./routes/strava.js";
 
 /**
  * Factory function to build and configure the Fastify application.
@@ -32,7 +33,10 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   // 4. Register health routes (no prefix, public route)
   await fastify.register(healthRoutes);
 
-  // 5. Register protected routes with /api/v1 prefix
+  // 5. Register public Strava callback route (no auth required)
+  await fastify.register(stravaPublicRoutes, { prefix: "/api/v1" });
+
+  // 6. Register protected routes with /api/v1 prefix
   await fastify.register(
     async function protectedRoutes(scope) {
       await scope.register(authPlugin);
@@ -41,6 +45,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       await scope.register(insightsRoutes);
       await scope.register(aiRoutes);
       await scope.register(planRoutes);
+      await scope.register(stravaProtectedRoutes);
     },
     { prefix: "/api/v1" },
   );
