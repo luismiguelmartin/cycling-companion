@@ -112,7 +112,6 @@ describe("computeActivitySummary", () => {
   });
 
   it("diferencia duration_total y duration_moving con paradas", () => {
-    const baseTime = Date.now();
     // 20 min movimiento + 10 min parada + 10 min movimiento
     const moving1 = generateMovingPoints(1200, { power: 200, hr: 150, cadence: 90 });
     // Ajustar timestamps para que no se solapen

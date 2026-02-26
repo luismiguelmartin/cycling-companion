@@ -13,6 +13,9 @@ import {
 } from "./power-metrics.js";
 import { elevationGain } from "./elevation.js";
 import { haversineDistance } from "./haversine.js";
+import { powerZoneDistribution, hrZoneDistribution } from "./zone-distribution.js";
+import { computeBestEfforts } from "./best-efforts.js";
+import { POWER_ZONES, HR_ZONES } from "../constants/zones.js";
 
 /**
  * Pipeline completo: TrackPoint[] -> ActivitySummary.
@@ -115,6 +118,11 @@ export function computeActivitySummary(
   // Elevacion
   const elevGain = elevationGain(processed);
 
+  // Fase 3: distribución de zonas y best efforts
+  const powerZones = powerZoneDistribution(processed, userFtp, POWER_ZONES);
+  const hrZones = hrZoneDistribution(processed, userMaxHr ?? null, HR_ZONES);
+  const bestEfforts = computeBestEfforts(processed);
+
   return {
     duration_total: durationTotal,
     duration_moving: durationMoving,
@@ -133,6 +141,9 @@ export function computeActivitySummary(
     tss,
     elevation_gain: elevGain,
     max_power: maxPow !== null ? Math.round(maxPow) : null,
+    power_zone_distribution: powerZones.length > 0 ? powerZones : null,
+    hr_zone_distribution: hrZones.length > 0 ? hrZones : null,
+    best_efforts: bestEfforts.length > 0 ? bestEfforts : null,
   };
 }
 
@@ -205,5 +216,8 @@ function emptySummary(): ActivitySummary {
     tss: null,
     elevation_gain: null,
     max_power: null,
+    power_zone_distribution: null,
+    hr_zone_distribution: null,
+    best_efforts: null,
   };
 }

@@ -37,6 +37,38 @@ export const activitySchema = z.object({
   elevation_gain: z.number().int().nonnegative().nullable(),
   avg_hr_moving: z.number().int().positive().max(220).nullable(),
   avg_cadence_moving: z.number().int().nonnegative().nullable(),
+  // Fase 3: distribución de zonas y best efforts (JSONB)
+  power_zone_distribution: z
+    .array(
+      z.object({
+        zone: z.string(),
+        name: z.string(),
+        seconds: z.number(),
+        percentage: z.number(),
+        color: z.string(),
+      }),
+    )
+    .nullable(),
+  hr_zone_distribution: z
+    .array(
+      z.object({
+        zone: z.string(),
+        name: z.string(),
+        seconds: z.number(),
+        percentage: z.number(),
+        color: z.string(),
+      }),
+    )
+    .nullable(),
+  best_efforts: z
+    .array(
+      z.object({
+        windowSeconds: z.number(),
+        label: z.string(),
+        power: z.number(),
+      }),
+    )
+    .nullable(),
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
 });
@@ -63,6 +95,9 @@ export const activityCreateSchema = activitySchema
     elevation_gain: true,
     avg_hr_moving: true,
     avg_cadence_moving: true,
+    power_zone_distribution: true,
+    hr_zone_distribution: true,
+    best_efforts: true,
     created_at: true,
     updated_at: true,
   })

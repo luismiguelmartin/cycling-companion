@@ -145,6 +145,10 @@ export async function createActivity(
       avg_hr_moving: summary?.avg_hr_moving != null ? Math.round(summary.avg_hr_moving) : null,
       avg_cadence_moving:
         summary?.avg_cadence_moving != null ? Math.round(summary.avg_cadence_moving) : null,
+      // Fase 3: distribución de zonas y best efforts (JSONB)
+      power_zone_distribution: summary?.power_zone_distribution ?? null,
+      hr_zone_distribution: summary?.hr_zone_distribution ?? null,
+      best_efforts: summary?.best_efforts ?? null,
     })
     .select()
     .single();

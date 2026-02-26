@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { OnboardingData } from "shared";
 import { AppError } from "../plugins/error-handler.js";
 import { getProfile, updateProfile } from "../services/profile.service.js";
+import { recalculateMetricsForUser } from "../services/recalculate.service.js";
 
 export default async function profileRoutes(fastify: FastifyInstance) {
   fastify.get("/profile", async (request) => {
@@ -14,7 +15,15 @@ export default async function profileRoutes(fastify: FastifyInstance) {
     if (!body || typeof body !== "object" || Array.isArray(body)) {
       throw new AppError("Request body must be a JSON object", 400, "BAD_REQUEST");
     }
+
+    const previousProfile = await getProfile(request.userId);
     const profile = await updateProfile(request.userId, body as Partial<OnboardingData>);
+
+    // Fire-and-forget: recalcular métricas si cambia FTP
+    if (profile.ftp && profile.ftp !== previousProfile.ftp) {
+      recalculateMetricsForUser(request.userId, profile.ftp).catch(() => {});
+    }
+
     return { data: profile };
   });
 }

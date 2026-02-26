@@ -30,6 +30,26 @@ export interface ActivitySummary {
   tss: number | null; // Training Stress Score
   elevation_gain: number | null; // metros
   max_power: number | null; // W
+  // Fase 3
+  power_zone_distribution: ZoneTimeDistributionData[] | null;
+  hr_zone_distribution: ZoneTimeDistributionData[] | null;
+  best_efforts: BestEffortData[] | null;
+}
+
+/** Datos de distribución de zona (serializables a JSON) */
+export interface ZoneTimeDistributionData {
+  zone: string;
+  name: string;
+  seconds: number;
+  percentage: number;
+  color: string;
+}
+
+/** Datos de best effort (serializables a JSON) */
+export interface BestEffortData {
+  windowSeconds: number;
+  label: string;
+  power: number;
 }
 
 /** Umbrales de validacion de sensores y movimiento */

@@ -1,5 +1,15 @@
 import { notFound } from "next/navigation";
-import { Activity, Clock, Zap, Heart, TrendingUp, Gauge, Timer, Mountain } from "lucide-react";
+import {
+  Activity,
+  Clock,
+  Zap,
+  Heart,
+  TrendingUp,
+  Gauge,
+  Timer,
+  Mountain,
+  Flame,
+} from "lucide-react";
 import { apiGet, getServerToken } from "@/lib/api/server";
 import { formatDuration } from "@/lib/dashboard/calculations";
 import { formatActivityDate } from "@/lib/activities/format-date";
@@ -8,6 +18,8 @@ import { BackButton } from "@/components/back-button";
 import { MetricsGrid, type MetricItem } from "@/components/metrics-grid";
 import { ActivityChart } from "@/components/charts/activity-chart";
 import { AIAnalysisCard } from "@/components/ai-analysis-card";
+import { ZoneDistributionChart } from "@/components/charts/zone-distribution-chart";
+import { BestEffortsTable } from "@/components/best-efforts-table";
 import { DetailHeader } from "./detail-header";
 import { DeleteActivityButton } from "./delete-activity-button";
 
@@ -39,6 +51,26 @@ interface ActivityData {
   elevation_gain: number | null;
   avg_hr_moving: number | null;
   avg_cadence_moving: number | null;
+  // Fase 3
+  power_zone_distribution: Array<{
+    zone: string;
+    name: string;
+    seconds: number;
+    percentage: number;
+    color: string;
+  }> | null;
+  hr_zone_distribution: Array<{
+    zone: string;
+    name: string;
+    seconds: number;
+    percentage: number;
+    color: string;
+  }> | null;
+  best_efforts: Array<{
+    windowSeconds: number;
+    label: string;
+    power: number;
+  }> | null;
 }
 
 interface MetricRow {
@@ -155,6 +187,18 @@ export default async function ActivityDetailPage({ params }: PageProps) {
           value: activity.intensity_factor != null ? activity.intensity_factor.toFixed(2) : "—",
           unit: "",
         },
+        ...(activity.normalized_power != null &&
+        activity.avg_hr_bpm != null &&
+        activity.avg_hr_bpm > 0
+          ? [
+              {
+                icon: <Flame className="h-3 w-3" style={{ color: "#f43f5e" }} />,
+                label: "EF",
+                value: (activity.normalized_power / activity.avg_hr_bpm).toFixed(2),
+                unit: "",
+              },
+            ]
+          : []),
       ]
     : [];
 
@@ -188,6 +232,18 @@ export default async function ActivityDetailPage({ params }: PageProps) {
       <MetricsGrid metrics={metrics} />
       {advancedMetrics.length > 0 && <MetricsGrid metrics={advancedMetrics} />}
       <ActivityChart data={timeSeries} />
+      {activity.best_efforts && activity.best_efforts.length > 0 && (
+        <BestEffortsTable data={activity.best_efforts} />
+      )}
+      {activity.power_zone_distribution && activity.power_zone_distribution.length > 0 && (
+        <ZoneDistributionChart data={activity.power_zone_distribution} title="Zonas de potencia" />
+      )}
+      {activity.hr_zone_distribution && activity.hr_zone_distribution.length > 0 && (
+        <ZoneDistributionChart
+          data={activity.hr_zone_distribution}
+          title="Zonas de frecuencia cardíaca"
+        />
+      )}
       <AIAnalysisCard analysis={analysis} activityId={activity.id} />
     </div>
   );

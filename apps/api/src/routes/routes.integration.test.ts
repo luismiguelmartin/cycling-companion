@@ -229,7 +229,24 @@ describe("API Integration", () => {
     });
 
     it("PATCH /api/v1/profile con error de DB devuelve 500", async () => {
-      mockFromChain({ data: null, error: { message: "DB connection failed", code: "PGRST000" } });
+      // Primera llamada (getProfile) éxito, segunda llamada (updateProfile) falla
+      const successChain = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { id: "user-1", ftp: 200 }, error: null }),
+      };
+      const errorChain = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: null,
+          error: { message: "DB connection failed", code: "PGRST000" },
+        }),
+        update: vi.fn().mockReturnThis(),
+      };
+      vi.mocked(supabaseAdmin.from)
+        .mockReturnValueOnce(successChain as ReturnType<typeof supabaseAdmin.from>)
+        .mockReturnValueOnce(errorChain as ReturnType<typeof supabaseAdmin.from>);
       const res = await app.inject({
         method: "PATCH",
         url: "/api/v1/profile",
