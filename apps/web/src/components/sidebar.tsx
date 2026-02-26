@@ -103,7 +103,11 @@ export function Sidebar({
         <ThemeToggle showLabel />
 
         {/* User info */}
-        <div className="flex items-center gap-2.5 rounded-lg px-3 py-2">
+        <Link
+          href="/profile"
+          onClick={onMobileClose}
+          className="flex items-center gap-2.5 rounded-lg px-3 py-2 transition-colors hover:bg-[var(--hover-bg)]"
+        >
           {userAvatarUrl ? (
             <Image
               src={userAvatarUrl}
@@ -124,7 +128,7 @@ export function Sidebar({
             </p>
             <p className="truncate text-[11px] text-[var(--text-muted)]">{userEmail}</p>
           </div>
-        </div>
+        </Link>
       </div>
     </div>
   );
