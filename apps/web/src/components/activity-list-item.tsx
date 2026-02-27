@@ -13,6 +13,7 @@ interface ActivityListItemProps {
   avgPower: number | null;
   avgHR: number | null;
   rpe: number | null;
+  source?: string;
 }
 
 function formatDate(dateStr: string): string {
@@ -30,6 +31,7 @@ export function ActivityListItem({
   avgPower,
   avgHR,
   rpe,
+  source,
 }: ActivityListItemProps) {
   const activityType = ACTIVITY_TYPES[type as ActivityTypeKey] ?? ACTIVITY_TYPES.endurance;
 
@@ -61,6 +63,11 @@ export function ActivityListItem({
             >
               {activityType.label}
             </span>
+            {source === "strava" && (
+              <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium bg-[#FC4C02]/10 text-[#FC4C02]">
+                Strava
+              </span>
+            )}
           </div>
           <p className="text-[11px] text-[var(--text-muted)]">{formatDate(date)}</p>
         </div>

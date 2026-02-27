@@ -41,6 +41,9 @@ interface ActivityData {
   elevation_gain: number | null;
   avg_hr_moving: number | null;
   avg_cadence_moving: number | null;
+  // Strava
+  source: string;
+  strava_id: number | null;
   // Fase 3
   power_zone_distribution: Array<{
     zone: string;
@@ -211,6 +214,8 @@ export default async function ActivityDetailPage({ params }: PageProps) {
         name={activity.name}
         type={activity.type}
         dateFormatted={dateFormatted}
+        source={activity.source}
+        stravaId={activity.strava_id}
         actions={<DeleteActivityButton activityId={activity.id} activityName={activity.name} />}
       />
       <MetricsGrid metrics={metrics} />

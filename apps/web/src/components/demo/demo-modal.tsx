@@ -203,7 +203,17 @@ function DemoSlide({ screenId }: { screenId: string }) {
     case "profile":
       return (
         <DemoScreenWrapper activeScreenId="profile">
-          <ProfileContent profile={DEMO_PROFILE} />
+          <ProfileContent
+            profile={DEMO_PROFILE}
+            stravaStatus={{
+              connected: false,
+              athlete_name: null,
+              strava_athlete_id: null,
+              connected_at: null,
+              last_sync_at: null,
+              activities_count: 0,
+            }}
+          />
         </DemoScreenWrapper>
       );
     default:

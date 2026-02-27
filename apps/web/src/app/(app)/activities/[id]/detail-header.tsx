@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { ExternalLink } from "lucide-react";
 import { ACTIVITY_TYPES, type ActivityTypeKey } from "shared";
 
 interface DetailHeaderProps {
@@ -6,9 +7,18 @@ interface DetailHeaderProps {
   type: string;
   dateFormatted: string;
   actions?: ReactNode;
+  source?: string;
+  stravaId?: number | null;
 }
 
-export function DetailHeader({ name, type, dateFormatted, actions }: DetailHeaderProps) {
+export function DetailHeader({
+  name,
+  type,
+  dateFormatted,
+  actions,
+  source,
+  stravaId,
+}: DetailHeaderProps) {
   const activityType = ACTIVITY_TYPES[type as ActivityTypeKey] ?? ACTIVITY_TYPES.endurance;
 
   return (
@@ -28,7 +38,23 @@ export function DetailHeader({ name, type, dateFormatted, actions }: DetailHeade
             {activityType.label}
           </span>
         </div>
-        <p className="text-xs text-[var(--text-muted)]">{dateFormatted}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs text-[var(--text-muted)]">{dateFormatted}</p>
+          {source === "strava" && stravaId && (
+            <a
+              href={`https://www.strava.com/activities/${stravaId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-[11px] text-[#FC4C02] hover:underline"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Ver en Strava
+            </a>
+          )}
+          {source === "upload" && (
+            <span className="text-[11px] text-[var(--text-muted)]">Importada desde archivo</span>
+          )}
+        </div>
       </div>
       {actions && <div className="shrink-0">{actions}</div>}
     </div>

@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Smartphone, Loader2 } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
 import { GOALS, onboardingSchema } from "shared";
-import type { GoalType } from "shared";
+import type { GoalType, StravaConnectionStatus } from "shared";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { OnboardingField } from "@/components/onboarding-field";
 import { GoalCard } from "@/components/goal-card";
 import { ZoneTable } from "@/components/zone-table";
+import { StravaConnect } from "@/components/strava-connect";
 import { ProfileHeader } from "./profile-header";
 import { saveProfile } from "./actions";
 
@@ -25,6 +26,7 @@ interface ProfileContentProps {
     rest_hr: number | null;
     goal: string;
   };
+  stravaStatus: StravaConnectionStatus;
 }
 
 function buildInitialFormData(profile: ProfileContentProps["profile"]) {
@@ -39,7 +41,7 @@ function buildInitialFormData(profile: ProfileContentProps["profile"]) {
   };
 }
 
-export function ProfileContent({ profile }: ProfileContentProps) {
+export function ProfileContent({ profile, stravaStatus }: ProfileContentProps) {
   const router = useRouter();
   const [formData, setFormData] = useState(() => buildInitialFormData(profile));
   const [originalData, setOriginalData] = useState(() => buildInitialFormData(profile));
@@ -274,35 +276,8 @@ export function ProfileContent({ profile }: ProfileContentProps) {
 
         {/* Tab: Ajustes */}
         <TabsContent value="ajustes" className="flex flex-col gap-6 pt-4">
-          {/* Dispositivos */}
-          <section className="rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-4 md:p-5">
-            <h2 className="mb-1 text-[16px] font-bold text-[var(--text-primary)]">Dispositivos</h2>
-            <p className="mb-4 text-[12px] text-[var(--text-muted)]">
-              Conecta tus dispositivos para sincronizar actividades
-            </p>
-            <div className="flex flex-col gap-3">
-              {[
-                { name: "Garmin Connect", status: "Próximamente" },
-                { name: "Strava", status: "Próximamente" },
-                { name: "Wahoo", status: "Próximamente" },
-              ].map((device) => (
-                <div
-                  key={device.name}
-                  className="flex items-center justify-between rounded-xl border border-[var(--card-border)] px-4 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="h-5 w-5 text-[var(--text-muted)]" />
-                    <span className="text-[14px] font-medium text-[var(--text-primary)]">
-                      {device.name}
-                    </span>
-                  </div>
-                  <span className="rounded-[5px] bg-[var(--active-nav-bg)] px-2 py-0.5 text-[11px] text-[var(--text-muted)]">
-                    {device.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
+          {/* Sincronizacion Strava */}
+          <StravaConnect initialStatus={stravaStatus} />
 
           {/* Notificaciones */}
           <section className="rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-4 md:p-5">

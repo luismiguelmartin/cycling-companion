@@ -19,6 +19,7 @@ interface ActivityRow {
   avg_power_non_zero: number | null;
   avg_hr_bpm: number | null;
   rpe: number | null;
+  source?: string;
 }
 
 interface ActivitiesContentProps {
@@ -146,6 +147,7 @@ export function ActivitiesContent({ activities }: ActivitiesContentProps) {
               avgPower={activity.avg_power_non_zero ?? activity.avg_power_watts}
               avgHR={activity.avg_hr_bpm}
               rpe={activity.rpe}
+              source={activity.source}
             />
           ))}
         </div>

@@ -13,6 +13,23 @@ const baseProps = {
   avgHR: 156,
 };
 
+describe("ActivityListItem source badge", () => {
+  it("muestra badge Strava cuando source es strava", () => {
+    render(<ActivityListItem {...baseProps} rpe={null} source="strava" />);
+    expect(screen.getByText("Strava")).toBeInTheDocument();
+  });
+
+  it("no muestra badge Strava cuando source es manual", () => {
+    render(<ActivityListItem {...baseProps} rpe={null} source="manual" />);
+    expect(screen.queryByText("Strava")).not.toBeInTheDocument();
+  });
+
+  it("no muestra badge Strava cuando source es undefined", () => {
+    render(<ActivityListItem {...baseProps} rpe={null} />);
+    expect(screen.queryByText("Strava")).not.toBeInTheDocument();
+  });
+});
+
 describe("ActivityListItem RPE label", () => {
   it("muestra número y descripción combinados en tooltip cuando rpe tiene valor", () => {
     render(<ActivityListItem {...baseProps} rpe={7} />);
