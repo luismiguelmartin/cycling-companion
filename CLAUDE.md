@@ -70,6 +70,8 @@ Variables de entorno: ver `apps/web/.env.example` y `apps/api/.env.example`.
 - `moduleResolution: "bundler"` NO añade `.js` al compilar — ponerlas en el source `.ts`
 
 ### Frontend
+- Bash: paths con `(app)` DEBEN ir entre comillas — `git add "apps/web/src/app/(app)/..."` (sin comillas → syntax error)
+- `demo-modal.tsx` usa `ProfileContent` directamente — actualizar props si cambia la interfaz
 - `activity_type` ENUM: `intervals`, `endurance`, `recovery`, `tempo`, `rest` (no confundir con outdoor/indoor)
 - Padding centralizado en `app-shell.tsx` (`p-4 md:p-8`), no en páginas individuales
 - Iconos Server→Client: usar `ReactNode` (JSX pre-renderizado), no `LucideIcon` (función)
