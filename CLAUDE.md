@@ -80,6 +80,7 @@ Variables de entorno: ver `apps/web/.env.example` y `apps/api/.env.example`.
 - Timeouts SSR: `apiGet`/`apiPatch` usan `AbortSignal.timeout(9000)` para evitar 504 en Vercel
 - Coach tip: se carga client-side (`AICoachCardClient`) para no bloquear SSR con llamada IA lenta
 - Error boundary: `app/(app)/error.tsx` captura errores no manejados en rutas protegidas
+- Sin `@testing-library/user-event` — usar `fireEvent` de `@testing-library/react`
 
 ### Backend
 - FitParser mock en tests: clase, no arrow function → `class MockFitParser { parseAsync = mockFn }`
@@ -90,14 +91,15 @@ Variables de entorno: ver `apps/web/.env.example` y `apps/api/.env.example`.
 - Análisis IA fire-and-forget tras import: `analyzeActivity(userId, id).catch(() => {})`
 - CORS: array de orígenes en `cors.ts` (`FRONTEND_URL` + localhost en dev). Requiere `FRONTEND_URL` en Render
 - Rate limit IA: `rpc("check_ai_rate_limit")` con fallback a query directa si la función SQL no existe
-- Strava tokens cifrados con AES-256-GCM (`utils/crypto.ts`). Requiere `STRAVA_TOKEN_ENCRYPTION_KEY` (32 bytes base64)
-- Strava servicios en `services/strava/`: api (HTTP client), connection (CRUD BD + auto-refresh), mapper (Strava→schema propio), import (importStravaActivity, processWebhookEvent, backfillStravaActivities)
-- `StravaAuthError` y `StravaRateLimitError` extienden `AppError` — manejo diferenciado en rutas
-- Strava rutas: públicas (callback, webhook) registradas fuera del scope auth, protegidas (auth-url, status, disconnect, sync) dentro
-- `createActivity` acepta param `extra?: { strava_id, source }` para campos Strava (bypasa activityCreateSchema que los omite)
+
+### Strava Integration (`services/strava/`)
+- Tokens cifrados con AES-256-GCM (`utils/crypto.ts`). Requiere `STRAVA_TOKEN_ENCRYPTION_KEY` (32 bytes base64)
+- 4 servicios: api (HTTP client), connection (CRUD BD + auto-refresh), mapper (Strava→schema propio), import (importar, webhook, backfill)
+- `StravaAuthError` (401) y `StravaRateLimitError` (429) extienden `AppError`
+- Rutas: públicas (callback, webhook) fuera del scope auth, protegidas (auth-url, status, disconnect, sync) dentro
+- `createActivity` param `extra?: { strava_id, source }` para campos que `activityCreateSchema` omite
 - Webhook POST responde 200 inmediatamente, procesa en background (Strava requiere < 2s)
-- Backfill secuencial para respetar rate limits, se detiene en StravaRateLimitError
-- Sin `@testing-library/user-event` en web — usar `fireEvent` de `@testing-library/react`
+- Backfill secuencial para respetar rate limits, se detiene en `StravaRateLimitError`
 
 ### Metrics v2 (`packages/shared/src/metrics/`)
 - Pipeline: sanitize → sort/dedup → resample 1Hz → speed → movement → compute-summary
@@ -107,6 +109,12 @@ Variables de entorno: ver `apps/web/.env.example` y `apps/api/.env.example`.
 - `processUpload` ignora `summary.distance_km` si es 0 (datos sin GPS → usa distancia del parser)
 - Migración `006_enhanced_metrics.sql`: 11 columnas nuevas en `activities`, 3 en `activity_metrics` (lat, lon, elevation)
 - Frontend: segunda fila de métricas condicional (`hasAdvancedMetrics` = `duration_moving` o `normalized_power` no null)
+
+### Testing
+- Workflow de validación: `pnpm typecheck` → `pnpm lint` → `pnpm test` (ejecutar los 3 antes de commit)
+- Mocks de Supabase en API tests: debe incluir `rpc: vi.fn()` además de `from: vi.fn()`
+- IDs en tests: usar UUIDs válidos (`00000000-0000-0000-0000-000000000001`), no strings como `"user-123"`
+- Frontend tests: `fireEvent` + `waitFor` para async, `vi.mock("next/navigation")` para router/searchParams
 
 ### Agentes Remotos
 - `--allowedTools` OBLIGATORIO en `claude-code-action@v1`
