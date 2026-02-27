@@ -53,9 +53,9 @@ Si no hay datos, el dashboard permite generar datos de demostración o importar 
 - ✅ Onboarding wizard (4 pasos)
 - ✅ **10 pantallas frontend implementadas** (todas las rutas del MVP + modo demo)
 - ✅ 37 componentes reutilizables
-- ✅ **~355 tests**: 114 web + 90 shared + 151 API
-- ✅ 5 schemas Zod compartidos + 8 módulos de constantes + utils de training
-- ✅ 5 migraciones SQL (schema, onboarding, activity types, ai_cache)
+- ✅ **~615 tests**: 131 web + 205 shared + 279 API
+- ✅ 6 schemas Zod compartidos + 9 módulos de constantes + utils de training
+- ✅ 8 migraciones SQL (schema, onboarding, activity types, ai_cache, rate limit, enhanced metrics, strava, zone/best efforts)
 - ✅ Design system documentado (dark/light theme)
 - ✅ 33 especificaciones L1/L2/L3 (frontend + backend + Fase 4)
 - ✅ **API Fastify completa**: 15+ endpoints (CRUD + IA + upload)
@@ -63,6 +63,8 @@ Si no hay datos, el dashboard permite generar datos de demostración o importar 
 - ✅ **Importación real** de archivos .fit/.gpx con Normalized Power, extensiones Garmin
 - ✅ **Frontend migrado** de Supabase directo → API backend (Bloque 8)
 - ✅ **Análisis IA** auto-trigger tras importar + botón manual en detalle
+- ✅ **Motor de métricas ciclistas v2**: resampleo 1Hz, NP Coggan, zonas de potencia/FC, best efforts, detección de movimiento
+- ✅ **Integración Strava API**: OAuth 2.0, webhooks, backfill histórico, UI en perfil, badge de origen en actividades
 - ✅ **Deploy producción**: Vercel + Render + Supabase
 - ✅ **5 agentes remotos** (GitHub Actions + `claude-code-action@v1`): R1 Analyzer, R2 PR Generator, R3 Reviewer, R5 Doc Generator, @claude Interactive
 - ✅ **Pipeline AI-first validado end-to-end**: Issue → R1 análisis → R2 genera PR → R3 review → merge → R5 CHANGELOG (~$0.38–$1.00/feature)
@@ -174,6 +176,12 @@ SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 ANTHROPIC_API_KEY=<claude-api-key>
 PORT=3001
+
+# Strava (opcional — ver docs/STRAVA-SETUP.md)
+STRAVA_CLIENT_ID=<strava-client-id>
+STRAVA_CLIENT_SECRET=<strava-client-secret>
+STRAVA_TOKEN_ENCRYPTION_KEY=<32-bytes-base64>
+STRAVA_WEBHOOK_VERIFY_TOKEN=<cualquier-string-secreta>
 ```
 
 ---
@@ -215,12 +223,15 @@ cycling-companion/
 │           └── utils/              # Training calculations, training rules
 │
 ├── supabase/
-│   ├── migrations/                 # 5 migraciones SQL
+│   ├── migrations/                 # 8 migraciones SQL
 │   │   ├── 001_initial_schema.sql
 │   │   ├── 002_alter_users_for_onboarding.sql
 │   │   ├── 003_align_activity_type_enum.sql
 │   │   ├── 004_ai_cache.sql
-│   │   └── 005_atomic_rate_limit.sql
+│   │   ├── 005_atomic_rate_limit.sql
+│   │   ├── 006_enhanced_metrics.sql
+│   │   ├── 007_strava_connections.sql
+│   │   └── 008_zone_best_efforts.sql
 │   ├── seed.sql                    # Seed genérico (placeholder <USER_ID>)
 │   ├── seed_personalized.sql       # Seed con datos de ejemplo
 │   ├── cleanup_mock_data.sql       # Limpieza de datos mock
@@ -269,17 +280,19 @@ cycling-companion/
 └── README.md
 ```
 
-### Modelo de Datos (5 migraciones SQL)
+### Modelo de Datos (8 migraciones SQL)
 
 **users** — Perfil: edad, peso, FTP, FC máx/reposo, objetivo (performance/health/weight_loss/recovery)
 
-**activities** — Métricas: duración, distancia, potencia, FC, cadencia, TSS, RPE (1-10), análisis IA (JSONB), notas
+**activities** — Métricas básicas + avanzadas v2 (NP, IF, VI, elevation, zonas, best efforts), Strava (strava_id, source), análisis IA (JSONB)
 
 **weekly_plans** — Plan semanal: 7 días (tipo, intensidad, duración, tips nutrición/descanso), rationale IA
 
-**activity_metrics** — Series temporales: potencia, FC, cadencia, velocidad por segundo
+**activity_metrics** — Series temporales: potencia, FC, cadencia, velocidad, lat/lon/elevation por segundo
 
 **ai_cache** — Caché y rate limit de IA: cache_key, endpoint, response (JSONB), expires_at
+
+**strava_connections** — Conexiones OAuth: tokens cifrados (AES-256-GCM), athlete_id, last_sync_at
 
 ### Endpoints API (Implementados ✅)
 
@@ -294,11 +307,18 @@ cycling-companion/
 ├── /insights           GET            Comparativas y tendencias
 ├── /insights/overload-check  GET      Alerta de sobrecarga
 ├── /plan               GET, PATCH, DELETE   Plan semanal
-└── /ai
-    ├── /analyze-activity   POST       Análisis post-sesión (Claude API)
-    ├── /weekly-plan        POST       Generación de plan semanal
-    ├── /weekly-summary     POST       Resumen comparativo
-    └── /coach-tip          GET        Recomendación diaria
+├── /ai
+│   ├── /analyze-activity   POST       Análisis post-sesión (Claude API)
+│   ├── /weekly-plan        POST       Generación de plan semanal
+│   ├── /weekly-summary     POST       Resumen comparativo
+│   └── /coach-tip          GET        Recomendación diaria
+└── /strava
+    ├── /auth-url        GET           URL de autorización OAuth (protegido)
+    ├── /status          GET           Estado de conexión (protegido)
+    ├── /disconnect      DELETE        Desconectar cuenta (protegido)
+    ├── /sync            POST          Backfill manual de actividades (protegido)
+    ├── /callback        GET           Callback OAuth de Strava (público)
+    └── /webhook         GET, POST     Validación y eventos webhook (público)
 ```
 
 ### Flujo de Recomendaciones IA (Implementado)
@@ -421,6 +441,7 @@ cycling-companion/
 - Datos personales: nombre, edad, peso, FTP, FC máx/reposo
 - Zonas de potencia y FC (calculadas o personalizables)
 - Objetivo actual (performance/health/weight_loss/recovery)
+- **Integración Strava**: conectar/desconectar cuenta, importar historial, sync automático vía webhooks
 - Preferencias: tema (dark/light), unidades (km/mi), notificaciones
 
 ### Features Transversales
@@ -456,6 +477,7 @@ Internamente implementado con:
 | [CI-CD-SETUP.md](docs/CI-CD-SETUP.md)                                       | Guía de configuración de CI/CD con GitHub Actions                     |
 | [GOOGLE-OAUTH-SETUP.md](docs/GOOGLE-OAUTH-SETUP.md)                         | Guía de configuración de Google OAuth en Supabase                     |
 | [SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md)                                 | Guía de configuración de Supabase y base de datos                     |
+| [STRAVA-SETUP.md](docs/STRAVA-SETUP.md)                                     | Guía de configuración de integración con Strava API                  |
 | [SETUP-CHECKLIST.md](docs/SETUP-CHECKLIST.md)                               | Checklist completo para setup inicial del proyecto                    |
 | [CLAUDE.md](CLAUDE.md)                                                      | Instrucciones para Claude Code (este repositorio)                     |
 | [AGENTS.md](AGENTS.md)                                                      | Instrucciones para agentes remotos (GitHub Actions)                   |
@@ -504,14 +526,14 @@ Este proyecto implementa un pipeline multi-agente para integrar IA en el ciclo d
 
 ## 🎯 Limitaciones MVP
 
-- **Sin integración directa con Strava/Garmin**: Solo importación manual
 - **Solo español**: Multi-idioma fuera de scope
 - **Cold starts en Render**: Tier gratuito ~30s después de 15min inactividad
 - **Costes Claude API**: Caché implementada + rate limit 20/usuario/día
+- **Strava multi-user**: Requiere aprobación de Strava para > 100 atletas
 
 ### Fuera del Alcance del MVP
 
-- Integración con APIs de Strava/Garmin Connect
+- Integración con APIs de Garmin Connect / Wahoo
 - Rol de entrenador humano multi-atleta
 - Mapas y trazado de rutas
 - Funcionalidad social (compartir, competir)

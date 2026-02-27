@@ -32,9 +32,9 @@ pnpm build                  # Build completo
 pnpm lint                   # ESLint (3 paquetes)
 pnpm typecheck              # TypeScript (3 paquetes)
 pnpm test                   # Vitest (3 paquetes)
-pnpm test --filter=web      # Solo web (114 tests)
-pnpm test --filter=api      # Solo API (228 tests)
-pnpm test --filter=shared   # Solo shared (189 tests)
+pnpm test --filter=web      # Solo web (131 tests)
+pnpm test --filter=api      # Solo API (279 tests)
+pnpm test --filter=shared   # Solo shared (205 tests)
 pnpm format                 # Prettier --write
 pnpm format:check           # Prettier --check
 ```
@@ -89,8 +89,13 @@ Variables de entorno: ver `apps/web/.env.example` y `apps/api/.env.example`.
 - CORS: array de orígenes en `cors.ts` (`FRONTEND_URL` + localhost en dev). Requiere `FRONTEND_URL` en Render
 - Rate limit IA: `rpc("check_ai_rate_limit")` con fallback a query directa si la función SQL no existe
 - Strava tokens cifrados con AES-256-GCM (`utils/crypto.ts`). Requiere `STRAVA_TOKEN_ENCRYPTION_KEY` (32 bytes base64)
-- Strava servicios en `services/strava/`: api (HTTP client), connection (CRUD BD + auto-refresh), mapper (Strava→schema propio)
+- Strava servicios en `services/strava/`: api (HTTP client), connection (CRUD BD + auto-refresh), mapper (Strava→schema propio), import (importStravaActivity, processWebhookEvent, backfillStravaActivities)
 - `StravaAuthError` y `StravaRateLimitError` extienden `AppError` — manejo diferenciado en rutas
+- Strava rutas: públicas (callback, webhook) registradas fuera del scope auth, protegidas (auth-url, status, disconnect, sync) dentro
+- `createActivity` acepta param `extra?: { strava_id, source }` para campos Strava (bypasa activityCreateSchema que los omite)
+- Webhook POST responde 200 inmediatamente, procesa en background (Strava requiere < 2s)
+- Backfill secuencial para respetar rate limits, se detiene en StravaRateLimitError
+- Sin `@testing-library/user-event` en web — usar `fireEvent` de `@testing-library/react`
 
 ### Metrics v2 (`packages/shared/src/metrics/`)
 - Pipeline: sanitize → sort/dedup → resample 1Hz → speed → movement → compute-summary
